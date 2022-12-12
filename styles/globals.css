@@ -2,8 +2,86 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: var(--font-default), -apple-system, BlinkMacSystemFont, Segoe UI,
+    Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+    sans-serif;
+  background-color: var(--bg-grey);
+  font-size: 16px;
+  color: var(--dark);
+}
+
+:root {
+  --font-wide: "Druk Wide", sans-serif;
+  --font-default: "SF Pro Display", sans-serif;
+  --dark: #282828;
+  --dark-hover: #414141;
+  --grey-60: rgba(40, 40, 40, 0.6);
+  --grey-30: rgba(40, 40, 40, 0.3);
+  --blue-msg: #ceddff;
+  --grey-10: rgba(40, 40, 40, 0.1);
+  --bg-grey: #f2f2f2;
+  --white: #fff;
+  --white-hover: rgb(243, 243, 243);
+  --transition: 0.2s linear;
+  --font-sm: 1rem;
+  --font-md: 1.1rem;
+  --font-xl: 1.5rem;
+  --font-xxl: 2rem;
+  --font-xxxl: 2.8rem;
+  --component-margin: 5rem;
+  --gap: 2rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title-sm {
+  font-family: var(--font-wide);
+  font-size: var(--font-xl);
+}
+
+.see-all-button {
+  font-size: 1rem;
+  font-family: var(--font-wide);
+  cursor: pointer;
+}
+
+.see-all-button:hover {
+  text-decoration: underline;
+}
+
+.title-md {
+  font-family: var(--font-wide);
+  font-size: var(--font-xxxl);
+}
+
+.input {
+  background-color: transparent;
+  border: none;
+  border: 1px solid var(--dark);
+  outline: none;
+  padding: 1.2em 1em;
+  font-family: var(--font-default);
+}
+.input::placeholder {
+  color: var(--grey-30);
+}
+
+.button {
+  cursor: pointer;
+  font-family: var(--font-wide);
+  color: var(--white);
+  background-color: var(--dark);
+  border: none;
+  font-size: 1rem;
+  padding: 1.1em 4em;
+  transition: background var(--transition);
+}
+
+.button:hover {
+  background-color: var(--dark-hover);
 }
 
 a {
@@ -12,15 +90,7 @@ a {
 }
 
 * {
+  padding: 0;
+  margin: 0;
   box-sizing: border-box;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
 }
