@@ -37,9 +37,19 @@ body {
   margin: 0 auto;
 }
 
+.label {
+  font-family: var(--font-wide);
+  font-size: var(--font-sm);
+}
+
 .title-sm {
   font-family: var(--font-wide);
   font-size: var(--font-xl);
+}
+
+.title-md {
+  font-family: var(--font-wide);
+  font-size: var(--font-xxl);
 }
 
 .see-all-button {
@@ -50,11 +60,6 @@ body {
 
 .see-all-button:hover {
   text-decoration: underline;
-}
-
-.title-md {
-  font-family: var(--font-wide);
-  font-size: var(--font-xxxl);
 }
 
 .input {

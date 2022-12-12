@@ -3,6 +3,7 @@ import Image from "next/image";
 import SearchIcon from "@public/images/search.svg";
 import Logo from "@public/images/logo.svg";
 import UnfilledHeart from "@public/images/unfilled-heart.svg";
+import Link from "next/link";
 
 export default function Header() {
   return (
@@ -18,7 +19,9 @@ export default function Header() {
           />
           <input type="text" placeholder="Search something" className="input" />
         </div>
-        <Image src={Logo} height={25} alt="Logo" className="logo" />
+        <Link href={"/"}>
+          <Image src={Logo} height={25} alt="Logo" className="logo" />
+        </Link>
         <div className="right">
           <Image
             src={UnfilledHeart}
@@ -27,7 +30,9 @@ export default function Header() {
             alt="Search icon"
             className="search-icon"
           />
-          <button className="button">Login</button>
+          <Link href={"/login"}>
+            <button className="button">Login</button>
+          </Link>
         </div>
       </HeaderStyles>
     </div>
