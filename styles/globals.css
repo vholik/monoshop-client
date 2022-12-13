@@ -40,6 +40,8 @@ body {
 .label {
   font-family: var(--font-wide);
   font-size: var(--font-sm);
+  display: flex;
+  flex-direction: column;
 }
 
 .title-sm {
@@ -68,6 +70,7 @@ body {
   border: 1px solid var(--dark);
   outline: none;
   padding: 1.2em 1em;
+  font-size: 1rem;
   font-family: var(--font-default);
 }
 .input::placeholder {

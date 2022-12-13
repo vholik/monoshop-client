@@ -4,8 +4,24 @@ import SearchIcon from "@public/images/search.svg";
 import Logo from "@public/images/logo.svg";
 import UnfilledHeart from "@public/images/unfilled-heart.svg";
 import Link from "next/link";
+import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
+import { useEffect } from "react";
+import { checkIsAuth } from "@store/reducers/auth/LoginSlice";
 
 export default function Header() {
+  const dispatch = useAppDispatch();
+  const { isAuth } = useAppSelector((state) => state.loginReducer);
+
+  useEffect(() => {
+    dispatch(checkIsAuth())
+      .unwrap()
+      .catch((error) => {
+        console.error("rejected", error);
+      });
+  }, []);
+
+  console.log(isAuth);
+
   return (
     <div className="container">
       <HeaderStyles>
