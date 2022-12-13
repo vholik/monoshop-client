@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { useEffect } from "react";
 import { checkIsAuth } from "@store/reducers/auth/LoginSlice";
+import ChatIcon from "@public/images/chat.svg";
 
 export default function Header() {
   const dispatch = useAppDispatch();
@@ -25,6 +26,10 @@ export default function Header() {
   return (
     <div className="container">
       <HeaderStyles>
+        <Link href={"/"}>
+          <Image src={Logo} height={25} alt="Logo" className="logo" />
+        </Link>
+
         <div className="input-wrapper">
           <Image
             src={SearchIcon}
@@ -35,21 +40,46 @@ export default function Header() {
           />
           <input type="text" placeholder="Search something" className="input" />
         </div>
-        <Link href={"/"}>
-          <Image src={Logo} height={25} alt="Logo" className="logo" />
-        </Link>
-        <div className="right">
-          <Image
-            src={UnfilledHeart}
-            height={25}
-            width={25}
-            alt="Search icon"
-            className="search-icon"
-          />
-          <Link href={"/login"}>
-            <button className="button">Login</button>
-          </Link>
-        </div>
+
+        {isAuth ? (
+          <div className="right">
+            <Image
+              src={UnfilledHeart}
+              height={25}
+              width={25}
+              alt="Search icon"
+              className="search-icon"
+            />
+            <Link href={"/chat"}>
+              <button className="button chat--button">
+                <Image
+                  src={ChatIcon}
+                  height={25}
+                  width={25}
+                  alt="Search icon"
+                  className="search-icon"
+                />
+                Messages
+              </button>
+            </Link>
+            <Link href={"/add-item"}>
+              <button className="button">Add item</button>
+            </Link>
+          </div>
+        ) : (
+          <div className="right">
+            <Image
+              src={UnfilledHeart}
+              height={25}
+              width={25}
+              alt="Search icon"
+              className="search-icon"
+            />
+            <Link href={"/login"}>
+              <button className="button">Login</button>
+            </Link>
+          </div>
+        )}
       </HeaderStyles>
     </div>
   );

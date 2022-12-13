@@ -10,7 +10,12 @@ export const HeaderStyles = styled.div`
     display: flex;
     align-items: center;
     padding: 0 0.5em;
+    background-color: white;
     width: fit-content;
+  }
+
+  .logo {
+    width: 14rem;
   }
 
   .input {
@@ -26,5 +31,11 @@ export const HeaderStyles = styled.div`
     display: flex;
     align-items: center;
     gap: 1.5rem;
+  }
+
+  .chat--button {
+    background-color: transparent;
+    color: var(--dark);
+    padding: 0;
   }
 `;

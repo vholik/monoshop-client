@@ -28,8 +28,11 @@ export default function Login() {
         const date = new Date();
         date.setDate(date.getDate() + 7);
 
-        setCookie("token", token, { expires: date });
+        if (token) {
+          setCookie("token", token, { expires: date });
+        }
 
+        console.log(token);
         Router.push("/");
       })
       .catch((error) => {

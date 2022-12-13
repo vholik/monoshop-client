@@ -146,7 +146,7 @@ export default function Home() {
 
 const HomeStyles = styled.div`
   .hero {
-    padding: 6rem 0;
+    padding: 10rem 0;
     font-family: var(--font-wide);
     color: white;
     background-image: url(${HeroBg.src});
