@@ -1,9 +1,12 @@
 import Categories from "@components/Categories/Categories";
 import Header from "@components/Header";
 import styled from "styled-components";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import Select from "react-select";
 import Footer from "@components/Footer/Footer";
+import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
+import { setError, uploadImage } from "@store/reducers/item/UploadImageSlice";
+import Image from "next/image";
 
 const options = [
   { value: "chocolate", label: "Chocolate" },
@@ -46,6 +49,38 @@ const colourStyles = {
 };
 
 export default function AddItem() {
+  const dispatch = useAppDispatch();
+  const { isLoading, error } = useAppSelector(
+    (state) => state.uploadImageReducer
+  );
+
+  const [formImages, setFormImages] = useState<string[]>([]);
+
+  const handleImageSubmit = (e: ChangeEvent<HTMLInputElement>) => {
+    const image = e.target.files![0];
+
+    if (image) {
+      let body = new FormData();
+      body.set("key", process.env.NEXT_PUBLIC_IMAGE_API_KEY!);
+      body.append("image", image);
+
+      dispatch(uploadImage(body))
+        .unwrap()
+        .then((result) => {
+          if (formImages.length >= 5) {
+            dispatch(setError("Max 5 images"));
+            throw new Error("Max 5 images");
+          }
+          // Add image url to the form images state
+          const image = result.data.url;
+          setFormImages([image, ...formImages]);
+        })
+        .catch((error) => {
+          console.error("rejected", error);
+        });
+    }
+  };
+
   return (
     <AddItemStyles>
       <Header />
@@ -54,7 +89,39 @@ export default function AddItem() {
         <div className="wrapper">
           <h1 className="title-md">Add new item</h1>
           <div className="inner">
-            <div className="row"></div>
+            {/* First row */}
+            <div className="row">
+              <label className="image-upload">
+                <input
+                  type="file"
+                  className="image-upload-input"
+                  accept="image/*"
+                  onChange={handleImageSubmit}
+                  disabled={isLoading}
+                />
+                Upload an image
+              </label>
+              {error && <p className="error">{error}</p>}
+              {isLoading && (
+                <div className="item-image loading-background"></div>
+              )}
+              {formImages.map((image, key) => (
+                <div className="item-image" key={key}>
+                  <Image
+                    style={{
+                      objectFit: "cover",
+                      width: "100%",
+                      height: "100%",
+                      position: "absolute",
+                    }}
+                    alt="Photo"
+                    src={image}
+                    fill
+                  />
+                </div>
+              ))}
+            </div>
+            {/* Second row */}
             <div className="row">
               <label className="label">
                 Category
@@ -168,6 +235,28 @@ const AddItemStyles = styled.div`
     margin-top: 2rem;
   }
 
+  .image-upload {
+    border: 2px dotted var(--grey-30);
+    width: 100%;
+    display: flex;
+    padding: 6px 12px;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+
+    input {
+      display: none;
+    }
+  }
+
+  .item-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    position: relative;
+    margin-top: 2rem;
+  }
+
   .inner {
     margin-top: 2rem;
     display: grid;
@@ -179,6 +268,12 @@ const AddItemStyles = styled.div`
       margin-top: 0.5rem;
       margin-bottom: 0.5rem;
     }
+  }
+
+  .error {
+    font-size: 1rem;
+    color: red;
+    margin-top: 0.5rem;
   }
 
   .button {

@@ -1,10 +1,12 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import registerReducer from "./auth/RegisterSlice";
 import loginReducer from "./auth/LoginSlice";
+import uploadImageReducer from "./item/UploadImageSlice";
 
 const rootReducer = combineReducers({
   registerReducer,
   loginReducer,
+  uploadImageReducer,
 });
 
 export const setupStore = () => {
