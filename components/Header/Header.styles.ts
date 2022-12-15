@@ -20,6 +20,7 @@ export const HeaderStyles = styled.div`
 
   .input {
     padding-left: 0.5em;
+    width: 15rem;
     border: none;
   }
 

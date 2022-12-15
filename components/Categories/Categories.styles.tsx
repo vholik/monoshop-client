@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const CategoriesStyles = styled.div`
-  font-family: var(--font-wide);
+  font-family: var(--font-default);
   margin-top: 2rem;
   padding: 1rem 0;
   border-top: 1px solid var(--grey-10);
@@ -18,7 +18,7 @@ export const CategoriesStyles = styled.div`
   }
 
   .category-name {
-    font-size: 0.9rem;
+    font-size: 1rem;
     cursor: pointer;
   }
 

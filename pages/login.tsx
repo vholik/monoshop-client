@@ -143,6 +143,7 @@ const LoginStyles = styled.div`
     }
 
     .account-action {
+      font-family: 400;
       color: var(--grey-60);
       .link {
         color: var(--dark);

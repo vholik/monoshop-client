@@ -52,7 +52,7 @@ export default function Home() {
       <div className="container">
         <section className="popular-brands">
           <div className="top">
-            <div className="title-sm">Popular brands</div>
+            <h2 className="title-sm">Popular brands</h2>
             <p className="see-all-button">See all</p>
           </div>
           <div className="wrapper">
@@ -146,13 +146,18 @@ export default function Home() {
 
 const HomeStyles = styled.div`
   .hero {
-    padding: 10rem 0;
-    font-family: var(--font-wide);
+    padding: 7rem 0;
+    font-family: var(--font-default);
     color: white;
     background-image: url(${HeroBg.src});
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
+  }
+
+  .hero-title {
+    text-transform: uppercase;
+    font-size: 2.5rem;
   }
 
   .hero-button {
@@ -177,7 +182,7 @@ const HomeStyles = styled.div`
     }
 
     &__item {
-      font-family: var(--font-wide);
+      font-family: var(--font-default);
       aspect-ratio: 1 / 1;
       width: 100%;
     }
@@ -245,7 +250,7 @@ const HomeStyles = styled.div`
       }
 
       &__price {
-        font-family: var(--font-wide);
+        font-family: var(--font-default);
         margin-top: 1rem;
       }
     }

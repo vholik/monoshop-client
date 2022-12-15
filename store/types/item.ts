@@ -1,9 +1,6 @@
-import { Brand } from "./brand";
 import { Gender } from "./gender.enum";
-import { Size } from "./size";
+import { ItemEntity } from "./item-entity";
 import { User } from "./user";
-import { Colour } from "./colour";
-import { Category } from "./category";
 
 export interface Item {
   id: number;
@@ -11,10 +8,22 @@ export interface Item {
   style: string;
   images: string[];
   price: number;
-  size: Size;
-  category: Category;
-  brand: Brand;
-  colour: Colour;
+  size: ItemEntity;
+  category: ItemEntity;
+  brand: ItemEntity;
+  colour: ItemEntity;
   condition: number;
   gender: Gender;
+}
+
+export interface IAddItemFormData {
+  categoryId: number;
+  condition: number;
+  style: string;
+  brand: string;
+  colour: string;
+  size: string;
+  price: number;
+  gender: string;
+  images: string[];
 }

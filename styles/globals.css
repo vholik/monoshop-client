@@ -6,13 +6,12 @@ body {
     Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
   background-color: var(--bg-grey);
-  font-size: 16px;
+  font-size: 18px;
   color: var(--dark);
 }
 
 :root {
-  --font-wide: "Druk Wide", sans-serif;
-  --font-default: "SF Pro Display", sans-serif;
+  --font-default: "FuturaMediumC", sans-serif;
   --dark: #282828;
   --dark-hover: #414141;
   --grey-60: rgba(40, 40, 40, 0.6);
@@ -37,6 +36,18 @@ body {
   margin: 0 auto;
 }
 
+.error {
+  font-size: 1rem;
+  color: red;
+  margin-top: 1rem;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 400;
+}
+
 .label {
   font-family: var(--font-default);
   font-size: var(--font-md);
@@ -45,19 +56,24 @@ body {
 }
 
 .title-sm {
-  font-family: var(--font-wide);
-  font-size: var(--font-xl);
+  font-family: var(--font-default);
+  font-size: var(--font-xxl);
 }
 
 .title-md {
-  font-family: var(--font-wide);
-  font-size: var(--font-xxl);
+  font-family: var(--font-default);
+  font-size: var(--font-xxxl);
 }
 
 .see-all-button {
   font-size: 1rem;
-  font-family: var(--font-wide);
+  font-family: var(--font-default);
   cursor: pointer;
+  text-transform: uppercase;
+}
+
+.uppercase {
+  text-transform: uppercase;
 }
 
 .see-all-button:hover {
@@ -86,9 +102,11 @@ body {
 
 .button {
   cursor: pointer;
-  font-family: var(--font-wide);
+  font-family: var(--font-default);
   color: var(--white);
   background-color: var(--dark);
+  text-transform: uppercase;
+  font-weight: 500;
   border: none;
   font-size: 1rem;
   padding: 1.1em 4em;
@@ -96,6 +114,15 @@ body {
   align-items: center;
   gap: 0.5rem;
   transition: background var(--transition);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  background-color: var(--grey-30);
+}
+
+.button:disabled:hover {
+  background-color: var(--grey-30);
 }
 
 .button:hover {

@@ -1,25 +1,30 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
 import { AxiosError } from "axios";
-import { Category } from "@store/types/category";
+import { ItemEntity } from "@store/types/item-entity";
+import { Gender } from "@store/types/gender.enum";
 
 interface CategoriesState {
-  isLoading: boolean;
-  error: string;
-  categories: Category[];
+  isCategoriesLoading: boolean;
+  categoriesError: string;
+  categories: ItemEntity[];
 }
 
 const initialState: CategoriesState = {
-  isLoading: false,
-  error: "",
+  isCategoriesLoading: false,
+  categoriesError: "",
   categories: [],
 };
 
 export const getCategories = createAsyncThunk(
   "category",
-  async (_, thunkAPI) => {
+  async (gender: Gender, thunkAPI) => {
     try {
-      const response = await instance.get<Category[]>("category");
+      const response = await instance.get<ItemEntity[]>("category", {
+        params: {
+          gender: gender,
+        },
+      });
       return response.data;
     } catch (e) {
       if (e instanceof AxiosError) {
@@ -37,18 +42,18 @@ export const GetCategoriesSlice = createSlice({
   extraReducers: {
     [getCategories.fulfilled.type]: (
       state,
-      action: PayloadAction<Category[]>
+      action: PayloadAction<ItemEntity[]>
     ) => {
       state.categories = action.payload;
-      state.isLoading = false;
-      state.error = "";
+      state.isCategoriesLoading = false;
+      state.categoriesError = "";
     },
     [getCategories.pending.type]: (state) => {
-      state.isLoading = true;
+      state.isCategoriesLoading = true;
     },
     [getCategories.rejected.type]: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
-      state.error = action.payload;
+      state.isCategoriesLoading = false;
+      state.categoriesError = action.payload;
     },
   },
 });

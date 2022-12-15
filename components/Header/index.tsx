@@ -21,8 +21,6 @@ export default function Header() {
       });
   }, []);
 
-  console.log(isAuth);
-
   return (
     <div className="container">
       <HeaderStyles>

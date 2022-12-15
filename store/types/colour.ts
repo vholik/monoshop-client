@@ -1,4 +1,5 @@
-export interface Colour {
-  id: number;
-  name: string;
+import { ItemEntity } from "./item-entity";
+
+export interface Colour extends ItemEntity {
+  hexCode: string;
 }
