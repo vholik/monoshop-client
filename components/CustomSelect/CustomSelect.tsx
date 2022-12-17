@@ -1,5 +1,5 @@
 import { ItemEntity } from "@store/types/item-entity";
-import { colourStyles } from "@utils/react-select.styles";
+import { colourStyles } from "@utils/react-select-utils";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import Select, { GroupBase, Props, SingleValue } from "react-select";
 

@@ -1,13 +1,18 @@
 export const filterColourStyles = {
   menuList: (styles: any) => ({
     ...styles,
-    background: "transparent",
+    background: "var(--white)",
     borderRadius: 0,
+    position: "fixed",
+    width: "8rem",
   }),
-
+  dropdownIndicator: (base: any) => ({
+    ...base,
+    color: "var(--grey-30)",
+  }),
   option: (styles: any, { isFocused, isSelected }: any) => ({
     ...styles,
-    background: isFocused ? "#f6f6f6" : isSelected ? "#f4f4f4" : undefined,
+    background: isFocused ? "#f6f6f6" : isSelected ? "#fff" : undefined,
     color: "var(--dark) !important",
     zIndex: 1,
     borderRadius: 0,
@@ -27,6 +32,7 @@ export const filterColourStyles = {
     border: "0",
     borderRadius: 0,
   }),
+
   valueContainer: (provided: any) => ({
     ...provided,
     padding: "0",
@@ -51,6 +57,7 @@ export const colourStyles = {
     background: "transparent",
     borderRadius: 0,
   }),
+
   option: (styles: any, { isFocused, isSelected }: any) => ({
     ...styles,
     background: isFocused ? "#f6f6f6" : isSelected ? "#f4f4f4" : undefined,
@@ -83,3 +90,28 @@ export const colourStyles = {
     margin: "0",
   }),
 };
+
+export const sizes = [
+  { value: "S", label: "S" },
+  { value: "M", label: "M" },
+  { value: "XL", label: "XL" },
+  { value: "XXL", label: "XXL" },
+];
+
+export const conditions = [
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "4", label: "4" },
+  { value: "5", label: "5" },
+  { value: "6", label: "6" },
+  { value: "7", label: "7" },
+  { value: "8", label: "8" },
+  { value: "9", label: "9" },
+  { value: "10", label: "10" },
+];
+
+export const genders = [
+  { value: "MEN", label: "Menswear" },
+  { value: "WOMEN", label: "Womenswear" },
+];

@@ -17,31 +17,7 @@ import { Gender } from "@store/types/gender.enum";
 import { addItem } from "@store/reducers/item/AddItemSlice";
 import ReactLoading from "react-loading";
 import Loading from "@components/Loading/Loading";
-
-const sizes = [
-  { value: "S", label: "S" },
-  { value: "M", label: "M" },
-  { value: "XL", label: "XL" },
-  { value: "XXL", label: "XXL" },
-];
-
-const conditions = [
-  { value: "1", label: "1" },
-  { value: "2", label: "2" },
-  { value: "3", label: "3" },
-  { value: "4", label: "4" },
-  { value: "5", label: "5" },
-  { value: "6", label: "6" },
-  { value: "7", label: "7" },
-  { value: "8", label: "8" },
-  { value: "9", label: "9" },
-  { value: "10", label: "10" },
-];
-
-const genders = [
-  { value: "MEN", label: "Menswear" },
-  { value: "WOMEN", label: "Womenswear" },
-];
+import { conditions, genders, sizes } from "@utils/react-select-utils";
 
 export default function AddItem() {
   const dispatch = useAppDispatch();
