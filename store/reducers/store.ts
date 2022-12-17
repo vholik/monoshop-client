@@ -7,6 +7,7 @@ import getBrandsReducer from "./item/GetBrandsSlice";
 import getStylesReducer from "./item/GetStylesSlice";
 import getColoursReducer from "./item/GetColoursSlice";
 import addItemReducer from "./item/AddItemSlice";
+import { createWrapper } from "next-redux-wrapper";
 
 const rootReducer = combineReducers({
   registerReducer,
@@ -28,3 +29,5 @@ export const setupStore = () => {
 export type RootState = ReturnType<typeof rootReducer>;
 export type AppStore = ReturnType<typeof setupStore>;
 export type AppDispatch = AppStore["dispatch"];
+
+export const wrapper = createWrapper(setupStore, { debug: true });

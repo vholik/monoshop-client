@@ -1,4 +1,5 @@
 import { ItemEntity } from "@store/types/item-entity";
+import { colourStyles } from "@utils/react-select.styles";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import Select, { GroupBase, Props, SingleValue } from "react-select";
 
@@ -11,45 +12,6 @@ interface SelectProps {
   disabled?: boolean;
   handleSelectChange: (e: SingleValue<ItemEntity>, name: string) => void;
 }
-
-const colourStyles = {
-  menuList: (styles: any) => ({
-    ...styles,
-    background: "transparent",
-    borderRadius: 0,
-  }),
-  option: (styles: any, { isFocused, isSelected }: any) => ({
-    ...styles,
-    background: isFocused ? "#f6f6f6" : isSelected ? "#f4f4f4" : undefined,
-    color: "var(--dark) !important",
-    zIndex: 1,
-    borderRadius: 0,
-  }),
-  menu: (base: any) => ({
-    ...base,
-    zIndex: 100,
-    borderRadius: 0,
-    border: "1px solid var(--grey-10)",
-    boxShadow: "none",
-  }),
-  control: (provided: any, { isFocused, isSelected }: any) => ({
-    ...provided,
-    boxShadow: "none",
-    color: "var(--dark)",
-    border: "1px solid var(--grey-10) !important",
-    borderRadius: 0,
-  }),
-  valueContainer: (provided: any) => ({
-    ...provided,
-    padding: "1.2em 1em",
-    fontSize: "1rem",
-    margin: "0",
-  }),
-  input: (provided: any) => ({
-    ...provided,
-    margin: "0",
-  }),
-};
 
 interface ISelect {
   clearValue: () => void;
@@ -90,6 +52,27 @@ const CustomSelect = ({
         name={name}
         isClearable={true}
         ref={selectRef}
+        formatOptionLabel={(option) => (
+          <div>
+            {option.hexCode ? (
+              <div
+                style={{ display: "flex", gap: "10px", alignItems: "center" }}
+              >
+                <div
+                  style={{
+                    height: "30px",
+                    width: "30px",
+                    borderRadius: "50%",
+                    backgroundColor: `#${option.hexCode}`,
+                  }}
+                ></div>
+                <span>{option.label}</span>
+              </div>
+            ) : (
+              <span>{option.label}</span>
+            )}
+          </div>
+        )}
       />
       {error && <p className="error">{error}</p>}
     </div>

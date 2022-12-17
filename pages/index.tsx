@@ -4,6 +4,7 @@ import styled from "styled-components";
 import HeroBg from "@public/images/hero-bg.png";
 import Categories from "@components/Categories/Categories";
 import Footer from "@components/Footer/Footer";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -17,7 +18,9 @@ export default function Home() {
       <main className="hero">
         <div className="container">
           <h1 className="hero-title">Create your style with monoshop</h1>
-          <button className="hero-button button">Shop</button>
+          <Link href="/shop">
+            <button className="hero-button button">Shop</button>
+          </Link>
         </div>
       </main>
       {/* Popular categories */}

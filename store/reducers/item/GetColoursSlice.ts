@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
 import { AxiosError } from "axios";
-import { Colour } from "@store/types/colour";
+import { ItemEntity } from "@store/types/item-entity";
 
 interface BrandsState {
   isColoursLoading: boolean;
   coloursError: string;
-  colours: Colour[];
+  colours: ItemEntity[];
 }
 
 const initialState: BrandsState = {
@@ -17,7 +17,7 @@ const initialState: BrandsState = {
 
 export const getColours = createAsyncThunk("colour", async (_, thunkAPI) => {
   try {
-    const response = await instance.get<Colour[]>("colour");
+    const response = await instance.get<ItemEntity[]>("colour");
     return response.data;
   } catch (e) {
     if (e instanceof AxiosError) {
@@ -32,7 +32,10 @@ export const GetColoursSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: {
-    [getColours.fulfilled.type]: (state, action: PayloadAction<Colour[]>) => {
+    [getColours.fulfilled.type]: (
+      state,
+      action: PayloadAction<ItemEntity[]>
+    ) => {
       state.colours = action.payload;
       state.isColoursLoading = false;
       state.coloursError = "";
