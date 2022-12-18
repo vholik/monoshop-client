@@ -1,27 +1,32 @@
 import Categories from "@components/Categories/Categories";
 import Header from "@components/Header";
 import styled from "styled-components";
-import Select, { MultiValue } from "react-select";
+import Select, { MultiValue, SingleValue } from "react-select";
 import {
   conditions,
   filterColourStyles,
+  genders,
   sizes,
 } from "@utils/react-select-utils";
-import { useAppDispatch } from "@store/hooks/redux";
+import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { getItems } from "@store/reducers/item/GetItemsSlice";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { wrapper } from "@store/reducers/store";
 import { Item } from "@store/types/item";
 import Image from "next/image";
 import { getTrackBackground, Range } from "react-range";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getBrands } from "@store/reducers/item/GetBrandsSlice";
 import { getStyles } from "@store/reducers/item/GetStylesSlice";
 import { getColours } from "@store/reducers/item/GetColoursSlice";
 import { ItemEntity } from "@store/types/item-entity";
+import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
+import { Gender } from "@store/types/gender.enum";
+import { IFilter } from "@store/types/filter";
+import { FilterBy } from "@store/types/filter-by.enum";
+import Link from "next/link";
 
 interface IShopProps {
-  items: Item[];
   brands: ItemEntity[];
   colours: ItemEntity[];
   styles: ItemEntity[];
@@ -31,13 +36,93 @@ const STEP = 0.1;
 const MIN = 0;
 const MAX = 10000;
 
-function Shop({ items, brands, colours, styles }: IShopProps) {
-  const filterHandler = (e: MultiValue<{ label: string; value: string }>) => {
-    console.log(e);
-  };
+const Shop = ({ brands, colours, styles }: IShopProps) => {
+  const dispatch = useAppDispatch();
+
+  const { items, isItemsLoading, itemsError } = useAppSelector(
+    (state) => state.getItemsReducer
+  );
+  const { categories, categoriesError, isCategoriesLoading } = useAppSelector(
+    (state) => state.getCategoriesReducer
+  );
+
+  const categorieRef = useRef<any>(null);
 
   const [values, setValues] = useState([0, 10000]);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
+  const [filterData, setFilterData] = useState<IFilter>({
+    price: [0, 10000],
+    gender: undefined,
+    category: [],
+    size: [],
+    condition: [],
+    brand: [],
+    style: [],
+    colour: [],
+    sortBy: FilterBy.Popular,
+  });
+
+  useEffect(() => {
+    if (filterData.gender) {
+      dispatch(getCategories(filterData.gender));
+
+      if (categorieRef.current) {
+        categorieRef.current.clearValue();
+      }
+    }
+  }, [filterData.gender]);
+
+  useEffect(() => {
+    if (itemsError || isItemsLoading) return;
+
+    if (items)
+      dispatch(getItems(filterData))
+        .unwrap()
+        .catch((error) => {
+          console.error("rejected", error);
+        });
+  }, [filterData]);
+
+  const genderHandler = (
+    e: SingleValue<{
+      value: string;
+      label: string;
+    }>
+  ) => {
+    if (e) {
+      setFilterData({
+        ...filterData,
+        gender: e?.value as Gender,
+      });
+    }
+  };
+
+  console.log(filterData);
+
+  const priceHandler = (values: number[]) => {
+    setValues(values);
+
+    setFilterData({
+      ...filterData,
+      price: [Math.round(values[0]), Math.round(values[1])],
+    });
+  };
+
+  const filterHandler = (
+    e: MultiValue<ItemEntity>,
+    filterName: keyof IFilter
+  ) => {
+    if (e) {
+      const mapped = e.map((item) => {
+        return item.value;
+      });
+
+      setFilterData({
+        ...filterData,
+        [filterName]: mapped,
+      });
+    }
+  };
 
   return (
     <ShopStyling onClick={() => setIsPriceOpen(false)}>
@@ -47,15 +132,13 @@ function Shop({ items, brands, colours, styles }: IShopProps) {
         <div className="wrapper">
           <div className="filter">
             <div className="filter-inner">
-              <div className="price">
-                <p
-                  className="price-tag"
-                  onClick={(e) => {
-                    e.stopPropagation(), setIsPriceOpen(!isPriceOpen);
-                  }}
-                >
-                  Price
-                </p>
+              <div
+                className="price"
+                onClick={(e) => {
+                  e.stopPropagation(), setIsPriceOpen(!isPriceOpen);
+                }}
+              >
+                <p className="price-tag">Price</p>
                 <div className="price-arrow">
                   <svg
                     height="20"
@@ -77,7 +160,7 @@ function Shop({ items, brands, colours, styles }: IShopProps) {
                     step={STEP}
                     min={MIN}
                     max={MAX}
-                    onChange={(values) => setValues(values)}
+                    onChange={(values) => priceHandler(values)}
                     renderTrack={({ props, children }) => (
                       <div
                         onMouseDown={props.onMouseDown}
@@ -158,9 +241,38 @@ function Shop({ items, brands, colours, styles }: IShopProps) {
                 </div>
               </div>
               <Select
+                placeholder={"Gender"}
+                styles={filterColourStyles}
+                onChange={genderHandler}
+                options={genders}
+                className="select"
+                required={true}
+                isDisabled={false}
+                isLoading={false}
+                isSearchable={true}
+                name={"gender"}
+                instanceId="gender-select"
+              />
+              <Select
+                ref={categorieRef}
+                placeholder={"Categories"}
+                styles={filterColourStyles}
+                onChange={(e) => filterHandler(e, "category" as keyof IFilter)}
+                options={categories}
+                isMulti
+                className="select"
+                required={true}
+                isDisabled={!filterData.gender || Boolean(categoriesError)}
+                isLoading={isCategoriesLoading}
+                isSearchable={true}
+                name={"category"}
+                instanceId="category-select"
+                isClearable={true}
+              />
+              <Select
                 placeholder={"Size"}
                 styles={filterColourStyles}
-                onChange={filterHandler}
+                onChange={(e) => filterHandler(e, "size" as keyof IFilter)}
                 options={sizes}
                 isMulti
                 className="select"
@@ -180,6 +292,7 @@ function Shop({ items, brands, colours, styles }: IShopProps) {
                 className="select"
                 required={true}
                 isDisabled={false}
+                onChange={(e) => filterHandler(e, "condition" as keyof IFilter)}
                 isLoading={false}
                 isSearchable={true}
                 name={"condition"}
@@ -192,6 +305,7 @@ function Shop({ items, brands, colours, styles }: IShopProps) {
                 isMulti
                 options={brands}
                 className="select"
+                onChange={(e) => filterHandler(e, "brand" as keyof IFilter)}
                 required={true}
                 isDisabled={false}
                 isLoading={false}
@@ -206,6 +320,7 @@ function Shop({ items, brands, colours, styles }: IShopProps) {
                 isMulti
                 options={styles}
                 className="select"
+                onChange={(e) => filterHandler(e, "style" as keyof IFilter)}
                 required={true}
                 isDisabled={false}
                 isLoading={false}
@@ -225,6 +340,7 @@ function Shop({ items, brands, colours, styles }: IShopProps) {
                 isLoading={false}
                 isSearchable={true}
                 name={"colour"}
+                onChange={(e) => filterHandler(e, "colour" as keyof IFilter)}
                 isClearable={true}
                 instanceId="colour-select"
                 formatOptionLabel={(option) => (
@@ -253,35 +369,37 @@ function Shop({ items, brands, colours, styles }: IShopProps) {
                   </div>
                 )}
               />
+              <Select
+                placeholder={"Sort by"}
+                styles={filterColourStyles}
+                options={[
+                  { name: "popular", label: "Popular" },
+                  { name: "price-low", label: "Price (Low first)" },
+                  { name: "price-high", label: "Price (Hight first)" },
+                ]}
+                className="select"
+                required={true}
+                isDisabled={false}
+                isLoading={false}
+                isSearchable={true}
+                name={"sort"}
+                instanceId="style-select"
+              />
             </div>
-            <Select
-              placeholder={"Sort by"}
-              styles={filterColourStyles}
-              options={[
-                { name: "popular", label: "Popular" },
-                { name: "price-low", label: "Price (Low first)" },
-                { name: "price-high", label: "Price (Hight first)" },
-              ]}
-              className="select"
-              required={true}
-              isDisabled={false}
-              isLoading={false}
-              isSearchable={true}
-              name={"sort"}
-              instanceId="style-select"
-            />
           </div>
           <div className="items-wrapper">
             {items.map((item) => (
               <div className="item" key={item.id}>
-                <div className="item-image">
-                  <Image
-                    src={item.images[0]}
-                    alt="Image"
-                    style={{ objectFit: "cover" }}
-                    fill
-                  />
-                </div>
+                <Link href={`shop/${item.id}`}>
+                  <div className="item-image">
+                    <Image
+                      src={item.images[0]}
+                      alt="Image"
+                      style={{ objectFit: "cover" }}
+                      fill
+                    />
+                  </div>
+                </Link>
                 <p className="item-price">{item.price} PLN</p>
               </div>
             ))}
@@ -290,26 +408,23 @@ function Shop({ items, brands, colours, styles }: IShopProps) {
       </div>
     </ShopStyling>
   );
-}
+};
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) => async () => {
-    const items = await store.dispatch(getItems());
     const brands = await store.dispatch(getBrands());
     const styles = await store.dispatch(getStyles());
     const colours = await store.dispatch(getColours());
 
     const props = {
-      items: await items.payload,
       brands: await brands.payload,
       styles: await styles.payload,
       colours: await colours.payload,
     };
 
-    if (!props.items || !props.brands || !props.colours || !props.styles) {
+    if (!props.brands || !props.colours || !props.styles) {
       return {
         props: {
-          items: [],
           brands: [],
           styles: [],
           colours: [],
@@ -323,7 +438,7 @@ export const getServerSideProps = wrapper.getServerSideProps(
   }
 );
 
-export default Shop;
+export default wrapper.withRedux(Shop);
 
 const ShopStyling = styled.div`
   .wrapper {
@@ -331,18 +446,16 @@ const ShopStyling = styled.div`
   }
 
   .filter {
-    overflow-x: auto;
-    overflow-y: hidden;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-top: 1rem;
+    overflow-y: hidden;
+    overflow-y: auto;
   }
 
   .filter-inner {
     width: max-content;
+    overflow-x: hidden;
+    overflow-y: hidden;
     display: flex;
-
     gap: 1rem;
     max-height: 500px;
   }

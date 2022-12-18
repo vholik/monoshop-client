@@ -3,24 +3,25 @@ import instance from "@utils/axios";
 import { AxiosError } from "axios";
 import { Gender } from "@store/types/gender.enum";
 import { Item } from "@store/types/item";
+import { IFilter } from "@store/types/filter";
 
-interface CategoriesState {
+interface ItemsState {
   isItemsLoading: boolean;
   itemsError: string;
   items: Item[];
 }
 
-const initialState: CategoriesState = {
+const initialState: ItemsState = {
   isItemsLoading: false,
   itemsError: "",
   items: [],
 };
 
-export const getItems = createAsyncThunk<Item[]>(
+export const getItems = createAsyncThunk<Item[], IFilter>(
   "items",
-  async (_, thunkAPI: any) => {
+  async (filter: IFilter, thunkAPI: any) => {
     try {
-      const response = await instance.get<Item[]>("item");
+      const response = await instance.get<Item[]>("item", { params: filter });
       return response.data;
     } catch (e) {
       if (e instanceof AxiosError) {

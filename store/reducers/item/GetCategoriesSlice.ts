@@ -18,7 +18,7 @@ const initialState: CategoriesState = {
 
 export const getCategories = createAsyncThunk(
   "category",
-  async (gender: Gender, thunkAPI) => {
+  async (gender: Gender | undefined, thunkAPI) => {
     try {
       const response = await instance.get<ItemEntity[]>("category", {
         params: {

@@ -7,7 +7,9 @@ import getBrandsReducer from "./item/GetBrandsSlice";
 import getStylesReducer from "./item/GetStylesSlice";
 import getColoursReducer from "./item/GetColoursSlice";
 import addItemReducer from "./item/AddItemSlice";
+import getItemsReducer from "./item/GetItemsSlice";
 import { createWrapper } from "next-redux-wrapper";
+import getItemByIdReducer from "./item/GetItemByIdSlice";
 
 const rootReducer = combineReducers({
   registerReducer,
@@ -18,6 +20,8 @@ const rootReducer = combineReducers({
   getStylesReducer,
   getColoursReducer,
   addItemReducer,
+  getItemsReducer,
+  getItemByIdReducer,
 });
 
 export const setupStore = () => {
