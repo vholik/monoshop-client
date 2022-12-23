@@ -6,12 +6,12 @@ body {
     Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
   background-color: var(--bg-grey);
-  font-size: 18px;
+  font-size: 14px;
   color: var(--dark);
 }
 
 :root {
-  --font-default: "FuturaMediumC", sans-serif;
+  --font-default: "GT America Extended", sans-serif;
   --dark: #282828;
   --dark-hover: #414141;
   --grey-60: rgba(40, 40, 40, 0.6);
@@ -31,6 +31,10 @@ body {
   --gap: 2rem;
 }
 
+.label {
+  margin-bottom: 1rem;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -45,7 +49,7 @@ body {
 h1,
 h2,
 h3 {
-  font-weight: 400;
+  font-weight: 600;
 }
 
 .label {
@@ -106,7 +110,7 @@ h3 {
   color: var(--white);
   background-color: var(--dark);
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 600;
   border: none;
   font-size: 1rem;
   padding: 1.1em 4em;
@@ -149,6 +153,11 @@ a {
   }
 }
 
+.success {
+  margin-top: 1rem;
+  color: rgb(28, 190, 36);
+}
+
 .loading-background {
   animation-duration: 3s;
   animation-fill-mode: forwards;
@@ -159,4 +168,8 @@ a {
   background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+}
+
+.loading-background img {
+  display: none;
 }

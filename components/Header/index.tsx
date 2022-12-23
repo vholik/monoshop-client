@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { useEffect } from "react";
 import { checkIsAuth } from "@store/reducers/auth/LoginSlice";
 import ChatIcon from "@public/images/chat.svg";
+import UserIcon from "@public/images/user.svg";
 
 export default function Header() {
   const dispatch = useAppDispatch();
@@ -22,63 +23,74 @@ export default function Header() {
   }, []);
 
   return (
-    <div className="container">
-      <HeaderStyles>
-        <Link href={"/"}>
-          <Image src={Logo} height={25} alt="Logo" className="logo" />
-        </Link>
+    <HeaderStyles>
+      <Link href={"/"}>
+        <Image src={Logo} height={25} alt="Logo" className="logo" />
+      </Link>
 
-        <div className="input-wrapper">
+      <div className="input-wrapper">
+        <Image
+          src={SearchIcon}
+          height={16}
+          width={16}
+          alt="Search icon"
+          className="search-icon"
+        />
+        <input type="text" placeholder="Search something" className="input" />
+      </div>
+
+      {isAuth ? (
+        <div className="right">
           <Image
-            src={SearchIcon}
-            height={16}
-            width={16}
+            src={UnfilledHeart}
+            height={20}
+            width={20}
             alt="Search icon"
             className="search-icon"
           />
-          <input type="text" placeholder="Search something" className="input" />
-        </div>
 
-        {isAuth ? (
-          <div className="right">
-            <Image
-              src={UnfilledHeart}
-              height={25}
-              width={25}
-              alt="Search icon"
-              className="search-icon"
-            />
-            <Link href={"/chat"}>
-              <button className="button chat--button">
-                <Image
-                  src={ChatIcon}
-                  height={25}
-                  width={25}
-                  alt="Search icon"
-                  className="search-icon"
-                />
-                Messages
-              </button>
-            </Link>
-            <Link href={"/add-item"}>
-              <button className="button">Add item</button>
-            </Link>
-          </div>
-        ) : (
-          <div className="right">
-            <Image
-              src={UnfilledHeart}
-              height={25}
-              width={25}
-              alt="Search icon"
-              className="search-icon"
-            />
-            <Link href={"/login"}>
-              <button className="button">Login</button>
-            </Link>
-          </div>
-        )}
-      </HeaderStyles>
-    </div>
+          <Link href={"/me"}>
+            <button className="button chat--button">
+              <Image
+                src={UserIcon}
+                height={20}
+                width={20}
+                alt="Search icon"
+                className="search-icon"
+              />
+              Profile
+            </button>
+          </Link>
+          <Link href={"/chat"}>
+            <button className="button chat--button">
+              <Image
+                src={ChatIcon}
+                height={20}
+                width={20}
+                alt="Search icon"
+                className="search-icon"
+              />
+              Messages
+            </button>
+          </Link>
+          <Link href={"/add-item"}>
+            <button className="button">Add item</button>
+          </Link>
+        </div>
+      ) : (
+        <div className="right">
+          <Image
+            src={UnfilledHeart}
+            height={25}
+            width={25}
+            alt="Search icon"
+            className="search-icon"
+          />
+          <Link href={"/login"}>
+            <button className="button">Login</button>
+          </Link>
+        </div>
+      )}
+    </HeaderStyles>
   );
 }

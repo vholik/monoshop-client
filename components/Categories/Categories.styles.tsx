@@ -5,9 +5,12 @@ export const CategoriesStyles = styled.div`
   margin-top: 2rem;
   padding: 1rem 0;
   border-top: 1px solid var(--grey-10);
+  border-bottom: 1px solid var(--grey-10);
   display: flex;
   align-items: center;
   gap: 4rem;
+  margin-left: 50px;
+  margin-right: 50px;
 
   .category {
     position: relative;

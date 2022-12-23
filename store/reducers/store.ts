@@ -10,6 +10,9 @@ import addItemReducer from "./item/AddItemSlice";
 import getItemsReducer from "./item/GetItemsSlice";
 import { createWrapper } from "next-redux-wrapper";
 import getItemByIdReducer from "./item/GetItemByIdSlice";
+import getUserByIdReducer from "./user/GetUserById";
+import profileReducer from "./user/ProfileSlice";
+import editProfileReducer from "./user/EditProfileSlice";
 
 const rootReducer = combineReducers({
   registerReducer,
@@ -21,7 +24,10 @@ const rootReducer = combineReducers({
   getColoursReducer,
   addItemReducer,
   getItemsReducer,
+  getUserByIdReducer,
   getItemByIdReducer,
+  profileReducer,
+  editProfileReducer,
 });
 
 export const setupStore = () => {

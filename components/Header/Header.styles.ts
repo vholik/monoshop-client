@@ -5,8 +5,11 @@ export const HeaderStyles = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-left: 50px;
+  padding-right: 50px;
+
   .input-wrapper {
-    border: 1px solid var(--dark);
+    border: 1px solid var(--grey-60);
     display: flex;
     align-items: center;
     padding: 0 0.5em;
@@ -20,7 +23,7 @@ export const HeaderStyles = styled.div`
 
   .input {
     padding-left: 0.5em;
-    width: 15rem;
+    width: 20rem;
     border: none;
   }
 

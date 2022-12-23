@@ -24,7 +24,7 @@ export default function Home() {
         </div>
       </main>
       {/* Popular categories */}
-      <section className="container">
+      <div className="container">
         <div className="popular-categories">
           <h1 className="title-sm">Popular categories</h1>
           <div className="wrapper">
@@ -50,7 +50,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </div>
       {/* Popular brands */}
       <div className="container">
         <section className="popular-brands">
@@ -161,6 +161,9 @@ const HomeStyles = styled.div`
   .hero-title {
     text-transform: uppercase;
     font-size: 2.5rem;
+    font-weight: 500;
+    font-family: "GT America";
+    font-style: italic;
   }
 
   .hero-button {

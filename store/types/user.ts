@@ -6,6 +6,14 @@ export interface User {
   items?: Item[];
   location?: string;
   phone?: string;
-  image?: string;
+  image: string;
+  id: string;
   favorites?: Item[];
+}
+
+export interface IProfileFormData {
+  image?: string;
+  fullName?: string;
+  phone?: string;
+  location?: string;
 }

@@ -1,5 +1,6 @@
 import { FilterBy } from "./filter-by.enum";
 import { Gender } from "./gender.enum";
+import { Item } from "./item";
 
 export interface IFilter {
   price: number[];
@@ -11,4 +12,12 @@ export interface IFilter {
   style: string[];
   colour: string[];
   sortBy: FilterBy;
+  page: number;
+}
+
+export interface IFileringData {
+  data: Item[];
+  meta: {
+    total: number;
+  };
 }

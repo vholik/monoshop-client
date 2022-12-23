@@ -2,6 +2,7 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { Provider } from "react-redux";
 import { setupStore, wrapper } from "@store/reducers/store";
+import React from "react";
 
 // const store = setupStore();
 

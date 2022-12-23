@@ -3,25 +3,29 @@ import instance from "@utils/axios";
 import { AxiosError } from "axios";
 import { Gender } from "@store/types/gender.enum";
 import { Item } from "@store/types/item";
-import { IFilter } from "@store/types/filter";
+import { IFileringData, IFilter } from "@store/types/filter";
 
 interface ItemsState {
   isItemsLoading: boolean;
+  total: number;
   itemsError: string;
   items: Item[];
 }
 
 const initialState: ItemsState = {
   isItemsLoading: false,
+  total: 1,
   itemsError: "",
   items: [],
 };
 
-export const getItems = createAsyncThunk<Item[], IFilter>(
+export const getItems = createAsyncThunk<IFileringData[], IFilter>(
   "items",
   async (filter: IFilter, thunkAPI: any) => {
     try {
-      const response = await instance.get<Item[]>("item", { params: filter });
+      const response = await instance.get<IFileringData[]>("item", {
+        params: filter,
+      });
       return response.data;
     } catch (e) {
       if (e instanceof AxiosError) {
@@ -37,8 +41,12 @@ export const GetItemsSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: {
-    [getItems.fulfilled.type]: (state, action: PayloadAction<Item[]>) => {
-      state.items = action.payload;
+    [getItems.fulfilled.type]: (
+      state,
+      action: PayloadAction<IFileringData>
+    ) => {
+      state.items = action.payload.data;
+      state.total = action.payload.meta.total;
       state.isItemsLoading = false;
       state.itemsError = "";
     },

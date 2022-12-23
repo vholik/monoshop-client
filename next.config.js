@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ['i.ibb.co'],
+    domains: ["i.ibb.co", "t4.ftcdn.net"],
   },
   async headers() {
     return [

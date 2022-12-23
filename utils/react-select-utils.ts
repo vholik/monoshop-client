@@ -12,8 +12,8 @@ export const filterColourStyles = {
   }),
   option: (styles: any, { isFocused, isSelected }: any) => ({
     ...styles,
-    background: isFocused ? "#f6f6f6" : isSelected ? "#fff" : undefined,
-    color: "var(--dark) !important",
+    background: isFocused ? "#f6f6f6" : isSelected ? "#f6f6f6" : undefined,
+    color: isSelected ? "var(--grey-60)" : "var(--dark) !important",
     zIndex: 1,
     borderRadius: 0,
   }),
@@ -44,6 +44,7 @@ export const filterColourStyles = {
   input: (provided: any) => ({
     ...provided,
     margin: "0",
+    padding: "0",
   }),
   placeholder: (styles: any) => ({
     ...styles,
@@ -88,6 +89,7 @@ export const colourStyles = {
   input: (provided: any) => ({
     ...provided,
     margin: "0",
+    padding: "0",
   }),
 };
 

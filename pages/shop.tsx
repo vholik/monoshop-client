@@ -1,7 +1,12 @@
 import Categories from "@components/Categories/Categories";
 import Header from "@components/Header";
 import styled from "styled-components";
-import Select, { MultiValue, SingleValue } from "react-select";
+import Select, {
+  components,
+  MultiValue,
+  SingleValue,
+  ValueContainerProps,
+} from "react-select";
 import {
   conditions,
   filterColourStyles,
@@ -10,9 +15,7 @@ import {
 } from "@utils/react-select-utils";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { getItems } from "@store/reducers/item/GetItemsSlice";
-import { GetServerSideProps, NextPage } from "next";
 import { wrapper } from "@store/reducers/store";
-import { Item } from "@store/types/item";
 import Image from "next/image";
 import { getTrackBackground, Range } from "react-range";
 import { useEffect, useRef, useState } from "react";
@@ -25,6 +28,8 @@ import { Gender } from "@store/types/gender.enum";
 import { IFilter } from "@store/types/filter";
 import { FilterBy } from "@store/types/filter-by.enum";
 import Link from "next/link";
+import Pagination from "rc-pagination";
+import "rc-pagination/assets/index.css";
 
 interface IShopProps {
   brands: ItemEntity[];
@@ -32,14 +37,14 @@ interface IShopProps {
   styles: ItemEntity[];
 }
 
-const STEP = 0.1;
+const STEP = 1;
 const MIN = 0;
 const MAX = 10000;
 
 const Shop = ({ brands, colours, styles }: IShopProps) => {
   const dispatch = useAppDispatch();
 
-  const { items, isItemsLoading, itemsError } = useAppSelector(
+  const { items, isItemsLoading, itemsError, total } = useAppSelector(
     (state) => state.getItemsReducer
   );
   const { categories, categoriesError, isCategoriesLoading } = useAppSelector(
@@ -60,7 +65,15 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
     style: [],
     colour: [],
     sortBy: FilterBy.Popular,
+    page: 1,
   });
+
+  const nextPage = (page: number) => {
+    setFilterData({
+      ...filterData,
+      page: page,
+    });
+  };
 
   useEffect(() => {
     if (filterData.gender) {
@@ -75,9 +88,16 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
   useEffect(() => {
     if (itemsError || isItemsLoading) return;
 
-    if (items)
+    if (items && filterData)
       dispatch(getItems(filterData))
         .unwrap()
+        .then(() => {
+          window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "smooth",
+          });
+        })
         .catch((error) => {
           console.error("rejected", error);
         });
@@ -97,15 +117,23 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
     }
   };
 
-  console.log(filterData);
-
-  const priceHandler = (values: number[]) => {
+  const priceValuesHandler = (values: number[]) => {
     setValues(values);
+  };
 
-    setFilterData({
-      ...filterData,
-      price: [Math.round(values[0]), Math.round(values[1])],
-    });
+  const priceHandler = () => {
+    if (isItemsLoading) return;
+
+    const isPreviousPrice =
+      Math.round(values[0]) === filterData.price[0] &&
+      Math.round(values[1]) === filterData.price[1];
+
+    if (!isPreviousPrice) {
+      setFilterData({
+        ...filterData,
+        price: [Math.round(values[0]), Math.round(values[1])],
+      });
+    }
   };
 
   const filterHandler = (
@@ -128,39 +156,40 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
     <ShopStyling onClick={() => setIsPriceOpen(false)}>
       <Header />
       <Categories />
-      <div className="container">
-        <div className="wrapper">
-          <div className="filter">
-            <div className="filter-inner">
-              <div
-                className="price"
-                onClick={(e) => {
-                  e.stopPropagation(), setIsPriceOpen(!isPriceOpen);
-                }}
-              >
-                <p className="price-tag">Price</p>
-                <div className="price-arrow">
-                  <svg
-                    height="20"
-                    width="20"
-                    viewBox="0 0 20 20"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path>
-                  </svg>
-                </div>
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  className="price-handler"
-                  style={isPriceOpen ? undefined : { display: "none" }}
+
+      <div className="wrapper">
+        <div className="filter">
+          <div className="filter-inner">
+            <div
+              className="price"
+              onClick={(e) => {
+                e.stopPropagation(), setIsPriceOpen(!isPriceOpen);
+              }}
+            >
+              <p className="price-tag">Price</p>
+              <div className="price-arrow">
+                <svg
+                  height="20"
+                  width="20"
+                  viewBox="0 0 20 20"
+                  aria-hidden="true"
+                  focusable="false"
                 >
+                  <path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path>
+                </svg>
+              </div>
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="price-handler"
+                style={isPriceOpen ? undefined : { display: "none" }}
+              >
+                <div className="price-range">
                   <Range
                     values={values}
                     step={STEP}
                     min={MIN}
                     max={MAX}
-                    onChange={(values) => priceHandler(values)}
+                    onChange={(values) => priceValuesHandler(values)}
                     renderTrack={({ props, children }) => (
                       <div
                         onMouseDown={props.onMouseDown}
@@ -239,158 +268,199 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
                     )}
                   />
                 </div>
+                <button
+                  disabled={isItemsLoading}
+                  className="button price--buton"
+                  onClick={priceHandler}
+                >
+                  Apply
+                </button>
               </div>
-              <Select
-                placeholder={"Gender"}
-                styles={filterColourStyles}
-                onChange={genderHandler}
-                options={genders}
-                className="select"
-                required={true}
-                isDisabled={false}
-                isLoading={false}
-                isSearchable={true}
-                name={"gender"}
-                instanceId="gender-select"
-              />
-              <Select
-                ref={categorieRef}
-                placeholder={"Categories"}
-                styles={filterColourStyles}
-                onChange={(e) => filterHandler(e, "category" as keyof IFilter)}
-                options={categories}
-                isMulti
-                className="select"
-                required={true}
-                isDisabled={!filterData.gender || Boolean(categoriesError)}
-                isLoading={isCategoriesLoading}
-                isSearchable={true}
-                name={"category"}
-                instanceId="category-select"
-                isClearable={true}
-              />
-              <Select
-                placeholder={"Size"}
-                styles={filterColourStyles}
-                onChange={(e) => filterHandler(e, "size" as keyof IFilter)}
-                options={sizes}
-                isMulti
-                className="select"
-                required={true}
-                isDisabled={false}
-                isLoading={false}
-                isSearchable={true}
-                name={"size"}
-                instanceId="size-select"
-                isClearable={true}
-              />
-              <Select
-                placeholder={"Condition"}
-                styles={filterColourStyles}
-                isMulti
-                options={conditions}
-                className="select"
-                required={true}
-                isDisabled={false}
-                onChange={(e) => filterHandler(e, "condition" as keyof IFilter)}
-                isLoading={false}
-                isSearchable={true}
-                name={"condition"}
-                isClearable={true}
-                instanceId="condition-select"
-              />
-              <Select
-                placeholder={"Brand"}
-                styles={filterColourStyles}
-                isMulti
-                options={brands}
-                className="select"
-                onChange={(e) => filterHandler(e, "brand" as keyof IFilter)}
-                required={true}
-                isDisabled={false}
-                isLoading={false}
-                isSearchable={true}
-                name={"brand"}
-                isClearable={true}
-                instanceId="brand-select"
-              />
-              <Select
-                placeholder={"Style"}
-                styles={filterColourStyles}
-                isMulti
-                options={styles}
-                className="select"
-                onChange={(e) => filterHandler(e, "style" as keyof IFilter)}
-                required={true}
-                isDisabled={false}
-                isLoading={false}
-                isSearchable={true}
-                name={"style"}
-                isClearable={true}
-                instanceId="style-select"
-              />
-              <Select
-                placeholder={"Colour"}
-                styles={filterColourStyles}
-                isMulti
-                options={colours}
-                className="select"
-                required={true}
-                isDisabled={false}
-                isLoading={false}
-                isSearchable={true}
-                name={"colour"}
-                onChange={(e) => filterHandler(e, "colour" as keyof IFilter)}
-                isClearable={true}
-                instanceId="colour-select"
-                formatOptionLabel={(option) => (
-                  <div>
-                    {option.hexCode ? (
+            </div>
+            <Select
+              placeholder={"Gender"}
+              styles={filterColourStyles}
+              onChange={genderHandler}
+              options={genders}
+              className="select"
+              required={true}
+              isDisabled={false}
+              isLoading={false}
+              isSearchable={true}
+              name={"gender"}
+              instanceId="gender-select"
+            />
+            <Select
+              ref={categorieRef}
+              placeholder={"Categories"}
+              styles={filterColourStyles}
+              onChange={(e) => filterHandler(e, "category" as keyof IFilter)}
+              options={categories}
+              isMulti
+              className="select"
+              required={true}
+              isDisabled={!filterData.gender || Boolean(categoriesError)}
+              isLoading={isCategoriesLoading}
+              isSearchable={true}
+              name={"category"}
+              instanceId="category-select"
+              isClearable={true}
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              components={{
+                ValueContainer,
+              }}
+            />
+            <Select
+              placeholder={"Size"}
+              styles={filterColourStyles}
+              onChange={(e) => filterHandler(e, "size" as keyof IFilter)}
+              options={sizes}
+              isMulti
+              className="select"
+              required={true}
+              isDisabled={false}
+              isLoading={false}
+              isSearchable={true}
+              name={"size"}
+              instanceId="size-select"
+              isClearable={true}
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              components={{
+                ValueContainer,
+              }}
+            />
+            <Select
+              placeholder={"Condition"}
+              styles={filterColourStyles}
+              isMulti
+              options={conditions}
+              className="select"
+              required={true}
+              isDisabled={false}
+              onChange={(e) => filterHandler(e, "condition" as keyof IFilter)}
+              isLoading={false}
+              isSearchable={true}
+              name={"condition"}
+              isClearable={true}
+              instanceId="condition-select"
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              components={{
+                ValueContainer,
+              }}
+            />
+            <Select
+              placeholder={"Brand"}
+              styles={filterColourStyles}
+              isMulti
+              options={brands}
+              className="select"
+              onChange={(e) => filterHandler(e, "brand" as keyof IFilter)}
+              required={true}
+              isDisabled={false}
+              isLoading={false}
+              isSearchable={true}
+              name={"brand"}
+              isClearable={true}
+              instanceId="brand-select"
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              components={{
+                ValueContainer,
+              }}
+            />
+            <Select
+              placeholder={"Style"}
+              styles={filterColourStyles}
+              isMulti
+              options={styles}
+              className="select"
+              onChange={(e) => filterHandler(e, "style" as keyof IFilter)}
+              required={true}
+              isDisabled={false}
+              isLoading={false}
+              isSearchable={true}
+              name={"style"}
+              isClearable={true}
+              instanceId="style-select"
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              components={{
+                ValueContainer,
+              }}
+            />
+            <Select
+              placeholder={"Colour"}
+              styles={filterColourStyles}
+              isMulti
+              options={colours}
+              className="select"
+              required={true}
+              isDisabled={false}
+              isLoading={false}
+              isSearchable={true}
+              name={"colour"}
+              onChange={(e) => filterHandler(e, "colour" as keyof IFilter)}
+              isClearable={true}
+              instanceId="colour-select"
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              components={{
+                ValueContainer,
+              }}
+              formatOptionLabel={(option) => (
+                <div>
+                  {option.hexCode ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        alignItems: "center",
+                      }}
+                    >
                       <div
                         style={{
-                          display: "flex",
-                          gap: "10px",
-                          alignItems: "center",
+                          minHeight: "30px",
+                          minWidth: "30px",
+                          borderRadius: "50%",
+                          backgroundColor: `#${option.hexCode}`,
                         }}
-                      >
-                        <div
-                          style={{
-                            minHeight: "30px",
-                            minWidth: "30px",
-                            borderRadius: "50%",
-                            backgroundColor: `#${option.hexCode}`,
-                          }}
-                        ></div>
-                        <span>{option.label}</span>
-                      </div>
-                    ) : (
+                      ></div>
                       <span>{option.label}</span>
-                    )}
-                  </div>
-                )}
-              />
-              <Select
-                placeholder={"Sort by"}
-                styles={filterColourStyles}
-                options={[
-                  { name: "popular", label: "Popular" },
-                  { name: "price-low", label: "Price (Low first)" },
-                  { name: "price-high", label: "Price (Hight first)" },
-                ]}
-                className="select"
-                required={true}
-                isDisabled={false}
-                isLoading={false}
-                isSearchable={true}
-                name={"sort"}
-                instanceId="style-select"
-              />
-            </div>
+                    </div>
+                  ) : (
+                    <span>{option.label}</span>
+                  )}
+                </div>
+              )}
+            />
+            <Select
+              placeholder={"Sort by"}
+              styles={filterColourStyles}
+              options={[
+                { name: "popular", label: "Popular" },
+                { name: "price-low", label: "Price (Low first)" },
+                { name: "price-high", label: "Price (Hight first)" },
+              ]}
+              className="select"
+              required={true}
+              isDisabled={false}
+              isLoading={false}
+              isSearchable={true}
+              name={"sort"}
+              isClearable={true}
+              instanceId="style-select"
+              closeMenuOnSelect={false}
+            />
           </div>
+        </div>
+        <div className="container">
           <div className="items-wrapper">
             {items.map((item) => (
               <div className="item" key={item.id}>
-                <Link href={`shop/${item.id}`}>
+                <Link href={`/shop/${item.id}`}>
                   <div className="item-image">
                     <Image
                       src={item.images[0]}
@@ -404,9 +474,36 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
               </div>
             ))}
           </div>
+          <Pagination
+            disabled={isItemsLoading}
+            simple
+            onChange={(page) => nextPage(page)}
+            defaultCurrent={1}
+            total={items.length === 0 ? 1 : total}
+            pageSize={12}
+          />
         </div>
       </div>
     </ShopStyling>
+  );
+};
+
+const ValueContainer = ({
+  children,
+  ...props
+}: ValueContainerProps<ItemEntity>) => {
+  let [values, input] = children as any;
+
+  if (Array.isArray(values)) {
+    const plural = values.length === 1 ? "" : "s";
+    values = `${values.length} item${plural} selected`;
+  }
+
+  return (
+    <components.ValueContainer {...props}>
+      {values}
+      {input}
+    </components.ValueContainer>
   );
 };
 
@@ -441,20 +538,35 @@ export const getServerSideProps = wrapper.getServerSideProps(
 export default wrapper.withRedux(Shop);
 
 const ShopStyling = styled.div`
-  .wrapper {
-    border-top: 1px solid var(--grey-10);
+  //Pagination styling
+  .rc-pagination-next button,
+  .rc-pagination-prev button {
+    &:hover {
+      color: var(--dark) !important;
+    }
   }
 
+  .rc-pagination-simple .rc-pagination-simple-pager input {
+    &:hover {
+      border: 1px solid #d9d9d9;
+    }
+  }
+
+  .rc-pagination {
+    display: flex;
+    margin-top: 5rem;
+    justify-content: end;
+  }
+
+  // Other
   .filter {
     margin-top: 1rem;
-    overflow-y: hidden;
-    overflow-y: auto;
+    margin-left: 50px;
+    margin-right: 50px;
   }
 
   .filter-inner {
     width: max-content;
-    overflow-x: hidden;
-    overflow-y: hidden;
     display: flex;
     gap: 1rem;
     max-height: 500px;
@@ -486,16 +598,33 @@ const ShopStyling = styled.div`
       z-index: 5;
       position: fixed;
       background-color: white;
-      padding: 0.5rem 1.5rem;
+      padding: 1rem 1rem;
       width: 14rem;
       border: 1px solid var(--grey-10);
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+
+      .price-range {
+        width: 100%;
+        padding: 0 12 px;
+      }
     }
+  }
+
+  .price--buton {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    justify-content: center;
+    display: flex;
+    width: 100%;
   }
 
   .items-wrapper {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-column-gap: 2rem;
+    grid-row-gap: 2rem;
     margin-top: 1rem;
 
     .item {
