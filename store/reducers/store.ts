@@ -1,4 +1,12 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import {
+  Action,
+  AnyAction,
+  combineReducers,
+  configureStore,
+  ConfigureStoreOptions,
+  ThunkAction,
+} from "@reduxjs/toolkit";
+import { createWrapper, HYDRATE } from "next-redux-wrapper";
 import registerReducer from "./auth/RegisterSlice";
 import loginReducer from "./auth/LoginSlice";
 import uploadImageReducer from "./item/UploadImageSlice";
@@ -8,13 +16,21 @@ import getStylesReducer from "./item/GetStylesSlice";
 import getColoursReducer from "./item/GetColoursSlice";
 import addItemReducer from "./item/AddItemSlice";
 import getItemsReducer from "./item/GetItemsSlice";
-import { createWrapper } from "next-redux-wrapper";
 import getItemByIdReducer from "./item/GetItemByIdSlice";
 import getUserByIdReducer from "./user/GetUserById";
 import profileReducer from "./user/ProfileSlice";
 import editProfileReducer from "./user/EditProfileSlice";
 
-const rootReducer = combineReducers({
+export type AppDispatch = Store["dispatch"];
+export type RootState = ReturnType<Store["getState"]>;
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;
+
+const combinedReducer = combineReducers({
   registerReducer,
   loginReducer,
   uploadImageReducer,
@@ -30,14 +46,23 @@ const rootReducer = combineReducers({
   editProfileReducer,
 });
 
-export const setupStore = () => {
-  return configureStore({
-    reducer: rootReducer,
-  });
+const reducer: typeof combinedReducer = (state, action) => {
+  if (action.type === HYDRATE) {
+    const nextState = {
+      ...state, // use previous state
+      ...action.payload, // apply delta from hydration
+    };
+    return nextState;
+  } else {
+    return combinedReducer(state, action);
+  }
 };
 
-export type RootState = ReturnType<typeof rootReducer>;
-export type AppStore = ReturnType<typeof setupStore>;
-export type AppDispatch = AppStore["dispatch"];
+export const makeStore = () =>
+  configureStore({
+    reducer,
+  });
 
-export const wrapper = createWrapper(setupStore, { debug: true });
+type Store = ReturnType<typeof makeStore>;
+
+export const wrapper = createWrapper(makeStore, { debug: true });

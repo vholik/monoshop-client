@@ -89,23 +89,23 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
     }
   }, [filterData.gender]);
 
-  // useEffect(() => {
-  //   if (itemsError || isItemsLoading) return;
+  useEffect(() => {
+    if (itemsError || isItemsLoading) return;
 
-  //   if (items && filterData)
-  //     dispatch(getItems(filterData))
-  //       .unwrap()
-  //       .then(() => {
-  //         window.scrollTo({
-  //           top: 0,
-  //           left: 0,
-  //           behavior: "smooth",
-  //         });
-  //       })
-  //       .catch((error) => {
-  //         console.error("rejected", error);
-  //       });
-  // }, [filterData]);
+    if (items && filterData)
+      dispatch(getItems(filterData))
+        .unwrap()
+        .then(() => {
+          window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "smooth",
+          });
+        })
+        .catch((error) => {
+          console.error("rejected", error);
+        });
+  }, [filterData]);
 
   const genderHandler = (
     e: SingleValue<{
@@ -155,8 +155,6 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
       });
     }
   };
-
-  console.log(items);
 
   return (
     <ShopStyling onClick={() => setIsPriceOpen(false)}>
