@@ -16,9 +16,11 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
   const { error, isLoading } = useAppSelector(
     (state) => state.uploadImageReducer
   );
+
   const { isProfileLoading, profileError, profile } = useAppSelector(
     (state) => state.editProfileReducer
   );
+
   const {
     register,
     handleSubmit,
@@ -64,6 +66,16 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
       return;
     }
 
+    if (isLoading) {
+      setFormError("Wait until photo uploads");
+
+      setTimeout(() => {
+        setFormError("");
+      }, 5000);
+
+      return;
+    }
+
     //Remove keys with empty strings
     const mappedObject = Object.fromEntries(
       Object.entries(data).filter(([_, v]) => v != false)
@@ -76,8 +88,6 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
         console.error("rejected", error);
       });
   };
-
-  console.log(profile);
 
   return (
     <ProfileSettingsStyles>
@@ -172,11 +182,14 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
               Photo
               <div className={isLoading ? "loading-background photo" : "photo"}>
                 <Image
-                  src={profilePhoto || user.image}
+                  src={user.image}
                   alt="Your photo"
                   fill
                   objectFit="cover"
                 />
+                {profilePhoto && (
+                  <Image src={profilePhoto} alt="" fill objectFit="cover" />
+                )}
                 {!isLoading && (
                   <label className="upload">
                     Click here to upload a picture

@@ -4,7 +4,7 @@ export const filterColourStyles = {
     background: "var(--white)",
     borderRadius: 0,
     position: "fixed",
-    width: "8rem",
+    width: "9rem",
   }),
   dropdownIndicator: (base: any) => ({
     ...base,

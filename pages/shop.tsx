@@ -25,11 +25,12 @@ import { getColours } from "@store/reducers/item/GetColoursSlice";
 import { ItemEntity } from "@store/types/item-entity";
 import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
 import { Gender } from "@store/types/gender.enum";
-import { IFilter } from "@store/types/filter";
+import { IFileringData, IFilter } from "@store/types/filter";
 import { FilterBy } from "@store/types/filter-by.enum";
 import Link from "next/link";
 import Pagination from "rc-pagination";
 import "rc-pagination/assets/index.css";
+import { Item } from "@store/types/item";
 
 interface IShopProps {
   brands: ItemEntity[];
@@ -47,6 +48,9 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
   const { items, isItemsLoading, itemsError, total } = useAppSelector(
     (state) => state.getItemsReducer
   );
+
+  console.log(items);
+
   const { categories, categoriesError, isCategoriesLoading } = useAppSelector(
     (state) => state.getCategoriesReducer
   );
@@ -85,23 +89,23 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
     }
   }, [filterData.gender]);
 
-  useEffect(() => {
-    if (itemsError || isItemsLoading) return;
+  // useEffect(() => {
+  //   if (itemsError || isItemsLoading) return;
 
-    if (items && filterData)
-      dispatch(getItems(filterData))
-        .unwrap()
-        .then(() => {
-          window.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: "smooth",
-          });
-        })
-        .catch((error) => {
-          console.error("rejected", error);
-        });
-  }, [filterData]);
+  //   if (items && filterData)
+  //     dispatch(getItems(filterData))
+  //       .unwrap()
+  //       .then(() => {
+  //         window.scrollTo({
+  //           top: 0,
+  //           left: 0,
+  //           behavior: "smooth",
+  //         });
+  //       })
+  //       .catch((error) => {
+  //         console.error("rejected", error);
+  //       });
+  // }, [filterData]);
 
   const genderHandler = (
     e: SingleValue<{
@@ -151,6 +155,8 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
       });
     }
   };
+
+  console.log(items);
 
   return (
     <ShopStyling onClick={() => setIsPriceOpen(false)}>
@@ -470,7 +476,8 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
                     />
                   </div>
                 </Link>
-                <p className="item-price">{item.price} PLN</p>
+                <h2 className="item-price">{item.price} PLN</h2>
+                <p className="item-size">{item.size}</p>
               </div>
             ))}
           </div>
@@ -507,35 +514,47 @@ const ValueContainer = ({
   );
 };
 
-export const getServerSideProps = wrapper.getServerSideProps(
-  (store) => async () => {
-    const brands = await store.dispatch(getBrands());
-    const styles = await store.dispatch(getStyles());
-    const colours = await store.dispatch(getColours());
+export const getStaticProps = wrapper.getStaticProps((store) => async () => {
+  const brands = await store.dispatch(getBrands());
+  const styles = await store.dispatch(getStyles());
+  const colours = await store.dispatch(getColours());
+  await store.dispatch(
+    getItems({
+      price: [0, 10000],
+      gender: undefined,
+      category: [],
+      size: [],
+      condition: [],
+      brand: [],
+      style: [],
+      colour: [],
+      sortBy: FilterBy.Popular,
+      page: 1,
+    })
+  );
 
-    const props = {
-      brands: await brands.payload,
-      styles: await styles.payload,
-      colours: await colours.payload,
-    };
+  const props = {
+    brands: await brands.payload,
+    styles: await styles.payload,
+    colours: await colours.payload,
+  };
 
-    if (!props.brands || !props.colours || !props.styles) {
-      return {
-        props: {
-          brands: [],
-          styles: [],
-          colours: [],
-        },
-      };
-    }
-
+  if (!props.brands || !props.colours || !props.styles) {
     return {
-      props,
+      props: {
+        brands: [],
+        styles: [],
+        colours: [],
+      },
     };
   }
-);
 
-export default wrapper.withRedux(Shop);
+  return {
+    props,
+  };
+});
+
+export default Shop;
 
 const ShopStyling = styled.div`
   //Pagination styling
@@ -594,7 +613,7 @@ const ShopStyling = styled.div`
     }
 
     .price-handler {
-      top: 270px;
+      top: 220px;
       z-index: 5;
       position: fixed;
       background-color: white;
@@ -625,7 +644,7 @@ const ShopStyling = styled.div`
     grid-template-columns: repeat(4, 1fr);
     grid-column-gap: 2rem;
     grid-row-gap: 2rem;
-    margin-top: 1rem;
+    margin-top: 2rem;
 
     .item {
       .item-image {
@@ -633,8 +652,15 @@ const ShopStyling = styled.div`
         position: relative;
       }
 
-      .item-price {
+      .item-size {
         margin-top: 0.5rem;
+        color: var(--grey-60);
+      }
+
+      .item-price {
+        font-size: 1.1rem;
+        margin-top: 1rem;
+        font-weight: 600;
       }
     }
   }

@@ -161,9 +161,8 @@ const HomeStyles = styled.div`
   .hero-title {
     text-transform: uppercase;
     font-size: 2.5rem;
-    font-weight: 500;
-    font-family: "GT America";
-    font-style: italic;
+    font-weight: 700;
+    font-family: var(--font-wide);
   }
 
   .hero-button {

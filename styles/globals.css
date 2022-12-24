@@ -11,7 +11,9 @@ body {
 }
 
 :root {
-  --font-default: "GT America Extended", sans-serif;
+  /* --font-default: "GT America Extended", sans-serif; */
+  --font-default: "RF Dewi Extended", sans-serif;
+  --font-wide: "RF Dewi Expanded", sans-serif;
   --dark: #282828;
   --dark-hover: #414141;
   --grey-60: rgba(40, 40, 40, 0.6);
@@ -62,11 +64,13 @@ h3 {
 .title-sm {
   font-family: var(--font-default);
   font-size: var(--font-xxl);
+  font-weight: 600;
 }
 
 .title-md {
   font-family: var(--font-default);
   font-size: var(--font-xxxl);
+  font-weight: 600;
 }
 
 .see-all-button {

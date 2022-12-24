@@ -6,12 +6,10 @@ import { Item } from "@store/types/item";
 import styled from "styled-components";
 import Image from "next/image";
 import unfilledHeart from "@public/images/unfilled-heart.svg";
-import { gsap } from "gsap";
-import ScrollTrigger from "gsap/dist/ScrollTrigger";
-import { useEffect, useLayoutEffect, useRef } from "react";
 import Footer from "@components/Footer/Footer";
 import Link from "next/link";
-gsap.registerPlugin(ScrollTrigger);
+import ArrowLeft from "@public/images/arrow-left.svg";
+import Router from "next/router";
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) =>
@@ -56,34 +54,17 @@ const ShopItem = ({ item }: IShopItem) => {
     name,
   } = item;
 
-  const heroRef = useRef(null);
-  const photosRef = useRef(null);
-
-  // useLayoutEffect(() => {
-  //   let ctx = gsap.context(() => {
-  //     const tl = gsap.timeline({
-  //       scrollTrigger: {
-  //         trigger: ".item-hero",
-  //         start: "+=200px",
-  //         end: "bottom",
-  //         pin: heroRef.current,
-  //         pinSpacing: false,
-  //         toggleActions: "play none none reverse",
-  //         markers: false,
-  //       },
-  //     });
-
-  //     return () => ctx.revert();
-  //   }, photosRef);
-  // }, []);
-
   return (
     <ShopItemStyles>
       <Header />
       <Categories />
       <div className="container">
+        <div className="return" onClick={() => Router.back()}>
+          <Image src={ArrowLeft} alt="Arrow" />
+          Return to previous page
+        </div>
         <div className="wrapper">
-          <div className="left" ref={photosRef}>
+          <div className="left">
             {images?.map((url, key) => (
               <div className="photo" key={key}>
                 <Image
@@ -113,7 +94,7 @@ const ShopItem = ({ item }: IShopItem) => {
                 </div>
               </Link>
             </div>
-            <div className="hero-wrapper" ref={heroRef}>
+            <div className="hero-wrapper">
               <div className="item-hero">
                 <h2 className="item-name">{name}</h2>
                 <Image src={unfilledHeart} alt="Add to favorite" />
@@ -185,6 +166,17 @@ const ShopItem = ({ item }: IShopItem) => {
 };
 
 const ShopItemStyles = styled.div`
+  .return {
+    width: fit-content;
+    cursor: pointer;
+    margin-top: 2rem;
+    display: flex;
+    font-size: 1rem;
+    font-weight: 600;
+    gap: 1rem;
+    align-items: center;
+  }
+
   .wrapper {
     display: grid;
     grid-template-columns: 1fr 1fr;

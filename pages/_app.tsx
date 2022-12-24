@@ -1,13 +1,13 @@
-import "../styles/globals.css";
-import type { AppProps } from "next/app";
 import { Provider } from "react-redux";
-import { setupStore, wrapper } from "@store/reducers/store";
-import React from "react";
+import type { AppProps } from "next/app";
+import { setupStore } from "@store/reducers/store";
 
-// const store = setupStore();
-
-function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <Provider store={setupStore}>
+      <Component {...pageProps} />
+    </Provider>
+  );
 }
 
-export default wrapper.withRedux(App);
+export default MyApp;
