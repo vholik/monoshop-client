@@ -12,9 +12,11 @@ body {
 
 :root {
   /* --font-default: "GT America Extended", sans-serif; */
-  --font-default: "RF Dewi Extended", sans-serif;
+  --font-default: "Helvetica", sans-serif;
+  /* --font-default: "RF Dewi Extended", sans-serif; */
   --font-wide: "RF Dewi Expanded", sans-serif;
-  --dark: #282828;
+  --font-mono: "Video", sans-serif;
+  --dark: #131313;
   --dark-hover: #414141;
   --loading: #ebebeb;
   --grey-60: rgba(40, 40, 40, 0.6);
@@ -49,8 +51,7 @@ body {
   margin-top: 1rem;
 }
 
-h1,
-h2,
+h1 h2,
 h3 {
   font-weight: 600;
 }
@@ -117,8 +118,9 @@ h3 {
   text-transform: uppercase;
   font-weight: 600;
   border: none;
+  width: max-content;
   font-size: 1rem;
-  padding: 1.1em 4em;
+  padding: 0.9em 4em;
   display: flex;
   align-items: center;
   gap: 0.5rem;

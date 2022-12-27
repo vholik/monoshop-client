@@ -815,6 +815,7 @@ const ShopStyling = styled.div`
     .price-tag {
       cursor: pointer;
       display: flex;
+
       align-items: center;
     }
 
@@ -899,6 +900,7 @@ const ShopStyling = styled.div`
       }
 
       .item-price {
+        font-family: var(--font-mono);
         font-size: 1.1rem;
         margin-top: 1rem;
         font-weight: 600;

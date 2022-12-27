@@ -36,7 +36,11 @@ export default function Header() {
           alt="Search icon"
           className="search-icon"
         />
-        <input type="text" placeholder="Search something" className="input" />
+        <input
+          type="text"
+          placeholder="Search for brand,color etc."
+          className="input"
+        />
       </div>
 
       {isAuth ? (

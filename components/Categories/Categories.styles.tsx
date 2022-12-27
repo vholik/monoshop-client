@@ -21,7 +21,8 @@ export const CategoriesStyles = styled.div`
   }
 
   .category-name {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
     cursor: pointer;
   }
 

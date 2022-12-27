@@ -9,12 +9,14 @@ export const HeaderStyles = styled.div`
   padding-right: 50px;
 
   .input-wrapper {
-    border: 1px solid var(--grey-60);
+    border: 1px solid var(--dark);
     display: flex;
     align-items: center;
     padding: 0 0.5em;
     background-color: white;
     width: fit-content;
+    width: 100%;
+    margin: 0 5rem;
   }
 
   .logo {
@@ -23,7 +25,7 @@ export const HeaderStyles = styled.div`
 
   .input {
     padding-left: 0.5em;
-    width: 20rem;
+    width: 100%;
     border: none;
   }
 

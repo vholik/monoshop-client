@@ -2,8 +2,8 @@ import { FooterStyles } from "./Footer.styles";
 
 const Footer = () => (
   <FooterStyles>
-    <div className="container">
-      <p>Made by Viktor Holik</p>
+    <div className="row">
+      <p>© 2023 monoshop</p>
     </div>
   </FooterStyles>
 );

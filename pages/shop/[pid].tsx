@@ -1,21 +1,35 @@
 import Categories from "@components/Categories/Categories";
 import Header from "@components/Header";
 import { getItemById } from "@store/reducers/item/GetItemByIdSlice";
-
 import styled from "styled-components";
 import Image from "next/image";
 import unfilledHeart from "@public/images/unfilled-heart.svg";
 import Footer from "@components/Footer/Footer";
 import Link from "next/link";
 import ArrowLeft from "@public/images/arrow-left.svg";
+import ArrowRight from "@public/images/arrow-right.svg";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
-import { useEffect } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import Router, { useRouter } from "next/router";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Carousel } from "react-responsive-carousel";
+
+const arrowStyles: CSSProperties = {
+  position: "absolute",
+  top: "50%",
+  transform: "translateY(-50%)",
+  bottom: "auto",
+  padding: "1em",
+  zIndex: 2,
+  backgroundColor: "rgba(255,255,255,0.3)",
+};
 
 const ShopItem = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { pid } = router.query;
+
+  const [images, setImages] = useState<{ image: string }[]>([]);
 
   const { item, isLoading, error } = useAppSelector(
     (state) => state.getItemByIdReducer
@@ -25,12 +39,20 @@ const ShopItem = () => {
     if (router.isReady) {
       dispatch(getItemById(pid as string))
         .unwrap()
-        .then(() => {
+        .then((res) => {
           window.scrollTo({
             top: 0,
             left: 0,
             behavior: "smooth",
           });
+
+          const mappedImages = res.images.map((image) => {
+            return {
+              image,
+            };
+          });
+
+          setImages(mappedImages);
         })
         .catch((error: Error) => {
           console.error("rejected", error);
@@ -46,13 +68,17 @@ const ShopItem = () => {
     <ShopItemStyles>
       <Header />
       <Categories />
+
       <div className="container">
-        <Link href="/shop">
-          <div className="return">
-            <Image src={ArrowLeft} alt="Arrow" />
-            Return to previous page
-          </div>
-        </Link>
+        <div className="url">
+          <p className="url-item">Main page</p>
+          <Image src={ArrowRight} alt="url" width={10} height={10} />
+          <p className="url-item">{item?.category.value}</p>
+          <Image src={ArrowRight} alt="url" width={10} height={10} />
+          <p className="url-item">{item?.subcategory.value}</p>
+          <Image src={ArrowRight} alt="url" width={10} height={10} />
+          <p className="url-item ">{item?.name}</p>
+        </div>
         {isLoading ? (
           <LoadingItemStyles>
             <div className="wrapper">
@@ -115,17 +141,62 @@ const ShopItem = () => {
         ) : (
           <div className="wrapper">
             <div className="left">
-              {item?.images?.map((url, key) => (
-                <div className="photo" key={key}>
-                  <Image
-                    src={url}
-                    fill
-                    alt="Product photo"
-                    style={{ position: "absolute", objectFit: "cover" }}
-                  />
-                </div>
-              ))}
+              <Carousel
+                showArrows={true}
+                showStatus={false}
+                showIndicators={false}
+                renderArrowPrev={(onClickHandler, hasPrev, label) =>
+                  hasPrev && (
+                    <button
+                      type="button"
+                      onClick={onClickHandler}
+                      title={label}
+                      style={{
+                        ...arrowStyles,
+                        left: "0",
+                        border: "none",
+                      }}
+                    >
+                      <Image
+                        src={ArrowRight}
+                        style={{ transform: "rotate(180deg)" }}
+                        alt="url"
+                        width={15}
+                        height={15}
+                      />
+                    </button>
+                  )
+                }
+                renderArrowNext={(onClickHandler, hasPrev, label) =>
+                  hasPrev && (
+                    <button
+                      type="button"
+                      onClick={onClickHandler}
+                      title={label}
+                      style={{
+                        ...arrowStyles,
+                        right: "0",
+                        border: "none",
+                      }}
+                    >
+                      <Image
+                        src={ArrowRight}
+                        alt="url"
+                        width={15}
+                        height={15}
+                      />
+                    </button>
+                  )
+                }
+              >
+                {images.map((image) => (
+                  <div className="image-slide">
+                    <img src={image.image} />
+                  </div>
+                ))}
+              </Carousel>
             </div>
+            {/* Right */}
             <div className="right">
               {item?.user && (
                 <div className="user">
@@ -276,22 +347,39 @@ const LoadingItemStyles = styled.div`
 `;
 
 const ShopItemStyles = styled.div`
-  .return {
-    width: fit-content;
-    cursor: pointer;
-    margin-top: 2rem;
+  .image-slide {
+    height: 100%;
+    img {
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .control-prev:before {
+    object-fit: cover;
+    width: 50px;
+    content: url(${ArrowRight}) !important;
+  }
+  [dir="rtl"] .control-prev:before {
+    content: url(${ArrowRight}) !important;
+  }
+
+  .url {
     display: flex;
-    font-size: 1rem;
-    font-weight: 600;
-    gap: 1rem;
     align-items: center;
+    gap: 0.5rem;
+    font-weight: 300;
+    font-size: 0.9rem;
+    margin-top: 1.5rem;
+    text-decoration: underline;
+    cursor: pointer;
   }
 
   .wrapper {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.5fr 1fr;
     grid-column-gap: 4rem;
-    padding-top: 2rem;
+    padding-top: 1.5rem;
 
     .hashtags-wrapper {
       display: flex;
@@ -324,6 +412,12 @@ const ShopItemStyles = styled.div`
 
       &__tag {
         font-size: 1rem;
+        font-weight: 400;
+      }
+
+      &__value {
+        font-size: 1rem;
+        font-weight: 400;
       }
 
       .gender--value {
@@ -346,14 +440,6 @@ const ShopItemStyles = styled.div`
         width: 25px;
         border-radius: 50%;
       }
-
-      &__value {
-        font-size: 1rem;
-      }
-    }
-
-    .hero-wrapper {
-      background-color: var(--bg-grey);
     }
 
     .item-hero {
@@ -363,20 +449,26 @@ const ShopItemStyles = styled.div`
       align-items: center;
 
       .item-name {
-        font-size: var(--font-xxl);
+        font-size: 1.5rem;
+        /* text-transform: uppercase; */
+        font-weight: 400;
       }
     }
 
     .item--button {
       margin-top: 1rem;
       width: 100%;
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
       display: flex;
       justify-content: center;
     }
 
     .item-price {
-      margin-top: 1.5rem;
-      font-size: 1.2rem;
+      font-family: var(--font-mono);
+      margin-top: 1rem;
+      font-size: 1.5rem;
+      font-weight: 800;
     }
 
     .user {

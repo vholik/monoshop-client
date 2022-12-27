@@ -1,13 +1,10 @@
 import styled from "styled-components";
 
 export const FooterStyles = styled.div`
+  margin: 0 50px;
   margin-top: var(--component-margin);
-  background-color: var(--dark);
-  color: var(--white);
-  padding: 4rem 0 2rem 0;
-
   p {
-    border-top: 1px solid #909090;
+    border-top: 1px solid var(--grey-10);
     padding-top: 2rem;
     color: #909090;
     text-align: end;
