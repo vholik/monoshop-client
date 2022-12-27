@@ -6,6 +6,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { uploadImage } from "@store/reducers/item/UploadImageSlice";
 import { editProfile } from "@store/reducers/user/EditProfileSlice";
+import Loading from "@components/Loading/Loading";
 
 interface IProfileSetting {
   user: User | null;
@@ -81,7 +82,9 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
       Object.entries(data).filter(([_, v]) => v != false)
     );
 
-    dispatch(editProfile({ ...mappedObject, image: profilePhoto }))
+    dispatch(
+      editProfile({ ...mappedObject, image: profilePhoto || user?.image })
+    )
       .unwrap()
 
       .catch((error) => {

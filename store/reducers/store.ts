@@ -20,6 +20,10 @@ import getItemByIdReducer from "./item/GetItemByIdSlice";
 import getUserByIdReducer from "./user/GetUserById";
 import profileReducer from "./user/ProfileSlice";
 import editProfileReducer from "./user/EditProfileSlice";
+import filterReducer from "./filter/FilterSlice";
+import getUserItemsReducer from "./item/GetUserItemsSlice";
+import editItemReducer from "./item/EditItemSlice";
+import getSubcategoriesReducer from "./item/GetSubcategoriesSlice";
 
 export type AppDispatch = Store["dispatch"];
 export type RootState = ReturnType<Store["getState"]>;
@@ -44,6 +48,10 @@ const combinedReducer = combineReducers({
   getItemByIdReducer,
   profileReducer,
   editProfileReducer,
+  filterReducer,
+  getUserItemsReducer,
+  editItemReducer,
+  getSubcategoriesReducer,
 });
 
 const reducer: typeof combinedReducer = (state, action) => {

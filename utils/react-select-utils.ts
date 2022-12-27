@@ -1,3 +1,5 @@
+import { Gender } from "@store/types/gender.enum";
+
 export const filterColourStyles = {
   menuList: (styles: any) => ({
     ...styles,
@@ -24,13 +26,14 @@ export const filterColourStyles = {
     border: "1px solid var(--grey-10)",
     boxShadow: "none",
   }),
-  control: (provided: any, { isFocused, isSelected }: any) => ({
+  control: (provided: any, { isDisabled }: any) => ({
     ...provided,
     boxShadow: "none",
     color: "var(--dark)",
     background: "transparent",
     border: "0",
     borderRadius: 0,
+    cursor: isDisabled ? "not-allowed !important" : "default",
   }),
 
   valueContainer: (provided: any) => ({
@@ -46,9 +49,9 @@ export const filterColourStyles = {
     margin: "0",
     padding: "0",
   }),
-  placeholder: (styles: any) => ({
+  placeholder: (styles: any, { isDisabled }: any) => ({
     ...styles,
-    color: "var(--dark)",
+    color: isDisabled ? "#aaa !important" : "var(--dark)",
   }),
 };
 
@@ -113,7 +116,10 @@ export const conditions = [
   { value: "10", label: "10" },
 ];
 
-export const genders = [
-  { value: "MEN", label: "Menswear" },
-  { value: "WOMEN", label: "Womenswear" },
+export const genders: {
+  value: Gender;
+  label: string;
+}[] = [
+  { value: Gender.MEN, label: "Menswear" },
+  { value: Gender.WOMEN, label: "Womenswear" },
 ];

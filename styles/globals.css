@@ -16,6 +16,7 @@ body {
   --font-wide: "RF Dewi Expanded", sans-serif;
   --dark: #282828;
   --dark-hover: #414141;
+  --loading: #ebebeb;
   --grey-60: rgba(40, 40, 40, 0.6);
   --grey-30: rgba(40, 40, 40, 0.3);
   --blue-msg: #ceddff;
@@ -160,6 +161,10 @@ a {
 .success {
   margin-top: 1rem;
   color: rgb(28, 190, 36);
+}
+
+.loading {
+  background-color: #ebebeb;
 }
 
 .loading-background {

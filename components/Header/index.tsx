@@ -43,30 +43,29 @@ export default function Header() {
         <div className="right">
           <Image
             src={UnfilledHeart}
-            height={20}
-            width={20}
+            height={25}
+            width={25}
             alt="Search icon"
             className="search-icon"
           />
 
-          <Link href={"/me"}>
+          <Link href={"/settings"}>
             <button className="button chat--button">
               <Image
                 src={UserIcon}
-                height={20}
-                width={20}
+                height={25}
+                width={25}
                 alt="Search icon"
                 className="search-icon"
               />
-              Profile
             </button>
           </Link>
           <Link href={"/chat"}>
             <button className="button chat--button">
               <Image
                 src={ChatIcon}
-                height={20}
-                width={20}
+                height={25}
+                width={25}
                 alt="Search icon"
                 className="search-icon"
               />

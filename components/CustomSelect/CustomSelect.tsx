@@ -9,6 +9,7 @@ interface SelectProps {
   options: ItemEntity[];
   isLoading: boolean;
   error: string;
+  defaultValue?: ItemEntity;
   disabled?: boolean;
   handleSelectChange: (e: SingleValue<ItemEntity>, name: string) => void;
 }
@@ -25,6 +26,7 @@ const CustomSelect = ({
   error,
   handleSelectChange,
   disabled,
+  defaultValue,
 }: SelectProps) => {
   const isCategory = name === "category";
 
@@ -52,6 +54,7 @@ const CustomSelect = ({
         name={name}
         isClearable={true}
         ref={selectRef}
+        defaultValue={defaultValue}
         formatOptionLabel={(option) => (
           <div>
             {option.hexCode ? (

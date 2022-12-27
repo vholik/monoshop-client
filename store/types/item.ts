@@ -1,5 +1,5 @@
 import { Gender } from "./gender.enum";
-import { ItemEntity } from "./item-entity";
+import { ItemEntity, ItemEntityWithId } from "./item-entity";
 import { Size } from "./size.enum";
 import { User } from "./user";
 
@@ -10,7 +10,8 @@ export interface Item {
   images: string[];
   price: number;
   size: Size;
-  category: ItemEntity;
+  category: ItemEntityWithId;
+  subcategory: ItemEntityWithId;
   brand: ItemEntity;
   colour: ItemEntity;
   condition: number;
@@ -22,6 +23,7 @@ export interface Item {
 
 export interface IAddItemFormData {
   categoryId: number;
+  subcategoryId: number;
   condition: number;
   style: string;
   brand: string;
@@ -30,4 +32,8 @@ export interface IAddItemFormData {
   price: number;
   gender: string;
   images: string[];
+}
+
+export interface IEditItemFormData extends IAddItemFormData {
+  id: number;
 }

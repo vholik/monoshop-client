@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
 import { AxiosError } from "axios";
-import { ItemEntity } from "@store/types/item-entity";
+import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
 import { Gender } from "@store/types/gender.enum";
 
 interface CategoriesState {
   isCategoriesLoading: boolean;
   categoriesError: string;
-  categories: ItemEntity[];
+  categories: ItemEntityWithId[];
 }
 
 const initialState: CategoriesState = {
@@ -20,7 +20,7 @@ export const getCategories = createAsyncThunk(
   "category",
   async (gender: Gender | undefined, thunkAPI) => {
     try {
-      const response = await instance.get<ItemEntity[]>("category", {
+      const response = await instance.get<ItemEntityWithId[]>("category", {
         params: {
           gender: gender,
         },
@@ -42,7 +42,7 @@ export const GetCategoriesSlice = createSlice({
   extraReducers: {
     [getCategories.fulfilled.type]: (
       state,
-      action: PayloadAction<ItemEntity[]>
+      action: PayloadAction<ItemEntityWithId[]>
     ) => {
       state.categories = action.payload;
       state.isCategoriesLoading = false;

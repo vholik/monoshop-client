@@ -9,18 +9,10 @@ import { wrapper } from "@store/reducers/store";
 import { IProfileFormData, User } from "@store/types/user";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import Loading from "@components/Loading/Loading";
-
-enum SettingEnum {
-  PROFILE = "PROFILE",
-  POSTS = "POSTS",
-}
+import Link from "next/link";
 
 const MyProfile = () => {
   const dispatch = useAppDispatch();
-
-  const [currentCard, setCurrentCard] = useState<SettingEnum>(
-    SettingEnum.PROFILE
-  );
 
   const { error, isLoading, user } = useAppSelector(
     (state) => state.profileReducer
@@ -34,13 +26,7 @@ const MyProfile = () => {
       });
   }, []);
 
-  const changeCard = (name: SettingEnum) => {
-    setCurrentCard(name);
-  };
-
-  if (isLoading) {
-    return <Loading />;
-  }
+  console.log(user);
 
   return (
     <MyProfileStyles>
@@ -49,49 +35,17 @@ const MyProfile = () => {
       <div className="container">
         <h2 className="profile-title">My profile</h2>
         <div className="settings-list">
-          <p
-            className={
-              currentCard === SettingEnum.PROFILE
-                ? "settings-list__item active"
-                : "settings-list__item"
-            }
-            onClick={() => changeCard(SettingEnum.PROFILE)}
-          >
-            Profile settings
-          </p>
-          <p
-            className={
-              currentCard === SettingEnum.POSTS
-                ? "settings-list__item active"
-                : "settings-list__item"
-            }
-            onClick={() => changeCard(SettingEnum.POSTS)}
-          >
-            My items
-          </p>
+          <Link href={"/settings"}>
+            <p className="settings-list__item  active">Profile settings</p>
+          </Link>
+          <Link href={"/my-items"}>
+            <p className="settings-list__item">My items</p>
+          </Link>
         </div>
       </div>
       <div className="wrapper">
-        <div
-          className="container"
-          style={
-            currentCard === SettingEnum.PROFILE
-              ? { display: "block" }
-              : { display: "none" }
-          }
-        >
-          <ProfileSettings user={user} />
-        </div>
-
-        <div
-          className="container"
-          style={
-            currentCard === SettingEnum.POSTS
-              ? { display: "block" }
-              : { display: "none" }
-          }
-        >
-          <ProfileItems />
+        <div className="container">
+          {isLoading ? <Loading /> : <ProfileSettings user={user} />}
         </div>
       </div>
     </MyProfileStyles>

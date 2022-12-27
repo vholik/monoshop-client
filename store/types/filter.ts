@@ -3,9 +3,10 @@ import { Gender } from "./gender.enum";
 import { Item } from "./item";
 
 export interface IFilter {
-  price: number[];
-  gender: Gender | undefined;
-  category: string[];
+  price: [number, number];
+  gender: Gender | null;
+  category: number;
+  subcategory: number[];
   size: string[];
   condition: number[];
   brand: string[];

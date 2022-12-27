@@ -1,12 +1,15 @@
 import styled from "styled-components";
 
 export const ProfileSettingsStyles = styled.div`
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+
   .form {
     background-color: white;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 2rem;
-    padding: 1rem 0;
+    grid-area: "row";
   }
 
   .submit--buton {

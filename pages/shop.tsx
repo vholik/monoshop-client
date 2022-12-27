@@ -3,6 +3,7 @@ import Header from "@components/Header";
 import styled from "styled-components";
 import Select, {
   components,
+  GroupBase,
   MultiValue,
   SingleValue,
   ValueContainerProps,
@@ -15,85 +16,71 @@ import {
 } from "@utils/react-select-utils";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { getItems } from "@store/reducers/item/GetItemsSlice";
-import { wrapper } from "@store/reducers/store";
 import Image from "next/image";
 import { getTrackBackground, Range } from "react-range";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { getBrands } from "@store/reducers/item/GetBrandsSlice";
 import { getStyles } from "@store/reducers/item/GetStylesSlice";
 import { getColours } from "@store/reducers/item/GetColoursSlice";
-import { ItemEntity } from "@store/types/item-entity";
+import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
 import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
 import { Gender } from "@store/types/gender.enum";
-import { IFileringData, IFilter } from "@store/types/filter";
+import { IFilter } from "@store/types/filter";
 import { FilterBy } from "@store/types/filter-by.enum";
 import Link from "next/link";
 import Pagination from "rc-pagination";
 import "rc-pagination/assets/index.css";
-import { Item } from "@store/types/item";
-
-interface IShopProps {
-  brands: ItemEntity[];
-  colours: ItemEntity[];
-  styles: ItemEntity[];
-}
+import {
+  changePage,
+  setBrand,
+  setCategory,
+  setColour,
+  setCondition,
+  setGender,
+  setPrice,
+  setSize,
+  setStyle,
+  setSubcategory,
+} from "@store/reducers/filter/FilterSlice";
+import UnfilledWhiteHeart from "@public/images/unfilled-white-heart.svg";
+import { getSubcategories } from "@store/reducers/item/GetSubcategoriesSlice";
 
 const STEP = 1;
 const MIN = 0;
 const MAX = 10000;
 
-const Shop = ({ brands, colours, styles }: IShopProps) => {
+const Shop = () => {
   const dispatch = useAppDispatch();
+
+  const filter = useAppSelector((state) => state.filterReducer);
 
   const { items, isItemsLoading, itemsError, total } = useAppSelector(
     (state) => state.getItemsReducer
   );
-
-  console.log(items);
-
+  const { brands, isBrandsLoading } = useAppSelector(
+    (state) => state.getBrandsReducer
+  );
+  const { colours, isColoursLoading } = useAppSelector(
+    (state) => state.getColoursReducer
+  );
+  const { styles, isStylesLoading } = useAppSelector(
+    (state) => state.getStylesReducer
+  );
+  const { isSubcategoriesLoading, subcategories, subcategoriesError } =
+    useAppSelector((state) => state.getSubcategoriesReducer);
   const { categories, categoriesError, isCategoriesLoading } = useAppSelector(
     (state) => state.getCategoriesReducer
   );
 
   const categorieRef = useRef<any>(null);
+  const subcategorieRef = useRef<any>(null);
 
   const [values, setValues] = useState([0, 10000]);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
-  const [filterData, setFilterData] = useState<IFilter>({
-    price: [0, 10000],
-    gender: undefined,
-    category: [],
-    size: [],
-    condition: [],
-    brand: [],
-    style: [],
-    colour: [],
-    sortBy: FilterBy.Popular,
-    page: 1,
-  });
-
-  const nextPage = (page: number) => {
-    setFilterData({
-      ...filterData,
-      page: page,
-    });
-  };
 
   useEffect(() => {
-    if (filterData.gender) {
-      dispatch(getCategories(filterData.gender));
-
-      if (categorieRef.current) {
-        categorieRef.current.clearValue();
-      }
-    }
-  }, [filterData.gender]);
-
-  useEffect(() => {
-    if (itemsError || isItemsLoading) return;
-
-    if (items && filterData)
-      dispatch(getItems(filterData))
+    if (filter && items && !isItemsLoading) {
+      dispatch(getItems(filter))
         .unwrap()
         .then(() => {
           window.scrollTo({
@@ -102,10 +89,31 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
             behavior: "smooth",
           });
         })
-        .catch((error) => {
+        .catch((error: Error) => {
           console.error("rejected", error);
         });
-  }, [filterData]);
+    }
+  }, [filter]);
+
+  useEffect(() => {
+    dispatch(getBrands())
+      .unwrap()
+      .catch((error: Error) => {
+        console.error("rejected", error);
+      });
+    dispatch(getStyles())
+      .unwrap()
+      .catch((error: Error) => {
+        console.error("rejected", error);
+      });
+    dispatch(getColours())
+      .unwrap()
+      .catch((error: Error) => {
+        console.error("rejected", error);
+      });
+
+    setValues(filter.price);
+  }, []);
 
   const genderHandler = (
     e: SingleValue<{
@@ -113,11 +121,25 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
       label: string;
     }>
   ) => {
-    if (e) {
-      setFilterData({
-        ...filterData,
-        gender: e?.value as Gender,
-      });
+    dispatch(changePage(1));
+
+    if (e && e.value !== filter.gender) {
+      dispatch(setGender(e?.value as Gender));
+      dispatch(setCategory(0));
+      dispatch(setSubcategory([]));
+    }
+
+    if (e?.value && e.value !== filter.gender) {
+      dispatch(getCategories(e.value as Gender))
+        .unwrap()
+        .catch((err) => console.log("rejected", err));
+
+      if (categorieRef.current) {
+        categorieRef.current.clearValue();
+      }
+      if (subcategorieRef.current) {
+        subcategorieRef.current.clearValue();
+      }
     }
   };
 
@@ -128,16 +150,49 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
   const priceHandler = () => {
     if (isItemsLoading) return;
 
+    dispatch(changePage(1));
+
     const isPreviousPrice =
-      Math.round(values[0]) === filterData.price[0] &&
-      Math.round(values[1]) === filterData.price[1];
+      Math.round(values[0]) === filter.price[0] &&
+      Math.round(values[1]) === filter.price[1];
 
     if (!isPreviousPrice) {
-      setFilterData({
-        ...filterData,
-        price: [Math.round(values[0]), Math.round(values[1])],
-      });
+      dispatch(setPrice([Math.round(values[0]), Math.round(values[1])]));
     }
+  };
+
+  const categoryHandler = (e: SingleValue<ItemEntity>) => {
+    if (e?.id === filter.category) return;
+
+    if (!e) {
+      dispatch(setCategory(0));
+    }
+
+    if (e?.id) {
+      dispatch(setCategory(e.id));
+
+      dispatch(getSubcategories(e?.id))
+        .unwrap()
+        .catch((err) => console.log("rejected", err));
+    }
+
+    if (subcategorieRef.current) {
+      subcategorieRef.current.clearValue();
+    }
+
+    dispatch(changePage(1));
+  };
+
+  const subcategoriesHandler = (e: MultiValue<ItemEntityWithId>) => {
+    const mapped = e.map((subcategory) => {
+      return subcategory.id;
+    });
+
+    if (mapped === filter.subcategory) return; // Dont re-render
+
+    dispatch(setSubcategory(mapped));
+
+    dispatch(changePage(1));
   };
 
   const filterHandler = (
@@ -149,18 +204,126 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
         return item.value;
       });
 
-      setFilterData({
-        ...filterData,
-        [filterName]: mapped,
-      });
+      if (filterName === "condition") {
+        dispatch(setCondition(mapped.map((it) => Number(it))));
+        return;
+      }
+
+      if (filterName === "brand") {
+        dispatch(setBrand(mapped));
+        return;
+      }
+
+      if (filterName === "style") {
+        dispatch(setStyle(mapped));
+        return;
+      }
+
+      if (filterName === "colour") {
+        dispatch(setColour(mapped));
+        return;
+      }
+
+      if (filterName === "size") {
+        dispatch(setSize(mapped));
+        return;
+      }
+
+      dispatch(changePage(1));
     }
   };
+
+  const nextPage = (page: number) => {
+    dispatch(changePage(page));
+  };
+
+  function setDefaultSizeValue(): ItemEntity[] {
+    return filter.size.map((size) => {
+      return {
+        value: size,
+        label: size,
+      };
+    });
+  }
+  function setDefaultBrandValue(): ItemEntity[] {
+    return filter.brand.map((brand) => {
+      return {
+        value: brand,
+        label: brand,
+      };
+    });
+  }
+  function setDefaultColourValue(): ItemEntity[] {
+    return filter.colour.map((colour) => {
+      return {
+        value: colour,
+        label: colour,
+      };
+    });
+  }
+  function setDefaultStyleValue(): ItemEntity[] {
+    return filter.style.map((style) => {
+      return {
+        value: style,
+        label: style,
+      };
+    });
+  }
+  function setDefaultConditionValue(): ItemEntity[] {
+    return filter.condition.map((condition) => {
+      return {
+        value: String(condition),
+        label: String(condition),
+      };
+    });
+  }
+  function setDefaultCategoryValue(): ItemEntityWithId {
+    const find = categories.find((category) => category.id === filter.category);
+
+    if (find) {
+      return find;
+    }
+
+    return {
+      value: "Category",
+      label: "Category",
+      id: 0,
+    };
+  }
+  function setDefaultSubcategoryValue(): ItemEntityWithId[] {
+    const mapped = subcategories.filter((subcategory) => {
+      if (subcategory.id) {
+        return filter.subcategory.indexOf(subcategory.id) > -1;
+      }
+    });
+
+    if (mapped.length) {
+      return mapped;
+    }
+
+    return [];
+  }
+  function setDefaultGenderValue(): SingleValue<{
+    value: string;
+    label: string;
+  }> {
+    if (filter.gender) {
+      return {
+        value: filter.gender,
+        label: filter.gender === Gender.MEN ? "Menswear" : "Womenswear",
+      };
+    }
+
+    return {
+      value: "Gender",
+      label: "Gender",
+    };
+  }
 
   return (
     <ShopStyling onClick={() => setIsPriceOpen(false)}>
       <Header />
       <Categories />
-
       <div className="wrapper">
         <div className="filter">
           <div className="filter-inner">
@@ -293,24 +456,42 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
               isSearchable={true}
               name={"gender"}
               instanceId="gender-select"
+              defaultValue={setDefaultGenderValue()}
             />
             <Select
               ref={categorieRef}
               placeholder={"Categories"}
               styles={filterColourStyles}
-              onChange={(e) => filterHandler(e, "category" as keyof IFilter)}
+              onChange={categoryHandler}
               options={categories}
-              isMulti
               className="select"
               required={true}
-              isDisabled={!filterData.gender || Boolean(categoriesError)}
+              isDisabled={!filter.gender || Boolean(categoriesError)}
               isLoading={isCategoriesLoading}
               isSearchable={true}
               name={"category"}
               instanceId="category-select"
               isClearable={true}
+              defaultValue={setDefaultCategoryValue()}
+            />
+            <Select
+              ref={subcategorieRef}
+              placeholder={"Subcategories"}
+              styles={filterColourStyles}
+              onChange={subcategoriesHandler}
+              options={subcategories}
+              isMulti
+              className="select"
+              required={true}
+              isDisabled={!filter.category || Boolean(subcategoriesError)}
+              isLoading={isSubcategoriesLoading}
+              isSearchable={true}
+              name={"subcategory"}
+              instanceId="category-select"
+              isClearable={true}
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
+              defaultValue={setDefaultSubcategoryValue()}
               components={{
                 ValueContainer,
               }}
@@ -331,6 +512,7 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
               isClearable={true}
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
+              defaultValue={setDefaultSizeValue()}
               components={{
                 ValueContainer,
               }}
@@ -351,6 +533,7 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
               instanceId="condition-select"
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
+              defaultValue={setDefaultConditionValue()}
               components={{
                 ValueContainer,
               }}
@@ -364,13 +547,14 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
               onChange={(e) => filterHandler(e, "brand" as keyof IFilter)}
               required={true}
               isDisabled={false}
-              isLoading={false}
+              isLoading={isBrandsLoading}
               isSearchable={true}
               name={"brand"}
               isClearable={true}
               instanceId="brand-select"
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
+              defaultValue={setDefaultBrandValue()}
               components={{
                 ValueContainer,
               }}
@@ -384,13 +568,14 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
               onChange={(e) => filterHandler(e, "style" as keyof IFilter)}
               required={true}
               isDisabled={false}
-              isLoading={false}
+              isLoading={isStylesLoading}
               isSearchable={true}
               name={"style"}
               isClearable={true}
               instanceId="style-select"
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
+              defaultValue={setDefaultStyleValue()}
               components={{
                 ValueContainer,
               }}
@@ -403,7 +588,7 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
               className="select"
               required={true}
               isDisabled={false}
-              isLoading={false}
+              isLoading={isColoursLoading}
               isSearchable={true}
               name={"colour"}
               onChange={(e) => filterHandler(e, "colour" as keyof IFilter)}
@@ -411,6 +596,7 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
               instanceId="colour-select"
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
+              defaultValue={setDefaultColourValue()}
               components={{
                 ValueContainer,
               }}
@@ -440,50 +626,105 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
                 </div>
               )}
             />
-            <Select
-              placeholder={"Sort by"}
-              styles={filterColourStyles}
-              options={[
-                { name: "popular", label: "Popular" },
-                { name: "price-low", label: "Price (Low first)" },
-                { name: "price-high", label: "Price (Hight first)" },
-              ]}
-              className="select"
-              required={true}
-              isDisabled={false}
-              isLoading={false}
-              isSearchable={true}
-              name={"sort"}
-              isClearable={true}
-              instanceId="style-select"
-              closeMenuOnSelect={false}
-            />
           </div>
         </div>
-        <div className="container">
-          <div className="items-wrapper">
-            {items.map((item) => (
-              <div className="item" key={item.id}>
-                <Link href={`/shop/${item.id}`}>
-                  <div className="item-image">
-                    <Image
-                      src={item.images[0]}
-                      alt="Image"
-                      style={{ objectFit: "cover" }}
-                      fill
-                    />
-                  </div>
-                </Link>
-                <h2 className="item-price">{item.price} PLN</h2>
-                <p className="item-size">{item.size}</p>
+        <div className="item-container">
+          {isItemsLoading ? (
+            <LoadindShopStyling>
+              <div className="items-wrapper">
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
+                <div className="item">
+                  <div className="item-image "></div>
+                  <h2 className="item-price "></h2>
+                  <p className="item-size "></p>
+                </div>
               </div>
-            ))}
-          </div>
+            </LoadindShopStyling>
+          ) : (
+            <div className="items-wrapper">
+              {items.map((item) => (
+                <div className="item" key={item.id}>
+                  <Link href={`/shop/${item.id}`}>
+                    <div className="item-image">
+                      <Image
+                        src={UnfilledWhiteHeart}
+                        alt="Add to favorites"
+                        className="unfilled-heart"
+                      />
+                      <Image
+                        src={item.images[0]}
+                        alt="Image"
+                        style={{ objectFit: "cover" }}
+                        fill
+                      />
+                    </div>
+                  </Link>
+                  <h2 className="item-price">{item.price} PLN</h2>
+                  <p className="item-size">{item.size}</p>
+                </div>
+              ))}
+            </div>
+          )}
           <Pagination
             disabled={isItemsLoading}
             simple
+            current={filter.page}
             onChange={(page) => nextPage(page)}
-            defaultCurrent={1}
+            defaultCurrent={filter.page}
             total={items.length === 0 ? 1 : total}
             pageSize={12}
           />
@@ -493,11 +734,8 @@ const Shop = ({ brands, colours, styles }: IShopProps) => {
   );
 };
 
-const ValueContainer = ({
-  children,
-  ...props
-}: ValueContainerProps<ItemEntity>) => {
-  let [values, input] = children as any;
+const ValueContainer = ({ children, ...props }: ValueContainerProps<any>) => {
+  let [values, input] = children as ReactNode[];
 
   if (Array.isArray(values)) {
     const plural = values.length === 1 ? "" : "s";
@@ -512,47 +750,27 @@ const ValueContainer = ({
   );
 };
 
-export const getStaticProps = wrapper.getStaticProps((store) => async () => {
-  const brands = await store.dispatch(getBrands());
-  const styles = await store.dispatch(getStyles());
-  const colours = await store.dispatch(getColours());
-  await store.dispatch(
-    getItems({
-      price: [0, 10000],
-      gender: undefined,
-      category: [],
-      size: [],
-      condition: [],
-      brand: [],
-      style: [],
-      colour: [],
-      sortBy: FilterBy.Popular,
-      page: 1,
-    })
-  );
-
-  const props = {
-    brands: await brands.payload,
-    styles: await styles.payload,
-    colours: await colours.payload,
-  };
-
-  if (!props.brands || !props.colours || !props.styles) {
-    return {
-      props: {
-        brands: [],
-        styles: [],
-        colours: [],
-      },
-    };
-  }
-
-  return {
-    props,
-  };
-});
-
 export default Shop;
+
+const LoadindShopStyling = styled.div`
+  .item {
+    .item-image {
+      background-color: var(--loading);
+    }
+
+    .item-price {
+      height: 1.3rem;
+      width: 8rem;
+      background-color: var(--grey-10);
+    }
+
+    .item-size {
+      height: 1.2rem;
+      width: 2rem;
+      background-color: var(--grey-10);
+    }
+  }
+`;
 
 const ShopStyling = styled.div`
   //Pagination styling
@@ -637,6 +855,10 @@ const ShopStyling = styled.div`
     width: 100%;
   }
 
+  .item-container {
+    margin: 0 50px;
+  }
+
   .items-wrapper {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -645,9 +867,30 @@ const ShopStyling = styled.div`
     margin-top: 2rem;
 
     .item {
+      .unfilled-heart {
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+        z-index: 1;
+      }
+
       .item-image {
         aspect-ratio: 1 / 1.2;
         position: relative;
+        &::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: linear-gradient(
+            180deg,
+            rgba(40, 40, 40, 0) 0%,
+            rgba(40, 40, 40, 0.25) 90.73%,
+            rgba(40, 40, 40, 0.53) 100%
+          );
+        }
       }
 
       .item-size {
