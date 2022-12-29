@@ -157,18 +157,18 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
             <input
               defaultValue={user?.phone}
               type="tel"
-              maxLength={9}
-              minLength={9}
+              maxLength={12}
+              minLength={12}
               className="input"
               placeholder="Your phone"
               {...register("phone", {
                 minLength: {
-                  value: 9,
-                  message: "Phone must contains 9 numbers",
+                  value: 12,
+                  message: "Phone must contains 12 numbers",
                 },
                 maxLength: {
-                  value: 9,
-                  message: "Phone must contains 9 numbers",
+                  value: 12,
+                  message: "Phone max length is 12 numbers",
                 },
                 pattern: {
                   message: "Please type valid phone number",

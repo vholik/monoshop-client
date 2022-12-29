@@ -38,7 +38,7 @@ export default function Header() {
         />
         <input
           type="text"
-          placeholder="Search for brand,color etc."
+          placeholder="Search for brand, color etc."
           className="input"
         />
       </div>

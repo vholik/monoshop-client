@@ -161,8 +161,7 @@ const HomeStyles = styled.div`
   .hero-title {
     text-transform: uppercase;
     font-size: 2.5rem;
-    font-weight: 700;
-    font-family: var(--font-default);
+    font-family: var(--font-medium);
   }
 
   .hero-button {

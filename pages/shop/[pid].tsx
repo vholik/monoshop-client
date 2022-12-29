@@ -45,13 +45,11 @@ const ShopItem = () => {
             left: 0,
             behavior: "smooth",
           });
-
           const mappedImages = res.images.map((image) => {
             return {
               image,
             };
           });
-
           setImages(mappedImages);
         })
         .catch((error: Error) => {
@@ -77,7 +75,7 @@ const ShopItem = () => {
           <Image src={ArrowRight} alt="url" width={10} height={10} />
           <p className="url-item">{item?.subcategory.value}</p>
           <Image src={ArrowRight} alt="url" width={10} height={10} />
-          <p className="url-item ">{item?.name}</p>
+          <p className="url-item current-url">{item?.name}</p>
         </div>
         {isLoading ? (
           <LoadingItemStyles>
@@ -189,8 +187,8 @@ const ShopItem = () => {
                   )
                 }
               >
-                {images.map((image) => (
-                  <div className="image-slide">
+                {images.map((image, key) => (
+                  <div className="image-slide" key={key}>
                     <img src={image.image} />
                   </div>
                 ))}
@@ -316,13 +314,13 @@ const LoadingItemStyles = styled.div`
   }
 
   .item-name {
-    height: 2.4rem;
+    height: 1.8rem;
     background-color: var(--grey-10);
     width: 20rem;
   }
 
   .item-price {
-    height: 1.4rem;
+    height: 1.9rem;
     width: 8rem;
     background-color: var(--grey-10);
   }
@@ -355,24 +353,23 @@ const ShopItemStyles = styled.div`
     }
   }
 
-  .control-prev:before {
-    object-fit: cover;
-    width: 50px;
-    content: url(${ArrowRight}) !important;
-  }
-  [dir="rtl"] .control-prev:before {
-    content: url(${ArrowRight}) !important;
-  }
-
   .url {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-weight: 300;
+    font-weight: 400;
     font-size: 0.9rem;
     margin-top: 1.5rem;
-    text-decoration: underline;
     cursor: pointer;
+
+    .url-item {
+      text-decoration: underline;
+    }
+  }
+
+  .current-url {
+    text-decoration: none !important;
+    color: var(--grey-60);
   }
 
   .wrapper {
@@ -451,24 +448,23 @@ const ShopItemStyles = styled.div`
       .item-name {
         font-size: 1.5rem;
         /* text-transform: uppercase; */
-        font-weight: 400;
+        font-weight: 00;
       }
     }
 
     .item--button {
       margin-top: 1rem;
       width: 100%;
-      font-family: var(--font-mono);
+      font-family: var(--font-medium);
       font-size: 1.2rem;
       display: flex;
       justify-content: center;
     }
 
     .item-price {
-      font-family: var(--font-mono);
+      font-family: var(--font-medium);
       margin-top: 1rem;
-      font-size: 1.5rem;
-      font-weight: 800;
+      font-size: 1.4rem;
     }
 
     .user {

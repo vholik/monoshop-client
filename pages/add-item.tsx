@@ -15,7 +15,6 @@ import { getStyles } from "@store/reducers/item/GetStylesSlice";
 import { getColours } from "@store/reducers/item/GetColoursSlice";
 import { Gender } from "@store/types/gender.enum";
 import { addItem } from "@store/reducers/item/AddItemSlice";
-import ReactLoading from "react-loading";
 import Loading from "@components/Loading/Loading";
 import {
   colourStyles,
@@ -25,6 +24,10 @@ import {
 } from "@utils/react-select-utils";
 import Select from "react-select";
 import { getSubcategories } from "@store/reducers/item/GetSubcategoriesSlice";
+import { Reorder } from "framer-motion";
+import Trash from "@public/images/trash.svg";
+import Upload from "@public/images/upload.svg";
+import Drag from "@public/images/drag.svg";
 
 export default function AddItem() {
   const dispatch = useAppDispatch();
@@ -120,11 +123,15 @@ export default function AddItem() {
       dispatch(uploadImage(body))
         .unwrap()
         .then((result) => {
-          if (formImages.length >= 5) {
-          }
           // Add image url to the form images state
           const image = result.data.url;
-          setFormImages([image, ...formImages]);
+          const find = formImages.find((url) => url === image);
+
+          if (find) {
+            setErrors({ ...errors, images: "Images can't be the same" });
+          } else {
+            setFormImages([image, ...formImages]);
+          }
         })
         .catch((error) => {
           console.error("rejected", error);
@@ -290,6 +297,14 @@ export default function AddItem() {
     }
   };
 
+  const textareaHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      description: e.target.value.replace(/\r\n|\r|\n/g, "<br />"),
+    });
+    setErrors({ ...errors, description: "" });
+  };
+
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -371,14 +386,14 @@ export default function AddItem() {
     if (formData.name.length < 5) {
       setErrors({
         ...errors,
-        description: "Min length of name is 5",
+        name: "Min length of name is 5",
       });
       return;
     }
     if (formData.name.length > 50) {
       setErrors({
         ...errors,
-        description: "Max length of name is 50",
+        name: "Max length of name is 50",
       });
       return;
     }
@@ -412,234 +427,248 @@ export default function AddItem() {
     <AddItemStyles>
       <Header />
       <Categories />
-      {addItemLoading && <Loading />}
+
       <div className="container">
         <div className="wrapper">
           <h1 className="title-md">Add new item</h1>
-          <form className="inner" onSubmit={onSubmit}>
-            {/* First row */}
-            <div className="row">
-              <label className="image-upload">
-                <input
-                  type="file"
-                  className="image-upload-input"
-                  accept="image/*"
-                  onChange={handleImageSubmit}
-                  disabled={isLoading}
-                />
-                Upload an image
-              </label>
-              {errors.images && <p className="error">{errors.images}</p>}
-              {error && <p className="error">{error}</p>}
-              {isLoading && (
-                <div className="item-image loading-background"></div>
-              )}
-              {formImages.map((image, key) => (
-                <div
-                  className="item-image"
-                  key={key}
-                  onClick={() => deleteImage(key)}
-                >
+          {addItemLoading ? (
+            <Loading />
+          ) : (
+            <form className="inner" onSubmit={onSubmit}>
+              {/* First row */}
+              <div className="row">
+                <label className="image-upload">
+                  <input
+                    type="file"
+                    className="image-upload-input"
+                    accept="image/*"
+                    onChange={handleImageSubmit}
+                    disabled={isLoading}
+                  />
                   <Image
-                    style={{
-                      objectFit: "cover",
-                      width: "100%",
-                      height: "100%",
-                      position: "absolute",
-                    }}
-                    alt="Photo"
-                    src={image}
-                    fill
+                    src={Upload}
+                    alt="Upload"
+                    className="upload-icon"
+                    height={50}
+                    width={50}
                   />
-                  <div className="wrapper">Click on image to delete</div>
-                </div>
-              ))}
-            </div>
-            <div className="inner-row">
-              {/* Second row */}
-              <div className="row">
-                <label className="label">
-                  Item name
-                  <input
-                    onChange={handleNameChange}
-                    type="text"
-                    className="input"
-                    placeholder="Item name"
-                    required
-                    min={5}
-                    max={50}
-                  />
+                  Upload an image
                 </label>
-                {errors.name && <p className="error">{errors.name}</p>}
-                <label className="label">
-                  Category
-                  <CustomSelect
-                    name="category"
-                    placeholder="Select a category"
-                    options={categories}
-                    isLoading={isCategoriesLoading}
-                    disabled={!formData.gender}
-                    error={categoriesError || errors.category}
-                    handleSelectChange={handleSelectChange}
-                  />
-                </label>
-
-                {errors.category && <p className="error">{errors.category}</p>}
-                <label className="label">
-                  Style
-                  <CustomSelect
-                    name="style"
-                    placeholder="Select a style"
-                    options={styles}
-                    isLoading={isStylesLoading}
-                    error={stylesError || errors.style}
-                    handleSelectChange={handleSelectChange}
-                  />
-                </label>
-                {errors.style && <p className="error">{errors.style}</p>}
-                <label className="label">
-                  Colour
-                  <CustomSelect
-                    name="colour"
-                    placeholder="Select a colour"
-                    options={colours}
-                    isLoading={isColoursLoading}
-                    error={coloursError || errors.colour}
-                    handleSelectChange={handleSelectChange}
-                  />
-                </label>
-                {errors.price && <p className="error">{errors.colour}</p>}
-                <label className="label">
-                  Price
-                  <input
-                    type="number"
-                    className="input"
-                    placeholder="Select a price"
-                    onChange={handlePriceChange}
-                    min={0}
-                    max={100000}
-                  />
-                </label>
-                {errors.price && <p className="error">{errors.price}</p>}
-                <label className="label">
-                  Hashtags
-                  <input
-                    type="text"
-                    className="input"
-                    placeholder="Hashtags"
-                    onChange={handleHashtagsChange}
-                  />
-                  {errors.hashtags && (
-                    <p className="error">{errors.hashtags}</p>
-                  )}
-                </label>
-              </div>
-              {/* Third row */}
-              <div className="row">
-                <label className="label">
-                  Sex
-                  <CustomSelect
-                    name="gender"
-                    placeholder="Select a sex"
-                    options={genders}
-                    isLoading={false}
-                    error={errors.gender}
-                    handleSelectChange={handleSelectChange}
-                  />
-                </label>
-                {errors.gender && <p className="error">{errors.gender}</p>}
-                <label className="label">
-                  Subcategory
-                  <Select
-                    ref={subcategoryRef}
-                    required={true}
-                    className="select"
-                    name="subcategory"
-                    isLoading={isSubcategoriesLoading}
-                    isDisabled={!formData.categoryId}
-                    placeholder="Select a subcategory"
-                    options={subcategories}
-                    isClearable={true}
-                    isSearchable={true}
-                    styles={colourStyles}
-                    onChange={(e) => handleSelectChange(e, "subcategory")}
-                  />
-                  {errors.subcategory && (
-                    <p className="error">{errors.subcategory}</p>
-                  )}
-                </label>
-                <label className="label">
-                  Condition
-                  <CustomSelect
-                    name="condition"
-                    placeholder="Select a condition"
-                    options={conditions}
-                    isLoading={false}
-                    error={errors.condition}
-                    handleSelectChange={handleSelectChange}
-                  />
-                </label>
-                {errors.condition && (
-                  <p className="error">{errors.condition}</p>
+                {errors.images && <p className="error">{errors.images}</p>}
+                {error && <p className="error">{error}</p>}
+                {isLoading && (
+                  <div className="item-image loading-background"></div>
                 )}
-                <label className="label">
-                  Brand
-                  <CustomSelect
-                    name="brand"
-                    placeholder="Select a brand"
-                    options={brands}
-                    isLoading={isBrandsLoading}
-                    error={brandsError || errors.brand}
-                    handleSelectChange={handleSelectChange}
-                  />
-                </label>
-                {errors.brand && <p className="error">{errors.brand}</p>}
-                <label className="label">
-                  Size
-                  <CustomSelect
-                    name="size"
-                    placeholder="Select a size"
-                    options={sizes}
-                    isLoading={false}
-                    error={errors.size}
-                    handleSelectChange={handleSelectChange}
-                  />
-                </label>
-                {errors.size && <p className="error">{errors.size}</p>}
+                <Reorder.Group
+                  as="ol"
+                  axis="y"
+                  values={formImages}
+                  onReorder={setFormImages}
+                >
+                  {formImages.map((url, key) => (
+                    <Reorder.Item key={url} value={url}>
+                      <div
+                        className="item-image"
+                        style={{
+                          backgroundImage: `url('${url}')`,
+                        }}
+                      >
+                        <div className="item-image__inner">
+                          <div className="image-icon drag--icon">
+                            <Image src={Drag} alt="Drag" />
+                          </div>
+                          <div
+                            className="image-icon delete--icon"
+                            onClick={() => deleteImage(key)}
+                          >
+                            <Image src={Trash} alt="Delete" />
+                          </div>
+                        </div>
+                      </div>
+                    </Reorder.Item>
+                  ))}
+                </Reorder.Group>
               </div>
-              <label className="label description--label">
-                Description
-                <textarea
-                  id="description"
-                  placeholder="Describe your item..."
-                  minLength={10}
-                  maxLength={200}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      description: e.target.value.replace(
-                        /\r\n|\r|\n/g,
-                        "<br />"
-                      ),
-                    })
-                  }
-                ></textarea>
-              </label>
-              {errors.description && (
-                <p className="error">{errors.description}</p>
-              )}
-              <button
-                className="button submit--buton"
-                disabled={addItemLoading}
-              >
-                Save
-              </button>
+              <div className="inner-row">
+                {/* Second row */}
+                <div className="row">
+                  <label className="label">
+                    Item name
+                    <input
+                      onChange={handleNameChange}
+                      type="text"
+                      className="input"
+                      placeholder="Item name"
+                      required
+                      min={5}
+                      max={50}
+                    />
+                    {errors.name && <p className="error">{errors.name}</p>}
+                  </label>
+                  <label className="label">
+                    Category
+                    <CustomSelect
+                      name="category"
+                      placeholder="Select a category"
+                      options={categories}
+                      isLoading={isCategoriesLoading}
+                      disabled={!formData.gender}
+                      error={categoriesError || errors.category}
+                      handleSelectChange={handleSelectChange}
+                    />
+                    {errors.category && (
+                      <p className="error">{errors.category}</p>
+                    )}
+                  </label>
 
-              {addItemError && <p className="error">{addItemError}</p>}
-            </div>
-          </form>
+                  <label className="label">
+                    Style
+                    <CustomSelect
+                      name="style"
+                      placeholder="Select a style"
+                      options={styles}
+                      isLoading={isStylesLoading}
+                      error={stylesError || errors.style}
+                      handleSelectChange={handleSelectChange}
+                    />
+                    {errors.style && <p className="error">{errors.style}</p>}
+                  </label>
+                  <label className="label">
+                    Colour
+                    <CustomSelect
+                      name="colour"
+                      placeholder="Select a colour"
+                      options={colours}
+                      isLoading={isColoursLoading}
+                      error={coloursError || errors.colour}
+                      handleSelectChange={handleSelectChange}
+                    />
+                    {errors.price && <p className="error">{errors.colour}</p>}
+                  </label>
+                  <label className="label">
+                    Price
+                    <input
+                      type="number"
+                      className="input"
+                      placeholder="Select a price"
+                      onChange={handlePriceChange}
+                      min={0}
+                      max={100000}
+                    />
+                    {errors.price && <p className="error">{errors.price}</p>}
+                  </label>
+                  <label className="label">
+                    Hashtags
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="Hashtags"
+                      onChange={handleHashtagsChange}
+                    />
+                    {errors.hashtags && (
+                      <p className="error">{errors.hashtags}</p>
+                    )}
+                  </label>
+                </div>
+                {/* Third row */}
+                <div className="row">
+                  <label className="label">
+                    Sex
+                    <CustomSelect
+                      name="gender"
+                      placeholder="Select a sex"
+                      options={genders}
+                      isLoading={false}
+                      error={errors.gender}
+                      handleSelectChange={handleSelectChange}
+                    />
+                    {errors.gender && <p className="error">{errors.gender}</p>}
+                  </label>
+                  <label className="label">
+                    Subcategory
+                    <Select
+                      ref={subcategoryRef}
+                      required={true}
+                      className="select"
+                      name="subcategory"
+                      isLoading={isSubcategoriesLoading}
+                      isDisabled={!formData.categoryId}
+                      placeholder="Select a subcategory"
+                      options={subcategories}
+                      isClearable={true}
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={(e) => handleSelectChange(e, "subcategory")}
+                    />
+                    {errors.subcategory && (
+                      <p className="error">{errors.subcategory}</p>
+                    )}
+                  </label>
+                  <label className="label">
+                    Condition
+                    <CustomSelect
+                      name="condition"
+                      placeholder="Select a condition"
+                      options={conditions}
+                      isLoading={false}
+                      error={errors.condition}
+                      handleSelectChange={handleSelectChange}
+                    />
+                    {errors.condition && (
+                      <p className="error">{errors.condition}</p>
+                    )}
+                  </label>
+                  <label className="label">
+                    Brand
+                    <CustomSelect
+                      name="brand"
+                      placeholder="Select a brand"
+                      options={brands}
+                      isLoading={isBrandsLoading}
+                      error={brandsError || errors.brand}
+                      handleSelectChange={handleSelectChange}
+                    />
+                    {errors.brand && <p className="error">{errors.brand}</p>}
+                  </label>
+                  <label className="label">
+                    Size
+                    <CustomSelect
+                      name="size"
+                      placeholder="Select a size"
+                      options={sizes}
+                      isLoading={false}
+                      error={errors.size}
+                      handleSelectChange={handleSelectChange}
+                    />
+                    {errors.size && <p className="error">{errors.size}</p>}
+                  </label>
+                </div>
+                <label className="label description--label">
+                  Description
+                  <textarea
+                    id="description"
+                    placeholder="Describe your item..."
+                    minLength={10}
+                    maxLength={200}
+                    onChange={textareaHandler}
+                  ></textarea>
+                  {errors.description && (
+                    <p className="error">{errors.description}</p>
+                  )}
+                </label>
+                <button
+                  className="button submit--buton"
+                  disabled={addItemLoading}
+                >
+                  Save
+                </button>
+                {addItemError && <p className="error">{addItemError}</p>}
+              </div>
+            </form>
+          )}
         </div>
       </div>
+
       <Footer />
     </AddItemStyles>
   );
@@ -685,39 +714,14 @@ const AddItemStyles = styled.div`
     display: flex;
     padding: 6px 12px;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
+    gap: 1rem;
     aspect-ratio: 1 / 1;
     cursor: pointer;
 
     input {
       display: none;
-    }
-  }
-
-  .item-image {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    position: relative;
-    margin-top: 2rem;
-
-    .wrapper {
-      opacity: 1;
-      color: white;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      position: absolute;
-      background-color: var(--grey-60);
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 10;
-    }
-
-    &:hover .wrapper {
-      display: flex;
     }
   }
 

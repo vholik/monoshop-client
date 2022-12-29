@@ -1,3 +1,4 @@
+import { SortBy } from "@store/types/filter-by.enum";
 import { Gender } from "@store/types/gender.enum";
 
 export const filterColourStyles = {
@@ -5,7 +6,6 @@ export const filterColourStyles = {
     ...styles,
     background: "var(--white)",
     borderRadius: 0,
-    position: "fixed",
     width: "9rem",
   }),
   dropdownIndicator: (base: any) => ({
@@ -44,6 +44,60 @@ export const filterColourStyles = {
     background: "transparent",
   }),
   indicatorSeparator: () => ({}),
+  input: (provided: any) => ({
+    ...provided,
+    margin: "0",
+    padding: "0",
+  }),
+  placeholder: (styles: any, { isDisabled }: any) => ({
+    ...styles,
+    color: isDisabled ? "#aaa !important" : "var(--dark)",
+  }),
+};
+export const sortingColourStyles = {
+  menuList: (styles: any) => ({
+    ...styles,
+    background: "var(--white)",
+    borderRadius: 0,
+    width: "10rem",
+  }),
+  dropdownIndicator: () => ({
+    display: "none",
+  }),
+  option: (styles: any, { isFocused, isSelected }: any) => ({
+    ...styles,
+    background: isFocused ? "#f6f6f6" : isSelected ? "#f6f6f6" : undefined,
+    color: isSelected ? "var(--grey-60)" : "var(--dark) !important",
+    zIndex: 1,
+    borderRadius: 0,
+  }),
+  menu: (base: any) => ({
+    ...base,
+    zIndex: 100,
+    borderRadius: 0,
+    border: "1px solid var(--grey-10)",
+    boxShadow: "none",
+    right: "50px",
+  }),
+  control: (provided: any, { isDisabled }: any) => ({
+    ...provided,
+    boxShadow: "none",
+    color: "var(--dark)",
+    background: "transparent",
+    border: "0",
+    borderRadius: 0,
+    cursor: isDisabled ? "not-allowed !important" : "default",
+  }),
+  indicatorSeparator: () => ({
+    display: "none",
+  }),
+  valueContainer: (provided: any) => ({
+    ...provided,
+    padding: "0",
+    fontSize: "1rem",
+    margin: "0",
+    background: "transparent",
+  }),
   input: (provided: any) => ({
     ...provided,
     margin: "0",
@@ -97,8 +151,10 @@ export const colourStyles = {
 };
 
 export const sizes = [
+  { value: "XS", label: "XS" },
   { value: "S", label: "S" },
   { value: "M", label: "M" },
+  { value: "L", label: "L " },
   { value: "XL", label: "XL" },
   { value: "XXL", label: "XXL" },
 ];
@@ -122,4 +178,11 @@ export const genders: {
 }[] = [
   { value: Gender.MEN, label: "Menswear" },
   { value: Gender.WOMEN, label: "Womenswear" },
+];
+
+export const sortingValues = [
+  { value: SortBy.PriceLow, label: "Price (Low first)" },
+  { value: SortBy.PriceHigh, label: "Price (High first)" },
+  { value: SortBy.Popular, label: "Popular" },
+  { value: SortBy.Recent, label: "Recent" },
 ];

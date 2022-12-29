@@ -29,6 +29,10 @@ import { Item } from "@store/types/item";
 import Select from "react-select";
 import { editItem } from "@store/reducers/item/EditItemSlice";
 import { getSubcategories } from "@store/reducers/item/GetSubcategoriesSlice";
+import Trash from "@public/images/trash.svg";
+import Upload from "@public/images/upload.svg";
+import Drag from "@public/images/drag.svg";
+import { Reorder } from "framer-motion";
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) =>
@@ -154,11 +158,16 @@ export default function AddItem({ item }: EditItemProps) {
       dispatch(uploadImage(body))
         .unwrap()
         .then((result) => {
-          if (formImages.length >= 5) {
-          }
           // Add image url to the form images state
           const image = result.data.url;
-          setFormImages([image, ...formImages]);
+
+          const find = formImages.find((url) => url === image);
+
+          if (find) {
+            setErrors({ ...errors, images: "Images can't be the same" });
+          } else {
+            setFormImages([image, ...formImages]);
+          }
         })
         .catch((error) => {
           console.error("rejected", error);
@@ -501,7 +510,8 @@ export default function AddItem({ item }: EditItemProps) {
       formData.price === item.price &&
       formData.size === item.size &&
       formData.style === item.style.value &&
-      formData.subcategoryId === item.subcategory.id;
+      formData.subcategoryId === item.subcategory.id &&
+      formImages === item.images;
 
     if (isEqualResults) {
       setErrors({
@@ -581,6 +591,13 @@ export default function AddItem({ item }: EditItemProps) {
                   onChange={handleImageSubmit}
                   disabled={isLoading}
                 />
+                <Image
+                  src={Upload}
+                  alt="Upload"
+                  className="upload-icon"
+                  height={50}
+                  width={50}
+                />
                 Upload an image
               </label>
               {errors.images && <p className="error">{errors.images}</p>}
@@ -588,26 +605,35 @@ export default function AddItem({ item }: EditItemProps) {
               {isLoading && (
                 <div className="item-image loading-background"></div>
               )}
-              {formImages.map((image, key) => (
-                <div
-                  className="item-image"
-                  key={key}
-                  onClick={() => deleteImage(key)}
-                >
-                  <Image
-                    style={{
-                      objectFit: "cover",
-                      width: "100%",
-                      height: "100%",
-                      position: "absolute",
-                    }}
-                    alt="Photo"
-                    src={image}
-                    fill
-                  />
-                  <div className="wrapper">Click on image to delete</div>
-                </div>
-              ))}
+              <Reorder.Group
+                as="ol"
+                axis="y"
+                values={formImages}
+                onReorder={setFormImages}
+              >
+                {formImages.map((url, key) => (
+                  <Reorder.Item key={url} value={url}>
+                    <div
+                      className="item-image"
+                      style={{
+                        backgroundImage: `url('${url}')`,
+                      }}
+                    >
+                      <div className="item-image__inner">
+                        <div className="image-icon drag--icon">
+                          <Image src={Drag} alt="Drag" />
+                        </div>
+                        <div
+                          className="image-icon delete--icon"
+                          onClick={() => deleteImage(key)}
+                        >
+                          <Image src={Trash} alt="Delete" />
+                        </div>
+                      </div>
+                    </div>
+                  </Reorder.Item>
+                ))}
+              </Reorder.Group>
             </div>
             <div className="inner-row">
               {/* Second row */}
@@ -909,7 +935,9 @@ const EditItemStyles = styled.div`
     display: flex;
     padding: 6px 12px;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
+    gap: 1rem;
     aspect-ratio: 1 / 1;
     cursor: pointer;
 
@@ -923,25 +951,46 @@ const EditItemStyles = styled.div`
     aspect-ratio: 1 / 1;
     position: relative;
     margin-top: 2rem;
-
-    .wrapper {
+    background-repeat: no-repeat;
+    background-size: cover;
+    &:hover .item-image__inner {
       opacity: 1;
-      color: white;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
+    }
+
+    &__inner {
+      opacity: 0;
       position: absolute;
-      background-color: var(--grey-60);
-      top: 0;
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      align-items: center;
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: 10;
-    }
+      top: 0;
+      background-color: var(--grey-30);
 
-    &:hover .wrapper {
-      display: flex;
+      .delete--icon {
+        cursor: pointer;
+      }
+
+      .drag--icon {
+        cursor: grab;
+      }
+
+      .image-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 4rem;
+        width: 4rem;
+        border-radius: 50%;
+        background-color: white;
+
+        img {
+          pointer-events: none;
+        }
+      }
     }
   }
 

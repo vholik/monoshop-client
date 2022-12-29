@@ -1,4 +1,4 @@
-import { FilterBy } from "./filter-by.enum";
+import { SortBy } from "./filter-by.enum";
 import { Gender } from "./gender.enum";
 import { Item } from "./item";
 
@@ -12,7 +12,7 @@ export interface IFilter {
   brand: string[];
   style: string[];
   colour: string[];
-  sortBy: FilterBy;
+  sortBy: SortBy;
   page: number;
 }
 

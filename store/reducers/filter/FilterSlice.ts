@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IFilter } from "@store/types/filter";
-import { FilterBy } from "@store/types/filter-by.enum";
+import { SortBy } from "@store/types/filter-by.enum";
 import { Gender } from "@store/types/gender.enum";
 
 const initialState: IFilter = {
@@ -13,7 +13,7 @@ const initialState: IFilter = {
   brand: [],
   style: [],
   colour: [],
-  sortBy: FilterBy.Popular,
+  sortBy: SortBy.Recent,
   page: 1,
 };
 
@@ -21,6 +21,9 @@ export const FilterSlice = createSlice({
   name: "filter",
   initialState,
   reducers: {
+    setSortBy: (state, action: PayloadAction<SortBy>) => {
+      state.sortBy = action.payload;
+    },
     setPrice: (state, action: PayloadAction<[number, number]>) => {
       state.price = action.payload;
     },
@@ -69,6 +72,7 @@ export const {
   setStyle,
   setStoredFilter,
   setSubcategory,
+  setSortBy,
 } = FilterSlice.actions;
 
 export default FilterSlice.reducer;

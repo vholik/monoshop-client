@@ -24,6 +24,7 @@ import filterReducer from "./filter/FilterSlice";
 import getUserItemsReducer from "./item/GetUserItemsSlice";
 import editItemReducer from "./item/EditItemSlice";
 import getSubcategoriesReducer from "./item/GetSubcategoriesSlice";
+import deleteItemReducer from "./item/DeleteItemSlice";
 
 export type AppDispatch = Store["dispatch"];
 export type RootState = ReturnType<Store["getState"]>;
@@ -51,6 +52,7 @@ const combinedReducer = combineReducers({
   filterReducer,
   getUserItemsReducer,
   editItemReducer,
+  deleteItemReducer,
   getSubcategoriesReducer,
 });
 

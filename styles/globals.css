@@ -10,12 +10,18 @@ body {
   color: var(--dark);
 }
 
+.ol,
+li {
+  list-style-type: none;
+}
+
 :root {
-  /* --font-default: "GT America Extended", sans-serif; */
-  --font-default: "Helvetica", sans-serif;
-  /* --font-default: "RF Dewi Extended", sans-serif; */
-  --font-wide: "RF Dewi Expanded", sans-serif;
-  --font-mono: "Video", sans-serif;
+  --font-default: "HelveticaNeueCyr", sans-serif;
+  --font-medium: "HelveticaNeueCyr", sans-serif;
+  --font-wide: "HelveticaNeueCyr", sans-serif;
+  /* --font-default: "GT America Extended", sans-serif;
+  --font-medium: "GT America Extended Medium", sans-serif;
+  --font-wide: "GT America Extended Bold", sans-serif; */
   --dark: #131313;
   --dark-hover: #414141;
   --loading: #ebebeb;
@@ -64,13 +70,13 @@ h3 {
 }
 
 .title-sm {
-  font-family: var(--font-default);
-  font-size: var(--font-xxl);
+  font-family: var(--font-medium);
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
 .title-md {
-  font-family: var(--font-default);
+  font-family: var(--font-medium);
   font-size: var(--font-xxxl);
   font-weight: 600;
 }
@@ -112,7 +118,7 @@ h3 {
 
 .button {
   cursor: pointer;
-  font-family: var(--font-default);
+  font-family: var(--font-medium);
   color: var(--white);
   background-color: var(--dark);
   text-transform: uppercase;
@@ -183,4 +189,29 @@ a {
 
 .loading-background img {
   display: none;
+}
+
+/* Modal */
+.modal-inner__title {
+  font-size: 1.8rem;
+  font-family: var(--font-medium);
+}
+
+.modal-inner__text {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: var(--grey-60);
+}
+
+.modal-buttons {
+  display: flex;
+  margin-top: 2rem;
+}
+
+.cancel--button {
+  background: transparent !important;
+  color: var(--dark);
+}
+.cancel--button:hover {
+  color: var(--dark-hover);
 }

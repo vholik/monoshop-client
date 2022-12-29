@@ -1,4 +1,4 @@
-export enum FilterBy {
+export enum SortBy {
   Recent = "RECENT",
   Popular = "POPULAR",
   PriceLow = "PRICE_LOW",

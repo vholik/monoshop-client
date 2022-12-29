@@ -6,6 +6,13 @@ import Categories from "@components/Categories/Categories";
 import { getUserById } from "@store/reducers/user/GetUserById";
 import Image from "next/image";
 import Link from "next/link";
+import Phone from "@public/images/phone.svg";
+import Location from "@public/images/location.svg";
+import { useAppSelector } from "@store/hooks/redux";
+import { useEffect } from "react";
+import Router from "next/router";
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) =>
@@ -13,17 +20,10 @@ export const getServerSideProps = wrapper.getServerSideProps(
       const pid = query.pid as string;
       const user = await (await store.dispatch(getUserById(pid))).payload;
 
-      if (!user) {
-        return {
-          props: {
-            user: {},
-          },
-        };
-      }
-
       return {
         props: {
           user,
+          error: null,
         },
       };
     }
@@ -34,7 +34,13 @@ interface UserProfileProps {
 }
 
 const UserProfile = ({ user }: UserProfileProps) => {
-  console.log(user);
+  const { error } = useAppSelector((state) => state.getUserByIdReducer);
+
+  useEffect(() => {
+    if (error) {
+      Router.push("/404");
+    }
+  }, []);
 
   return (
     <UserProfileStyles>
@@ -53,6 +59,19 @@ const UserProfile = ({ user }: UserProfileProps) => {
             <div className="right">
               <h2 className="user-name">{user.fullName}</h2>
               <p className="user-detail">{user.email}</p>
+              {user.phone && (
+                <p className="user-phone">
+                  <Image src={Phone} alt="Phone" height={20} width={20} />{" "}
+                  {user.phone}
+                </p>
+              )}
+              {user.location && (
+                <p className="user-location">
+                  <Image src={Location} alt="Location" height={20} width={20} />{" "}
+                  {user.location}
+                </p>
+              )}
+
               <button className="button">Message</button>
             </div>
           </div>
@@ -73,7 +92,9 @@ const UserProfile = ({ user }: UserProfileProps) => {
                     />
                   </div>
                 </Link>
+                <h2 className="item-name">{item.name}</h2>
                 <p className="item-price">{item.price} PLN</p>
+                <h3 className="item-size">{item.size}</h3>
               </div>
             ))}
           </div>
@@ -103,8 +124,19 @@ const UserProfileStyles = styled.div`
 
   .item {
     .item-image {
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 1 / 1.2;
       position: relative;
+    }
+
+    .item-name {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .item-size {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      color: var(--grey-60);
     }
 
     .item-price {
@@ -122,6 +154,15 @@ const UserProfileStyles = styled.div`
 
     .user-name {
       font-size: 1.5rem;
+    }
+
+    .user-location,
+    .user-phone {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      color: var(--grey-60);
     }
 
     .user-detail {

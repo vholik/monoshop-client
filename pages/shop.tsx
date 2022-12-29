@@ -13,6 +13,8 @@ import {
   filterColourStyles,
   genders,
   sizes,
+  sortingColourStyles,
+  sortingValues,
 } from "@utils/react-select-utils";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { getItems } from "@store/reducers/item/GetItemsSlice";
@@ -26,7 +28,7 @@ import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
 import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
 import { Gender } from "@store/types/gender.enum";
 import { IFilter } from "@store/types/filter";
-import { FilterBy } from "@store/types/filter-by.enum";
+import { SortBy } from "@store/types/filter-by.enum";
 import Link from "next/link";
 import Pagination from "rc-pagination";
 import "rc-pagination/assets/index.css";
@@ -39,11 +41,13 @@ import {
   setGender,
   setPrice,
   setSize,
+  setSortBy,
   setStyle,
   setSubcategory,
 } from "@store/reducers/filter/FilterSlice";
 import UnfilledWhiteHeart from "@public/images/unfilled-white-heart.svg";
 import { getSubcategories } from "@store/reducers/item/GetSubcategoriesSlice";
+import SortingIcon from "@public/images/filter.svg";
 
 const STEP = 1;
 const MIN = 0;
@@ -233,6 +237,17 @@ const Shop = () => {
     }
   };
 
+  const sortingHandler = (
+    e: SingleValue<{
+      value: SortBy;
+      label: string;
+    }>
+  ) => {
+    if (e?.value) {
+      dispatch(setSortBy(e.value));
+    }
+  };
+
   const nextPage = (page: number) => {
     dispatch(changePage(page));
   };
@@ -318,6 +333,14 @@ const Shop = () => {
       value: "Gender",
       label: "Gender",
     };
+  }
+  function setDefaultSortingValue() {
+    const find = sortingValues.find((obj) => obj.value === filter.sortBy);
+    if (find) {
+      return find;
+    }
+
+    return sortingValues[3];
   }
 
   return (
@@ -627,6 +650,17 @@ const Shop = () => {
               )}
             />
           </div>
+          <div className="sorting">
+            <Select
+              placeholder="Sorting"
+              onChange={sortingHandler}
+              options={sortingValues}
+              styles={sortingColourStyles}
+              defaultValue={setDefaultSortingValue()}
+              instanceId="select"
+            />
+            <Image src={SortingIcon} alt="Sort by" />
+          </div>
         </div>
         <div className="item-container">
           {isItemsLoading ? (
@@ -794,10 +828,17 @@ const ShopStyling = styled.div`
   }
 
   // Other
+  .sorting {
+    display: flex;
+    align-items: center;
+  }
+
   .filter {
     margin-top: 1rem;
     margin-left: 50px;
     margin-right: 50px;
+    display: flex;
+    justify-content: space-between;
   }
 
   .filter-inner {
@@ -900,7 +941,7 @@ const ShopStyling = styled.div`
       }
 
       .item-price {
-        font-family: var(--font-mono);
+        font-family: var(--font-medium);
         font-size: 1.1rem;
         margin-top: 1rem;
         font-weight: 600;

@@ -3,7 +3,6 @@ import Header from "@components/Header";
 import { useEffect } from "react";
 import styled from "styled-components";
 import ProfileItems from "@components/ProfileItems";
-
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import Link from "next/link";
 import { getUserItems } from "@store/reducers/item/GetUserItemsSlice";
@@ -15,6 +14,8 @@ const MyProfile = () => {
   const { items, isItemsLoading, itemsError } = useAppSelector(
     (state) => state.getUserItemsReducer
   );
+
+  const { isLoading } = useAppSelector((state) => state.deleteItemReducer);
 
   useEffect(() => {
     dispatch(getUserItems())
@@ -28,6 +29,7 @@ const MyProfile = () => {
     <MyProfileStyles>
       <Header />
       <Categories />
+
       <div className="container">
         <h2 className="profile-title">My profile</h2>
         <div className="settings-list">
@@ -41,7 +43,11 @@ const MyProfile = () => {
       </div>
       <div className="wrapper">
         <div className="container">
-          {isItemsLoading ? <Loading /> : <ProfileItems items={items} />}
+          {isItemsLoading || isLoading ? (
+            <Loading />
+          ) : (
+            <ProfileItems items={items} />
+          )}
         </div>
       </div>
     </MyProfileStyles>

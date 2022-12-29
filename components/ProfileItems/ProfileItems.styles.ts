@@ -10,6 +10,7 @@ export const ProfileItemsStyles = styled.div`
 
   .item {
     aspect-ratio: 1/1;
+
     .item-image {
       width: 100%;
       height: 100%;
@@ -17,14 +18,19 @@ export const ProfileItemsStyles = styled.div`
     }
   }
 
-  .bar {
-    margin-top: 0.5rem;
-    font-size: 1.1rem;
+  .hero {
+    margin-top: 1rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+
+  .bar {
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
 
     .edit {
+      margin-top: 0.5rem;
       cursor: pointer;
       text-decoration: underline;
     }
