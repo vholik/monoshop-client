@@ -39,6 +39,9 @@ const MyProfile = () => {
           <Link href={"/my-items"}>
             <p className="settings-list__item active">My items</p>
           </Link>
+          <Link href={"/favorites"}>
+            <p className="settings-list__item">My favorites</p>
+          </Link>
         </div>
       </div>
       <div className="wrapper">

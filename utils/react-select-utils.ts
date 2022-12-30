@@ -6,7 +6,7 @@ export const filterColourStyles = {
     ...styles,
     background: "var(--white)",
     borderRadius: 0,
-    width: "9rem",
+    minWidth: "fit-content",
   }),
   dropdownIndicator: (base: any) => ({
     ...base,

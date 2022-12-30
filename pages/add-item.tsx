@@ -28,6 +28,7 @@ import { Reorder } from "framer-motion";
 import Trash from "@public/images/trash.svg";
 import Upload from "@public/images/upload.svg";
 import Drag from "@public/images/drag.svg";
+import Router from "next/router";
 
 export default function AddItem() {
   const dispatch = useAppDispatch();
@@ -419,8 +420,10 @@ export default function AddItem() {
 
     dispatch(addItem(patchedData))
       .unwrap()
-      .then((res) => console.log(res))
-      .catch((err) => console.log("rejected", err));
+      .then(() => Router.push("/success"))
+      .catch((err) => {
+        console.log("rejected", err), Router.push("/404");
+      });
   };
 
   return (
@@ -722,6 +725,54 @@ const AddItemStyles = styled.div`
 
     input {
       display: none;
+    }
+  }
+
+  .item-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    position: relative;
+    margin-top: 2rem;
+    background-repeat: no-repeat;
+    background-size: cover;
+    &:hover .item-image__inner {
+      opacity: 1;
+    }
+
+    &__inner {
+      opacity: 0;
+      position: absolute;
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      align-items: center;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: 0;
+      background-color: var(--grey-30);
+
+      .delete--icon {
+        cursor: pointer;
+      }
+
+      .drag--icon {
+        cursor: grab;
+      }
+
+      .image-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 4rem;
+        width: 4rem;
+        border-radius: 50%;
+        background-color: white;
+
+        img {
+          pointer-events: none;
+        }
+      }
     }
   }
 

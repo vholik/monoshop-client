@@ -19,9 +19,9 @@ li {
   --font-default: "HelveticaNeueCyr", sans-serif;
   --font-medium: "HelveticaNeueCyr", sans-serif;
   --font-wide: "HelveticaNeueCyr", sans-serif;
-  /* --font-default: "GT America Extended", sans-serif;
-  --font-medium: "GT America Extended Medium", sans-serif;
-  --font-wide: "GT America Extended Bold", sans-serif; */
+  /* --font-default: "Euclid Circular A", sans-serif;
+  --font-medium: "Euclid Circular A", sans-serif;
+  --font-wide: "Euclid Circular A", sans-serif; */
   --dark: #131313;
   --dark-hover: #414141;
   --loading: #ebebeb;
@@ -124,7 +124,7 @@ h3 {
   text-transform: uppercase;
   font-weight: 600;
   border: none;
-  width: max-content;
+  min-width: max-content;
   font-size: 1rem;
   padding: 0.9em 4em;
   display: flex;

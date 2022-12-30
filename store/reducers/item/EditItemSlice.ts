@@ -16,9 +16,9 @@ const initialState: BrandsState = {
   item: null,
 };
 
-export const editItem = createAsyncThunk(
+export const editItem = createAsyncThunk<Item, IEditItemFormData>(
   "editItem",
-  async (formData: IEditItemFormData, thunkAPI) => {
+  async (formData: IEditItemFormData, thunkAPI: any) => {
     try {
       const response = await instance.put<Item>(
         `item/${formData.id}`,

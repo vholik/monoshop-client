@@ -17,7 +17,7 @@ import {
   sortingValues,
 } from "@utils/react-select-utils";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
-import { getItems } from "@store/reducers/item/GetItemsSlice";
+import { getItems, setFavorite } from "@store/reducers/item/GetItemsSlice";
 import Image from "next/image";
 import { getTrackBackground, Range } from "react-range";
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -46,8 +46,10 @@ import {
   setSubcategory,
 } from "@store/reducers/filter/FilterSlice";
 import UnfilledWhiteHeart from "@public/images/unfilled-white-heart.svg";
+import FilledHeart from "@public/images/filled-heart.svg";
 import { getSubcategories } from "@store/reducers/item/GetSubcategoriesSlice";
 import SortingIcon from "@public/images/filter.svg";
+import { toggleFavorite } from "@store/reducers/favorite/ToggleFavoriteSlice";
 
 const STEP = 1;
 const MIN = 0;
@@ -60,6 +62,9 @@ const Shop = () => {
 
   const { items, isItemsLoading, itemsError, total } = useAppSelector(
     (state) => state.getItemsReducer
+  );
+  const { isFavoriteToggleLoading } = useAppSelector(
+    (state) => state.toggleFavoriteReducer
   );
   const { brands, isBrandsLoading } = useAppSelector(
     (state) => state.getBrandsReducer
@@ -252,47 +257,47 @@ const Shop = () => {
     dispatch(changePage(page));
   };
 
-  function setDefaultSizeValue(): ItemEntity[] {
+  const setDefaultSizeValue = (): ItemEntity[] => {
     return filter.size.map((size) => {
       return {
         value: size,
         label: size,
       };
     });
-  }
-  function setDefaultBrandValue(): ItemEntity[] {
+  };
+  const setDefaultBrandValue = (): ItemEntity[] => {
     return filter.brand.map((brand) => {
       return {
         value: brand,
         label: brand,
       };
     });
-  }
-  function setDefaultColourValue(): ItemEntity[] {
+  };
+  const setDefaultColourValue = (): ItemEntity[] => {
     return filter.colour.map((colour) => {
       return {
         value: colour,
         label: colour,
       };
     });
-  }
-  function setDefaultStyleValue(): ItemEntity[] {
+  };
+  const setDefaultStyleValue = (): ItemEntity[] => {
     return filter.style.map((style) => {
       return {
         value: style,
         label: style,
       };
     });
-  }
-  function setDefaultConditionValue(): ItemEntity[] {
+  };
+  const setDefaultConditionValue = (): ItemEntity[] => {
     return filter.condition.map((condition) => {
       return {
         value: String(condition),
         label: String(condition),
       };
     });
-  }
-  function setDefaultCategoryValue(): ItemEntityWithId {
+  };
+  const setDefaultCategoryValue = (): ItemEntityWithId => {
     const find = categories.find((category) => category.id === filter.category);
 
     if (find) {
@@ -304,8 +309,8 @@ const Shop = () => {
       label: "Category",
       id: 0,
     };
-  }
-  function setDefaultSubcategoryValue(): ItemEntityWithId[] {
+  };
+  const setDefaultSubcategoryValue = (): ItemEntityWithId[] => {
     const mapped = subcategories.filter((subcategory) => {
       if (subcategory.id) {
         return filter.subcategory.indexOf(subcategory.id) > -1;
@@ -317,11 +322,11 @@ const Shop = () => {
     }
 
     return [];
-  }
-  function setDefaultGenderValue(): SingleValue<{
+  };
+  const setDefaultGenderValue = (): SingleValue<{
     value: string;
     label: string;
-  }> {
+  }> => {
     if (filter.gender) {
       return {
         value: filter.gender,
@@ -333,15 +338,29 @@ const Shop = () => {
       value: "Gender",
       label: "Gender",
     };
-  }
-  function setDefaultSortingValue() {
+  };
+  const setDefaultSortingValue = () => {
     const find = sortingValues.find((obj) => obj.value === filter.sortBy);
     if (find) {
       return find;
     }
 
     return sortingValues[3];
-  }
+  };
+  const favoriteHandler = (id: number) => {
+    if (!isFavoriteToggleLoading) {
+      dispatch(toggleFavorite(id))
+        .unwrap()
+        .then((isFavorite) => {
+          dispatch(setFavorite({ id, isFavorite }));
+        })
+        .catch((error: Error) => {
+          console.error("rejected", error);
+        });
+    }
+  };
+
+  console.log(items);
 
   return (
     <ShopStyling onClick={() => setIsPriceOpen(false)}>
@@ -732,13 +751,23 @@ const Shop = () => {
             <div className="items-wrapper">
               {items.map((item) => (
                 <div className="item" key={item.id}>
+                  {item.isFavorite ? (
+                    <Image
+                      src={FilledHeart}
+                      alt="Remove favorites"
+                      className="unfilled-heart"
+                      onClick={() => favoriteHandler(item.id)}
+                    />
+                  ) : (
+                    <Image
+                      src={UnfilledWhiteHeart}
+                      alt="Add to favorites"
+                      className="unfilled-heart"
+                      onClick={() => favoriteHandler(item.id)}
+                    />
+                  )}
                   <Link href={`/shop/${item.id}`}>
                     <div className="item-image">
-                      <Image
-                        src={UnfilledWhiteHeart}
-                        alt="Add to favorites"
-                        className="unfilled-heart"
-                      />
                       <Image
                         src={item.images[0]}
                         alt="Image"
@@ -909,9 +938,11 @@ const ShopStyling = styled.div`
     margin-top: 2rem;
 
     .item {
+      position: relative;
+
       .unfilled-heart {
         position: absolute;
-        bottom: 1rem;
+        top: 1rem;
         right: 1rem;
         z-index: 1;
       }
@@ -928,9 +959,9 @@ const ShopStyling = styled.div`
           right: 0;
           background: linear-gradient(
             180deg,
-            rgba(40, 40, 40, 0) 0%,
-            rgba(40, 40, 40, 0.25) 90.73%,
-            rgba(40, 40, 40, 0.53) 100%
+            rgba(19, 19, 19, 0.5) 0%,
+            rgba(19, 19, 19, 0.12) 18.75%,
+            rgba(19, 19, 19, 0) 100%
           );
         }
       }

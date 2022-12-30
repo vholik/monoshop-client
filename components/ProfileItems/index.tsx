@@ -7,8 +7,8 @@ import { useState } from "react";
 import Modal from "react-modal";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { deleteItemById } from "@store/reducers/item/DeleteItemSlice";
-import { Router } from "next/router";
 import { getUserItems } from "@store/reducers/item/GetUserItemsSlice";
+import Router from "next/router";
 
 Modal.setAppElement("#__next");
 
@@ -41,10 +41,10 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
     if (deleteId) {
       dispatch(deleteItemById(deleteId))
         .unwrap()
-        .then((res) => {
-          dispatch(getUserItems()), console.log(res);
-        })
-        .catch((err) => console.log("rejected", err));
+        .then(() => Router.push("/success-update"))
+        .catch((err) => {
+          console.log("rejected", err), Router.push("/404");
+        });
     }
   };
 

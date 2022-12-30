@@ -11,8 +11,6 @@ import Location from "@public/images/location.svg";
 import { useAppSelector } from "@store/hooks/redux";
 import { useEffect } from "react";
 import Router from "next/router";
-import Popup from "reactjs-popup";
-import "reactjs-popup/dist/index.css";
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) =>

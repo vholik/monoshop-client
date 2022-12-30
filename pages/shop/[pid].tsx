@@ -4,15 +4,20 @@ import { getItemById } from "@store/reducers/item/GetItemByIdSlice";
 import styled from "styled-components";
 import Image from "next/image";
 import unfilledHeart from "@public/images/unfilled-heart.svg";
+import filledHeart from "@public/images/filled-heart.svg";
 import Footer from "@components/Footer/Footer";
 import Link from "next/link";
-import ArrowLeft from "@public/images/arrow-left.svg";
 import ArrowRight from "@public/images/arrow-right.svg";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { CSSProperties, useEffect, useState } from "react";
 import Router, { useRouter } from "next/router";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
+import {
+  checkIsFavorite,
+  setIsFavorite,
+} from "@store/reducers/favorite/CheckIsFavoriteSlice";
+import { toggleFavorite } from "@store/reducers/favorite/ToggleFavoriteSlice";
 
 const arrowStyles: CSSProperties = {
   position: "absolute",
@@ -28,6 +33,13 @@ const ShopItem = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { pid } = router.query;
+  const { isAuth } = useAppSelector((state) => state.loginReducer);
+  const { isFavoriteLoading, isFavorite } = useAppSelector(
+    (state) => state.checkIsFavoriteReducer
+  );
+  const { isFavoriteToggleLoading } = useAppSelector(
+    (state) => state.toggleFavoriteReducer
+  );
 
   const [images, setImages] = useState<{ image: string }[]>([]);
 
@@ -36,8 +48,8 @@ const ShopItem = () => {
   );
 
   useEffect(() => {
-    if (router.isReady) {
-      dispatch(getItemById(pid as string))
+    if (router.isReady && typeof pid === "string") {
+      dispatch(getItemById(pid))
         .unwrap()
         .then((res) => {
           window.scrollTo({
@@ -51,6 +63,14 @@ const ShopItem = () => {
             };
           });
           setImages(mappedImages);
+          // Check favorite
+          if (isAuth) {
+            dispatch(checkIsFavorite(pid))
+              .unwrap()
+              .catch((error: Error) => {
+                console.error("rejected", error);
+              });
+          }
         })
         .catch((error: Error) => {
           console.error("rejected", error);
@@ -61,6 +81,27 @@ const ShopItem = () => {
   if (error) {
     Router.push("/404");
   }
+
+  const favoriteHandler = () => {
+    if (!isAuth) {
+      return Router.push("/login");
+    }
+
+    if (
+      typeof pid === "string" &&
+      !isFavoriteToggleLoading &&
+      !isFavoriteLoading
+    ) {
+      dispatch(toggleFavorite(Number(pid)))
+        .unwrap()
+        .then((isFavorite) => {
+          dispatch(setIsFavorite(isFavorite)), console.log(isFavorite);
+        })
+        .catch((error: Error) => {
+          console.error("rejected", error);
+        });
+    }
+  };
 
   return (
     <ShopItemStyles>
@@ -219,7 +260,19 @@ const ShopItem = () => {
               <div className="hero-wrapper">
                 <div className="item-hero">
                   <h2 className="item-name">{item?.name}</h2>
-                  <Image src={unfilledHeart} alt="Add to favorite" />
+                  {!isLoading && !isFavoriteLoading && !isFavorite ? (
+                    <Image
+                      src={unfilledHeart}
+                      alt="Add to favorites"
+                      onClick={favoriteHandler}
+                    />
+                  ) : (
+                    <Image
+                      src={filledHeart}
+                      alt="Remove from favorites"
+                      onClick={favoriteHandler}
+                    />
+                  )}
                 </div>
                 <h2 className="item-price">{item?.price} PLN</h2>
                 <button className="button item--button">Message</button>

@@ -1,12 +1,9 @@
 import Categories from "@components/Categories/Categories";
 import Header from "@components/Header";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
 import ProfileSettings from "@components/ProfileSettings";
-import ProfileItems from "@components/ProfileItems";
 import { getProfile } from "@store/reducers/user/ProfileSlice";
-import { wrapper } from "@store/reducers/store";
-import { IProfileFormData, User } from "@store/types/user";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import Loading from "@components/Loading/Loading";
 import Link from "next/link";
@@ -26,8 +23,6 @@ const MyProfile = () => {
       });
   }, []);
 
-  console.log(user);
-
   return (
     <MyProfileStyles>
       <Header />
@@ -40,6 +35,9 @@ const MyProfile = () => {
           </Link>
           <Link href={"/my-items"}>
             <p className="settings-list__item">My items</p>
+          </Link>
+          <Link href={"/favorites"}>
+            <p className="settings-list__item">My favorites</p>
           </Link>
         </div>
       </div>

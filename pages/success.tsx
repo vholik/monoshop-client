@@ -1,31 +1,30 @@
 import styled from "styled-components";
-import ErrorIllustration from "@public/images/404.png";
+import SuccessIllustration from "@public/images/success.png";
 import ArrowLeft from "@public/images/arrow-left.svg";
 import Image from "next/image";
 import Link from "next/link";
 import Header from "@components/Header";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 
-export default function Error() {
-  setTimeout(() => {
-    Router.push("/");
-  }, 5000);
+export default function Success() {
+  const router = useRouter();
+  const { pid } = router.query;
 
+  console.log(pid);
   return (
     <>
       <Header />
-      <ErrorStyling>
+      <SuccessStyling>
         <div className="image">
           <Image
-            src={ErrorIllustration}
-            alt="Error"
+            src={SuccessIllustration}
+            alt="Success"
             style={{ position: "absolute", objectFit: "contain" }}
             fill
           />
         </div>
-        <h1 className="error-text">
-          Houston we got a problem... Updating your cordinates directions to the
-          motherpage in 3...2... 1.
+        <h1 className="text">
+          Congratulations. Your item has added succesfully.
         </h1>
         <Link href={"/"}>
           <div className="return">
@@ -33,12 +32,12 @@ export default function Error() {
             Return to home page
           </div>
         </Link>
-      </ErrorStyling>
+      </SuccessStyling>
     </>
   );
 }
 
-export const ErrorStyling = styled.div`
+export const SuccessStyling = styled.div`
   width: 100%;
   display: flex;
   margin-top: 8rem;
@@ -51,7 +50,7 @@ export const ErrorStyling = styled.div`
     position: relative;
   }
 
-  .error-text {
+  .text {
     width: 50%;
     text-align: center;
     margin-top: 1rem;

@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { uploadImage } from "@store/reducers/item/UploadImageSlice";
 import { editProfile } from "@store/reducers/user/EditProfileSlice";
 import Loading from "@components/Loading/Loading";
+import Router from "next/router";
 
 interface IProfileSetting {
   user: User | null;
@@ -86,9 +87,9 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
       editProfile({ ...mappedObject, image: profilePhoto || user?.image })
     )
       .unwrap()
-
-      .catch((error) => {
-        console.error("rejected", error);
+      .then(() => Router.push("/success-update"))
+      .catch((err) => {
+        console.log("rejected", err), Router.push("/404");
       });
   };
 

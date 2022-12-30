@@ -39,7 +39,23 @@ export const getItems = createAsyncThunk<IFileringData[], IFilter>(
 export const GetItemsSlice = createSlice({
   name: "items",
   initialState,
-  reducers: {},
+  reducers: {
+    setFavorite: (
+      state,
+      action: PayloadAction<{ id: number; isFavorite: boolean }>
+    ) => {
+      state.items = state.items.map((it) => {
+        if (it.id === action.payload.id) {
+          return {
+            ...it,
+            isFavorite: action.payload.isFavorite,
+          };
+        }
+
+        return it;
+      });
+    },
+  },
   extraReducers: {
     [getItems.fulfilled.type]: (
       state,
@@ -59,5 +75,7 @@ export const GetItemsSlice = createSlice({
     },
   },
 });
+
+export const { setFavorite } = GetItemsSlice.actions;
 
 export default GetItemsSlice.reducer;

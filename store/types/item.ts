@@ -19,6 +19,7 @@ export interface Item {
   gender: Gender;
   name: string;
   hashtags: string[];
+  isFavorite?: boolean;
 }
 
 export interface IAddItemFormData {

@@ -33,6 +33,7 @@ import Trash from "@public/images/trash.svg";
 import Upload from "@public/images/upload.svg";
 import Drag from "@public/images/drag.svg";
 import { Reorder } from "framer-motion";
+import Router from "next/router";
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) =>
@@ -530,8 +531,10 @@ export default function AddItem({ item }: EditItemProps) {
 
     dispatch(editItem(patchedData))
       .unwrap()
-      .then((res) => console.log(res))
-      .catch((err) => console.log("rejected", err));
+      .then(() => Router.push("/success-update"))
+      .catch((err) => {
+        console.log("rejected", err), Router.push("/404");
+      });
   };
 
   const genderDefaultValue = {
@@ -575,319 +578,321 @@ export default function AddItem({ item }: EditItemProps) {
     <EditItemStyles>
       <Header />
       <Categories />
-      {editItemLoading && <Loading />}
       <div className="container">
         <div className="wrapper">
           <h1 className="title-md">Edit item</h1>
-          <form className="inner">
-            {/* First row */}
-            <div className="row">
-              <label className="image-upload">
-                <input
-                  required
-                  type="file"
-                  className="image-upload-input"
-                  accept="image/*"
-                  onChange={handleImageSubmit}
-                  disabled={isLoading}
-                />
-                <Image
-                  src={Upload}
-                  alt="Upload"
-                  className="upload-icon"
-                  height={50}
-                  width={50}
-                />
-                Upload an image
-              </label>
-              {errors.images && <p className="error">{errors.images}</p>}
-              {error && <p className="error">{error}</p>}
-              {isLoading && (
-                <div className="item-image loading-background"></div>
-              )}
-              <Reorder.Group
-                as="ol"
-                axis="y"
-                values={formImages}
-                onReorder={setFormImages}
-              >
-                {formImages.map((url, key) => (
-                  <Reorder.Item key={url} value={url}>
-                    <div
-                      className="item-image"
-                      style={{
-                        backgroundImage: `url('${url}')`,
-                      }}
-                    >
-                      <div className="item-image__inner">
-                        <div className="image-icon drag--icon">
-                          <Image src={Drag} alt="Drag" />
-                        </div>
-                        <div
-                          className="image-icon delete--icon"
-                          onClick={() => deleteImage(key)}
-                        >
-                          <Image src={Trash} alt="Delete" />
+          {editItemLoading ? (
+            <Loading />
+          ) : (
+            <form className="inner">
+              {/* First row */}
+              <div className="row">
+                <label className="image-upload">
+                  <input
+                    required
+                    type="file"
+                    className="image-upload-input"
+                    accept="image/*"
+                    onChange={handleImageSubmit}
+                    disabled={isLoading}
+                  />
+                  <Image
+                    src={Upload}
+                    alt="Upload"
+                    className="upload-icon"
+                    height={50}
+                    width={50}
+                  />
+                  Upload an image
+                </label>
+                {errors.images && <p className="error">{errors.images}</p>}
+                {error && <p className="error">{error}</p>}
+                {isLoading && (
+                  <div className="item-image loading-background"></div>
+                )}
+                <Reorder.Group
+                  as="ol"
+                  axis="y"
+                  values={formImages}
+                  onReorder={setFormImages}
+                >
+                  {formImages.map((url, key) => (
+                    <Reorder.Item key={url} value={url}>
+                      <div
+                        className="item-image"
+                        style={{
+                          backgroundImage: `url('${url}')`,
+                        }}
+                      >
+                        <div className="item-image__inner">
+                          <div className="image-icon drag--icon">
+                            <Image src={Drag} alt="Drag" />
+                          </div>
+                          <div
+                            className="image-icon delete--icon"
+                            onClick={() => deleteImage(key)}
+                          >
+                            <Image src={Trash} alt="Delete" />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Reorder.Item>
-                ))}
-              </Reorder.Group>
-            </div>
-            <div className="inner-row">
-              {/* Second row */}
-              <div className="row">
-                <label className="label">
-                  Item name
-                  <input
-                    onChange={handleNameChange}
-                    type="text"
-                    className="input"
-                    placeholder="Item name"
-                    required
-                    min={5}
-                    max={50}
-                    defaultValue={item.name || ""}
-                  />
-                  {errors.name && <p className="error">{errors.name}</p>}
-                </label>
+                    </Reorder.Item>
+                  ))}
+                </Reorder.Group>
+              </div>
+              <div className="inner-row">
+                {/* Second row */}
+                <div className="row">
+                  <label className="label">
+                    Item name
+                    <input
+                      onChange={handleNameChange}
+                      type="text"
+                      className="input"
+                      placeholder="Item name"
+                      required
+                      min={5}
+                      max={50}
+                      defaultValue={item.name || ""}
+                    />
+                    {errors.name && <p className="error">{errors.name}</p>}
+                  </label>
 
-                <label className="label">
-                  Category
-                  <Select
-                    required
-                    className="select"
-                    name="category"
-                    placeholder="Select a category"
-                    options={categories}
-                    isLoading={isCategoriesLoading}
-                    isClearable={true}
-                    isSearchable={true}
-                    instanceId="select"
-                    styles={colourStyles}
-                    ref={categoryRef}
-                    onChange={(e) => handleSelectChange(e, "category")}
-                    defaultValue={categoryDefaultValue || ""}
-                  />
-                  {errors.category && (
-                    <p className="error">{errors.category}</p>
-                  )}
-                </label>
+                  <label className="label">
+                    Category
+                    <Select
+                      required
+                      className="select"
+                      name="category"
+                      placeholder="Select a category"
+                      options={categories}
+                      isLoading={isCategoriesLoading}
+                      isClearable={true}
+                      isSearchable={true}
+                      instanceId="select"
+                      styles={colourStyles}
+                      ref={categoryRef}
+                      onChange={(e) => handleSelectChange(e, "category")}
+                      defaultValue={categoryDefaultValue || ""}
+                    />
+                    {errors.category && (
+                      <p className="error">{errors.category}</p>
+                    )}
+                  </label>
 
-                <label className="label">
-                  Style
-                  <Select
-                    required={true}
-                    className="select"
-                    name="style"
-                    placeholder="Select a style"
-                    options={styles}
-                    isLoading={isStylesLoading}
-                    isClearable={true}
-                    instanceId="select"
-                    isSearchable={true}
-                    styles={colourStyles}
-                    onChange={(e) => handleSelectChange(e, "style")}
-                    defaultValue={styleDefaultValue}
-                  />
-                  {errors.style && <p className="error">{errors.style}</p>}
-                </label>
+                  <label className="label">
+                    Style
+                    <Select
+                      required={true}
+                      className="select"
+                      name="style"
+                      placeholder="Select a style"
+                      options={styles}
+                      isLoading={isStylesLoading}
+                      isClearable={true}
+                      instanceId="select"
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={(e) => handleSelectChange(e, "style")}
+                      defaultValue={styleDefaultValue}
+                    />
+                    {errors.style && <p className="error">{errors.style}</p>}
+                  </label>
 
-                <label className="label">
-                  Colour
-                  <Select
-                    required={true}
-                    className="select"
-                    name="colour"
-                    placeholder="Select a colour"
-                    options={colours}
-                    isLoading={isColoursLoading}
-                    isClearable={true}
-                    instanceId="select"
-                    isSearchable={true}
-                    styles={colourStyles}
-                    onChange={(e) => handleSelectChange(e, "colour")}
-                    defaultValue={colourDefaultValue}
-                    formatOptionLabel={(option) => (
-                      <div>
-                        {option.hexCode ? (
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              alignItems: "center",
-                            }}
-                          >
+                  <label className="label">
+                    Colour
+                    <Select
+                      required={true}
+                      className="select"
+                      name="colour"
+                      placeholder="Select a colour"
+                      options={colours}
+                      isLoading={isColoursLoading}
+                      isClearable={true}
+                      instanceId="select"
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={(e) => handleSelectChange(e, "colour")}
+                      defaultValue={colourDefaultValue}
+                      formatOptionLabel={(option) => (
+                        <div>
+                          {option.hexCode ? (
                             <div
                               style={{
-                                height: "30px",
-                                width: "30px",
-                                borderRadius: "50%",
-                                backgroundColor: `#${option.hexCode}`,
+                                display: "flex",
+                                gap: "10px",
+                                alignItems: "center",
                               }}
-                            ></div>
+                            >
+                              <div
+                                style={{
+                                  height: "30px",
+                                  width: "30px",
+                                  borderRadius: "50%",
+                                  backgroundColor: `#${option.hexCode}`,
+                                }}
+                              ></div>
+                              <span>{option.label}</span>
+                            </div>
+                          ) : (
                             <span>{option.label}</span>
-                          </div>
-                        ) : (
-                          <span>{option.label}</span>
-                        )}
-                      </div>
+                          )}
+                        </div>
+                      )}
+                    />
+                    {errors.colour && <p className="error">{errors.colour}</p>}
+                  </label>
+
+                  <label className="label">
+                    Price
+                    <input
+                      required
+                      type="number"
+                      className="input"
+                      placeholder="Select a price"
+                      onChange={handlePriceChange}
+                      min={0}
+                      max={100000}
+                      defaultValue={item.price}
+                    />
+                    {errors.price && <p className="error">{errors.price}</p>}
+                  </label>
+                  <label className="label">
+                    Hashtags
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="Hashtags"
+                      onChange={handleHashtagsChange}
+                      defaultValue={hashtags}
+                    />
+                    {errors.hashtags && (
+                      <p className="error">{errors.hashtags}</p>
                     )}
-                  />
-                  {errors.colour && <p className="error">{errors.colour}</p>}
-                </label>
+                  </label>
+                </div>
+                {/* Third row */}
+                <div className="row">
+                  <label className="label">
+                    Sex
+                    <Select
+                      required={true}
+                      className="select"
+                      name="gender"
+                      placeholder="Select a gender"
+                      instanceId="select"
+                      options={genders}
+                      isClearable={true}
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={(e) => handleSelectChange(e, "gender")}
+                      defaultValue={genderDefaultValue}
+                    />
+                    {errors.gender && <p className="error">{errors.gender}</p>}
+                  </label>
+                  <label className="label">
+                    Subcategory
+                    <Select
+                      required={true}
+                      className="select"
+                      name="style"
+                      ref={subcategoryRef}
+                      placeholder="Select a subcategory"
+                      options={subcategories}
+                      isLoading={isSubcategoriesLoading}
+                      isClearable={true}
+                      instanceId="select"
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={(e) => handleSelectChange(e, "subcategory")}
+                      defaultValue={subcategoryDefaultValue}
+                    />
+                    {errors.gender && <p className="error">{errors.gender}</p>}
+                  </label>
 
-                <label className="label">
-                  Price
-                  <input
-                    required
-                    type="number"
-                    className="input"
-                    placeholder="Select a price"
-                    onChange={handlePriceChange}
-                    min={0}
-                    max={100000}
-                    defaultValue={item.price}
-                  />
-                  {errors.price && <p className="error">{errors.price}</p>}
-                </label>
-              </div>
-              {/* Third row */}
-              <div className="row">
-                <label className="label">
-                  Sex
-                  <Select
-                    required={true}
-                    className="select"
-                    name="gender"
-                    placeholder="Select a gender"
-                    instanceId="select"
-                    options={genders}
-                    isClearable={true}
-                    isSearchable={true}
-                    styles={colourStyles}
-                    onChange={(e) => handleSelectChange(e, "gender")}
-                    defaultValue={genderDefaultValue}
-                  />
-                  {errors.gender && <p className="error">{errors.gender}</p>}
-                </label>
-                <label className="label">
-                  Subcategory
-                  <Select
-                    required={true}
-                    className="select"
-                    name="style"
-                    ref={subcategoryRef}
-                    placeholder="Select a subcategory"
-                    options={subcategories}
-                    isLoading={isSubcategoriesLoading}
-                    isClearable={true}
-                    instanceId="select"
-                    isSearchable={true}
-                    styles={colourStyles}
-                    onChange={(e) => handleSelectChange(e, "subcategory")}
-                    defaultValue={subcategoryDefaultValue}
-                  />
-                  {errors.gender && <p className="error">{errors.gender}</p>}
-                </label>
+                  <label className="label">
+                    Condition
+                    <Select
+                      required={true}
+                      className="select"
+                      name="condition"
+                      placeholder="Select a condition"
+                      options={conditions}
+                      isClearable={true}
+                      instanceId="select"
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={(e) => handleSelectChange(e, "condition")}
+                      defaultValue={conditionDefaultValue}
+                    />
+                    {errors.condition && (
+                      <p className="error">{errors.condition}</p>
+                    )}
+                  </label>
 
-                <label className="label">
-                  Condition
-                  <Select
-                    required={true}
-                    className="select"
-                    name="condition"
-                    placeholder="Select a condition"
-                    options={conditions}
-                    isClearable={true}
-                    instanceId="select"
-                    isSearchable={true}
-                    styles={colourStyles}
-                    onChange={(e) => handleSelectChange(e, "condition")}
-                    defaultValue={conditionDefaultValue}
-                  />
-                  {errors.condition && (
-                    <p className="error">{errors.condition}</p>
+                  <label className="label">
+                    Brand
+                    <Select
+                      required={true}
+                      className="select"
+                      name="brand"
+                      placeholder="Select a brand"
+                      options={brands}
+                      isClearable={true}
+                      instanceId="select"
+                      isLoading={isBrandsLoading}
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={(e) => handleSelectChange(e, "gender")}
+                      defaultValue={brandDefaultValue}
+                    />
+                    {errors.brand && <p className="error">{errors.brand}</p>}
+                  </label>
+
+                  <label className="label">
+                    Size
+                    <Select
+                      required={true}
+                      className="select"
+                      name="size"
+                      placeholder="Select a size"
+                      options={sizes}
+                      isClearable={true}
+                      isSearchable={true}
+                      instanceId="select"
+                      styles={colourStyles}
+                      onChange={(e) => handleSelectChange(e, "size")}
+                      defaultValue={sizeDefaultValue}
+                    />
+                    {errors.size && <p className="error">{errors.size}</p>}
+                  </label>
+                </div>
+                <label className="label description--label">
+                  Description
+                  <textarea
+                    id="description"
+                    placeholder="Describe your item..."
+                    minLength={10}
+                    maxLength={200}
+                    defaultValue={item.description.replaceAll("<br />", "\n")}
+                    onChange={textAreaChange}
+                  ></textarea>
+                  {errors.description && (
+                    <p className="error">{errors.description}</p>
                   )}
+                  {errors.form && <p className="error">{errors.form}</p>}
                 </label>
 
-                <label className="label">
-                  Brand
-                  <Select
-                    required={true}
-                    className="select"
-                    name="brand"
-                    placeholder="Select a brand"
-                    options={brands}
-                    isClearable={true}
-                    instanceId="select"
-                    isLoading={isBrandsLoading}
-                    isSearchable={true}
-                    styles={colourStyles}
-                    onChange={(e) => handleSelectChange(e, "gender")}
-                    defaultValue={brandDefaultValue}
-                  />
-                  {errors.brand && <p className="error">{errors.brand}</p>}
-                </label>
-
-                <label className="label">
-                  Size
-                  <Select
-                    required={true}
-                    className="select"
-                    name="size"
-                    placeholder="Select a size"
-                    options={sizes}
-                    isClearable={true}
-                    isSearchable={true}
-                    instanceId="select"
-                    styles={colourStyles}
-                    onChange={(e) => handleSelectChange(e, "size")}
-                    defaultValue={sizeDefaultValue}
-                  />
-                  {errors.size && <p className="error">{errors.size}</p>}
-                </label>
-
-                <label className="label">
-                  Hashtags
-                  <input
-                    type="text"
-                    className="input"
-                    placeholder="Hashtags"
-                    onChange={handleHashtagsChange}
-                    defaultValue={hashtags}
-                  />
-                  {errors.hashtags && (
-                    <p className="error">{errors.hashtags}</p>
-                  )}
-                </label>
+                <button
+                  className="button submit--buton"
+                  disabled={editItemLoading}
+                  onClick={onSubmit}
+                >
+                  Save
+                </button>
               </div>
-              <label className="label description--label">
-                Description
-                <textarea
-                  id="description"
-                  placeholder="Describe your item..."
-                  minLength={10}
-                  maxLength={200}
-                  defaultValue={item.description.replaceAll("<br />", "\n")}
-                  onChange={textAreaChange}
-                ></textarea>
-                {errors.description && (
-                  <p className="error">{errors.description}</p>
-                )}
-                {errors.form && <p className="error">{errors.form}</p>}
-              </label>
-
-              <button
-                className="button submit--buton"
-                disabled={editItemLoading}
-                onClick={onSubmit}
-              >
-                Save
-              </button>
-            </div>
-          </form>
+            </form>
+          )}
         </div>
       </div>
       <Footer />
