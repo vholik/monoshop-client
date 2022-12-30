@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
-import { AxiosError } from "axios";
+import { AxiosError, isAxiosError } from "axios";
 import { ItemEntity } from "@store/types/item-entity";
 import { IAddItemFormData, Item } from "@store/types/item";
+import { ReduxError } from "@store/types/error";
 
 interface BrandsState {
   addItemLoading: boolean;
@@ -16,20 +17,23 @@ const initialState: BrandsState = {
   item: null,
 };
 
-export const addItem = createAsyncThunk(
-  "item",
-  async (formData: IAddItemFormData, thunkAPI) => {
-    try {
-      const response = await instance.post<Item>("item", formData);
-      return response.data;
-    } catch (e) {
-      if (e instanceof AxiosError) {
-        return thunkAPI.rejectWithValue(e.response!.data.message);
-      }
-      return e;
-    }
+export const addItem = createAsyncThunk<
+  Item,
+  IAddItemFormData,
+  {
+    rejectValue: ReduxError;
   }
-);
+>("item", async (formData: IAddItemFormData, thunkAPI) => {
+  try {
+    const response = await instance.post<Item>("item", formData);
+    return response.data;
+  } catch (e) {
+    if (isAxiosError(e) && e.response) {
+      return thunkAPI.rejectWithValue(e.response!.data.message);
+    }
+    return thunkAPI.rejectWithValue({ message: "Can not loading the data" });
+  }
+});
 
 export const AddItemSlice = createSlice({
   name: "item",

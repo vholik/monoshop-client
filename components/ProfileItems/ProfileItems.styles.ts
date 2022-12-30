@@ -1,13 +1,10 @@
 import styled from "styled-components";
 
 export const ProfileItemsStyles = styled.div`
-  background-color: white;
-  padding-top: 2rem;
-  padding-bottom: 2rem;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-gap: 2rem;
-
+  grid-gap: 0.5vw;
+  grid-row-gap: 2vw;
   .item {
     aspect-ratio: 1/1;
 
@@ -23,6 +20,10 @@ export const ProfileItemsStyles = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    .item-name {
+      font-weight: 700;
+    }
   }
 
   .bar {

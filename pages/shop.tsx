@@ -12,6 +12,7 @@ import {
   conditions,
   filterColourStyles,
   genders,
+  multiplefilterColourStyles,
   sizes,
   sortingColourStyles,
   sortingValues,
@@ -105,7 +106,7 @@ const Shop = () => {
   }, [filter]);
 
   useEffect(() => {
-    dispatch(getBrands())
+    dispatch(getBrands(""))
       .unwrap()
       .catch((error: Error) => {
         console.error("rejected", error);
@@ -209,6 +210,8 @@ const Shop = () => {
     filterName: keyof IFilter
   ) => {
     if (e) {
+      console.log(e);
+
       const mapped = e.map((item) => {
         return item.value;
       });
@@ -220,6 +223,7 @@ const Shop = () => {
 
       if (filterName === "brand") {
         dispatch(setBrand(mapped));
+
         return;
       }
 
@@ -297,18 +301,12 @@ const Shop = () => {
       };
     });
   };
-  const setDefaultCategoryValue = (): ItemEntityWithId => {
+  const setDefaultCategoryValue = (): ItemEntityWithId | undefined => {
     const find = categories.find((category) => category.id === filter.category);
 
     if (find) {
       return find;
     }
-
-    return {
-      value: "Category",
-      label: "Category",
-      id: 0,
-    };
   };
   const setDefaultSubcategoryValue = (): ItemEntityWithId[] => {
     const mapped = subcategories.filter((subcategory) => {
@@ -323,21 +321,18 @@ const Shop = () => {
 
     return [];
   };
-  const setDefaultGenderValue = (): SingleValue<{
-    value: string;
-    label: string;
-  }> => {
+  const setDefaultGenderValue = ():
+    | SingleValue<{
+        value: string;
+        label: string;
+      }>
+    | undefined => {
     if (filter.gender) {
       return {
         value: filter.gender,
         label: filter.gender === Gender.MEN ? "Menswear" : "Womenswear",
       };
     }
-
-    return {
-      value: "Gender",
-      label: "Gender",
-    };
   };
   const setDefaultSortingValue = () => {
     const find = sortingValues.find((obj) => obj.value === filter.sortBy);
@@ -359,8 +354,13 @@ const Shop = () => {
         });
     }
   };
-
-  console.log(items);
+  const onInputBrandChange = (e: string) => {
+    dispatch(getBrands(e))
+      .unwrap()
+      .catch((error: Error) => {
+        console.error("rejected", error);
+      });
+  };
 
   return (
     <ShopStyling onClick={() => setIsPriceOpen(false)}>
@@ -488,7 +488,7 @@ const Shop = () => {
             </div>
             <Select
               placeholder={"Gender"}
-              styles={filterColourStyles}
+              styles={multiplefilterColourStyles}
               onChange={genderHandler}
               options={genders}
               className="select"
@@ -496,14 +496,15 @@ const Shop = () => {
               isDisabled={false}
               isLoading={false}
               isSearchable={true}
+              isClearable={false}
               name={"gender"}
               instanceId="gender-select"
-              defaultValue={setDefaultGenderValue()}
+              value={setDefaultGenderValue()}
             />
             <Select
               ref={categorieRef}
               placeholder={"Categories"}
-              styles={filterColourStyles}
+              styles={multiplefilterColourStyles}
               onChange={categoryHandler}
               options={categories}
               className="select"
@@ -514,12 +515,12 @@ const Shop = () => {
               name={"category"}
               instanceId="category-select"
               isClearable={true}
-              defaultValue={setDefaultCategoryValue()}
+              value={setDefaultCategoryValue()}
             />
             <Select
               ref={subcategorieRef}
               placeholder={"Subcategories"}
-              styles={filterColourStyles}
+              styles={multiplefilterColourStyles}
               onChange={subcategoriesHandler}
               options={subcategories}
               isMulti
@@ -533,14 +534,14 @@ const Shop = () => {
               isClearable={true}
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
-              defaultValue={setDefaultSubcategoryValue()}
+              value={setDefaultSubcategoryValue()}
               components={{
                 ValueContainer,
               }}
             />
             <Select
               placeholder={"Size"}
-              styles={filterColourStyles}
+              styles={multiplefilterColourStyles}
               onChange={(e) => filterHandler(e, "size" as keyof IFilter)}
               options={sizes}
               isMulti
@@ -554,14 +555,14 @@ const Shop = () => {
               isClearable={true}
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
-              defaultValue={setDefaultSizeValue()}
+              value={setDefaultSizeValue()}
               components={{
                 ValueContainer,
               }}
             />
             <Select
               placeholder={"Condition"}
-              styles={filterColourStyles}
+              styles={multiplefilterColourStyles}
               isMulti
               options={conditions}
               className="select"
@@ -575,14 +576,14 @@ const Shop = () => {
               instanceId="condition-select"
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
-              defaultValue={setDefaultConditionValue()}
+              value={setDefaultConditionValue()}
               components={{
                 ValueContainer,
               }}
             />
             <Select
               placeholder={"Brand"}
-              styles={filterColourStyles}
+              styles={multiplefilterColourStyles}
               isMulti
               options={brands}
               className="select"
@@ -596,14 +597,15 @@ const Shop = () => {
               instanceId="brand-select"
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
-              defaultValue={setDefaultBrandValue()}
+              value={setDefaultBrandValue()}
+              onInputChange={onInputBrandChange}
               components={{
                 ValueContainer,
               }}
             />
             <Select
               placeholder={"Style"}
-              styles={filterColourStyles}
+              styles={multiplefilterColourStyles}
               isMulti
               options={styles}
               className="select"
@@ -617,14 +619,14 @@ const Shop = () => {
               instanceId="style-select"
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
-              defaultValue={setDefaultStyleValue()}
+              value={setDefaultStyleValue()}
               components={{
                 ValueContainer,
               }}
             />
             <Select
               placeholder={"Colour"}
-              styles={filterColourStyles}
+              styles={multiplefilterColourStyles}
               isMulti
               options={colours}
               className="select"
@@ -638,7 +640,7 @@ const Shop = () => {
               instanceId="colour-select"
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
-              defaultValue={setDefaultColourValue()}
+              value={setDefaultColourValue()}
               components={{
                 ValueContainer,
               }}
@@ -675,7 +677,7 @@ const Shop = () => {
               onChange={sortingHandler}
               options={sortingValues}
               styles={sortingColourStyles}
-              defaultValue={setDefaultSortingValue()}
+              value={setDefaultSortingValue()}
               instanceId="select"
             />
             <Image src={SortingIcon} alt="Sort by" />
@@ -933,8 +935,8 @@ const ShopStyling = styled.div`
   .items-wrapper {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-column-gap: 2rem;
-    grid-row-gap: 2rem;
+    grid-column-gap: 1vw;
+    grid-row-gap: 2vw;
     margin-top: 2rem;
 
     .item {

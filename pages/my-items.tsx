@@ -59,7 +59,6 @@ const MyProfile = () => {
 
 const MyProfileStyles = styled.div`
   .wrapper {
-    background-color: white;
     width: 100%;
     margin-top: 2rem;
     height: 100%;

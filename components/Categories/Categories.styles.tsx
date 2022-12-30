@@ -21,7 +21,7 @@ export const CategoriesStyles = styled.div`
   }
 
   .category-name {
-    font-size: 0.9rem;
+    font-size: 1rem;
     text-transform: uppercase;
     cursor: pointer;
     font-family: var(--font-medium);
@@ -31,11 +31,13 @@ export const CategoriesStyles = styled.div`
     position: absolute;
     background-color: white;
     border: 1px solid var(--grey-10);
+    font-size: 1.1rem;
     font-family: var(--font-default);
     border-bottom: 0;
     transition: opacity var(--transition);
     opacity: 0;
     pointer-events: none;
+    z-index: 5;
 
     &__subcategory {
       cursor: pointer;

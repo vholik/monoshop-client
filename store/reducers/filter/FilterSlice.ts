@@ -15,6 +15,7 @@ const initialState: IFilter = {
   colour: [],
   sortBy: SortBy.Recent,
   page: 1,
+  search: "",
 };
 
 export const FilterSlice = createSlice({
@@ -23,6 +24,9 @@ export const FilterSlice = createSlice({
   reducers: {
     setSortBy: (state, action: PayloadAction<SortBy>) => {
       state.sortBy = action.payload;
+    },
+    resetFilter: (state) => {
+      return;
     },
     setPrice: (state, action: PayloadAction<[number, number]>) => {
       state.price = action.payload;
@@ -54,8 +58,8 @@ export const FilterSlice = createSlice({
     setSize: (state, action: PayloadAction<string[]>) => {
       state.size = action.payload;
     },
-    setStoredFilter: (state, action: PayloadAction<IFilter>) => {
-      state = action.payload;
+    setSearchValue: (state, action: PayloadAction<string>) => {
+      state.search = action.payload;
     },
   },
 });
@@ -70,9 +74,10 @@ export const {
   setCondition,
   setSize,
   setStyle,
-  setStoredFilter,
   setSubcategory,
   setSortBy,
+  resetFilter,
+  setSearchValue,
 } = FilterSlice.actions;
 
 export default FilterSlice.reducer;

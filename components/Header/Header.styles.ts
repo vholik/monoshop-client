@@ -8,7 +8,14 @@ export const HeaderStyles = styled.div`
   padding-left: 50px;
   padding-right: 50px;
 
+  .input--button {
+    font-size: 0.9rem;
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+
   .input-wrapper {
+    border-radius: 0.2em;
     border: 1px solid var(--dark);
     display: flex;
     align-items: center;

@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
-import { AxiosError } from "axios";
-import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
+import { Axios, AxiosError, isAxiosError } from "axios";
+import { ItemEntityWithId } from "@store/types/item-entity";
 import { Gender } from "@store/types/gender.enum";
+import { ReduxError } from "@store/types/error";
 
 interface CategoriesState {
   isCategoriesLoading: boolean;
@@ -16,24 +17,27 @@ const initialState: CategoriesState = {
   categories: [],
 };
 
-export const getCategories = createAsyncThunk(
-  "category",
-  async (gender: Gender | undefined, thunkAPI) => {
-    try {
-      const response = await instance.get<ItemEntityWithId[]>("category", {
-        params: {
-          gender: gender,
-        },
-      });
-      return response.data;
-    } catch (e) {
-      if (e instanceof AxiosError) {
-        return thunkAPI.rejectWithValue(e.response!.data.message);
-      }
-      return e;
-    }
+export const getCategories = createAsyncThunk<
+  ItemEntityWithId[],
+  Gender,
+  {
+    rejectValue: ReduxError;
   }
-);
+>("category", async (gender, thunkAPI) => {
+  try {
+    const response = await instance.get<ItemEntityWithId[]>("category", {
+      params: {
+        gender: gender,
+      },
+    });
+    return response.data;
+  } catch (err) {
+    if (isAxiosError(err) && err.response) {
+      return thunkAPI.rejectWithValue(err.response!.data.message);
+    }
+    return thunkAPI.rejectWithValue({ message: "Can not loading the data" });
+  }
+});
 
 export const GetCategoriesSlice = createSlice({
   name: "category",

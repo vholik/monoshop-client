@@ -26,6 +26,63 @@ export const filterColourStyles = {
     border: "1px solid var(--grey-10)",
     boxShadow: "none",
   }),
+  control: (provided: any, { isDisabled, isSelected }: any) => ({
+    ...provided,
+    boxShadow: "none",
+    color: "var(--dark)",
+    background: "transparent",
+    border: "0",
+    borderRadius: 0,
+    cursor: isDisabled ? "not-allowed !important" : "default",
+    fontWeight: isSelected ? "700" : "400",
+  }),
+  valueContainer: (provided: any, { isDisabled, isSelected }: any) => ({
+    ...provided,
+    padding: "0",
+    fontSize: "1rem",
+    margin: "0",
+    background: "transparent",
+    fontWeight: isSelected ? "700" : "400",
+  }),
+  indicatorSeparator: () => ({}),
+  input: (provided: any, { isSelected }: any) => ({
+    ...provided,
+    margin: "0",
+    padding: "0",
+    fontWeight: isSelected ? "700" : "400",
+  }),
+  placeholder: (styles: any, { isDisabled, isSelected }: any) => ({
+    ...styles,
+    color: isDisabled ? "#aaa !important" : "var(--dark)",
+    fontWeight: isSelected ? "700" : "400",
+  }),
+};
+
+export const multiplefilterColourStyles = {
+  menuList: (styles: any) => ({
+    ...styles,
+    background: "var(--white)",
+    borderRadius: 0,
+    minWidth: "fit-content",
+  }),
+  dropdownIndicator: (base: any) => ({
+    ...base,
+    color: "var(--grey-30)",
+  }),
+  option: (styles: any, { isFocused, isSelected }: any) => ({
+    ...styles,
+    background: isFocused ? "#f6f6f6" : isSelected ? "#f6f6f6" : undefined,
+    color: isSelected ? "var(--grey-60)" : "var(--dark) !important",
+    zIndex: 1,
+    borderRadius: 0,
+  }),
+  menu: (base: any) => ({
+    ...base,
+    zIndex: 100,
+    borderRadius: 0,
+    border: "1px solid var(--grey-10)",
+    boxShadow: "none",
+  }),
   control: (provided: any, { isDisabled }: any) => ({
     ...provided,
     boxShadow: "none",
@@ -35,25 +92,28 @@ export const filterColourStyles = {
     borderRadius: 0,
     cursor: isDisabled ? "not-allowed !important" : "default",
   }),
-
   valueContainer: (provided: any) => ({
     ...provided,
     padding: "0",
     fontSize: "1rem",
     margin: "0",
     background: "transparent",
+    fontWeight: "700",
   }),
   indicatorSeparator: () => ({}),
-  input: (provided: any) => ({
+  input: (provided: any, { isSelected }: any) => ({
     ...provided,
     margin: "0",
     padding: "0",
+    fontWeight: isSelected ? "700" : "400",
   }),
-  placeholder: (styles: any, { isDisabled }: any) => ({
+  placeholder: (styles: any, { isDisabled, isSelected }: any) => ({
     ...styles,
     color: isDisabled ? "#aaa !important" : "var(--dark)",
+    fontWeight: isSelected ? "700" : "400",
   }),
 };
+
 export const sortingColourStyles = {
   menuList: (styles: any) => ({
     ...styles,

@@ -204,7 +204,7 @@ export default function AddItem({ item }: EditItemProps) {
     }
 
     //Brands
-    dispatch(getBrands())
+    dispatch(getBrands(""))
       .unwrap()
       .catch((error) => {
         console.error("rejected", error);
@@ -574,6 +574,14 @@ export default function AddItem({ item }: EditItemProps) {
 
   const hashtags = item.hashtags.join(",").replaceAll("#", ",");
 
+  const onInputBrandChange = (e: string) => {
+    dispatch(getBrands(e))
+      .unwrap()
+      .catch((error: Error) => {
+        console.error("rejected", error);
+      });
+  };
+
   return (
     <EditItemStyles>
       <Header />
@@ -845,6 +853,7 @@ export default function AddItem({ item }: EditItemProps) {
                       styles={colourStyles}
                       onChange={(e) => handleSelectChange(e, "gender")}
                       defaultValue={brandDefaultValue}
+                      onInputChange={onInputBrandChange}
                     />
                     {errors.brand && <p className="error">{errors.brand}</p>}
                   </label>

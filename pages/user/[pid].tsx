@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Phone from "@public/images/phone.svg";
 import Location from "@public/images/location.svg";
+import Flash from "@public/images/flash.svg";
 import { useAppSelector } from "@store/hooks/redux";
 import { useEffect } from "react";
 import Router from "next/router";
@@ -50,8 +51,9 @@ const UserProfile = ({ user }: UserProfileProps) => {
             <Image
               src={user.image}
               alt="User photo"
-              width={150}
-              height={150}
+              width={100}
+              height={100}
+              style={{ objectFit: "cover" }}
               className="user-photo"
             />
             <div className="right">
@@ -69,6 +71,10 @@ const UserProfile = ({ user }: UserProfileProps) => {
                   {user.location}
                 </p>
               )}
+              <p className="user-activity">
+                <Image src={Flash} alt="Flash" height={20} width={20} /> Last
+                active today
+              </p>
 
               <button className="button">Message</button>
             </div>
@@ -109,9 +115,6 @@ const UserProfileStyles = styled.div`
 
   .items-wrapper {
     margin-top: 2rem;
-    padding-top: 2rem;
-    padding-bottom: 3rem;
-    background-color: white;
 
     &__inner {
       display: grid;
@@ -144,7 +147,6 @@ const UserProfileStyles = styled.div`
 
   .user {
     display: flex;
-    align-items: center;
     gap: 1rem;
     .user-photo {
       border-radius: 50%;
@@ -155,12 +157,17 @@ const UserProfileStyles = styled.div`
     }
 
     .user-location,
-    .user-phone {
+    .user-phone,
+    .user-activity {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       margin-top: 0.5rem;
       color: var(--grey-60);
+    }
+
+    .user-activity {
+      color: var(--grey);
     }
 
     .user-detail {

@@ -21,8 +21,6 @@ const Favorites = () => {
       .catch((err) => console.log("rejected", err));
   }, []);
 
-  console.log(items);
-
   return (
     <FavoritesStyles>
       <Header />
@@ -61,7 +59,7 @@ const Favorites = () => {
                   </div>
                   <div className="bar">
                     <div className="hero">
-                      <div className="item-name">{item.name}</div>
+                      <div className="item-price">{item.price} PLN</div>
                     </div>
                   </div>
                 </div>
@@ -78,12 +76,10 @@ export default Favorites;
 
 const FavoritesStyles = styled.div`
   .items-inner {
-    background-color: white;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-gap: 2rem;
+    grid-gap: 0.5vw;
+    grid-row-gap: 2vw;
 
     .item {
       aspect-ratio: 1/1;
@@ -93,6 +89,10 @@ const FavoritesStyles = styled.div`
         height: 100%;
         position: relative;
       }
+
+      .item-price {
+        font-weight: 700;
+      }
     }
 
     .hero {
@@ -101,21 +101,9 @@ const FavoritesStyles = styled.div`
       align-items: center;
       justify-content: space-between;
     }
-
-    .bar {
-      margin-top: 0.5rem;
-      font-size: 1.1rem;
-
-      .edit {
-        margin-top: 0.5rem;
-        cursor: pointer;
-        text-decoration: underline;
-      }
-    }
   }
 
   .wrapper {
-    background-color: white;
     width: 100%;
     margin-top: 2rem;
     height: 100%;

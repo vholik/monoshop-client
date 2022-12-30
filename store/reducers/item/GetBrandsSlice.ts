@@ -15,17 +15,24 @@ const initialState: BrandsState = {
   brands: [],
 };
 
-export const getBrands = createAsyncThunk("brand", async (_, thunkAPI) => {
-  try {
-    const response = await instance.get<ItemEntity[]>("brand");
-    return response.data;
-  } catch (e) {
-    if (e instanceof AxiosError) {
-      return thunkAPI.rejectWithValue(e.response!.data.message);
+export const getBrands = createAsyncThunk<ItemEntity[], string, any>(
+  "brand",
+  async (search: string, thunkAPI) => {
+    try {
+      const response = await instance.get<ItemEntity[]>("brand", {
+        params: {
+          search: search || "",
+        },
+      });
+      return response.data;
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        return thunkAPI.rejectWithValue(e.response!.data.message);
+      }
+      return thunkAPI.rejectWithValue(e);
     }
-    return e;
   }
-});
+);
 
 export const GetBrandsSlice = createSlice({
   name: "brand",

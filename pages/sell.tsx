@@ -146,7 +146,7 @@ export default function AddItem() {
 
   useEffect(() => {
     //Brands
-    dispatch(getBrands())
+    dispatch(getBrands(""))
       .unwrap()
       .catch((error) => {
         console.error("rejected", error);
@@ -426,6 +426,14 @@ export default function AddItem() {
       });
   };
 
+  const onInputBrandChange = (e: string) => {
+    dispatch(getBrands(e))
+      .unwrap()
+      .catch((error: Error) => {
+        console.error("rejected", error);
+      });
+  };
+
   return (
     <AddItemStyles>
       <Header />
@@ -433,7 +441,7 @@ export default function AddItem() {
 
       <div className="container">
         <div className="wrapper">
-          <h1 className="title-md">Add new item</h1>
+          <h1 className="title-md">Sell new item</h1>
           {addItemLoading ? (
             <Loading />
           ) : (
@@ -623,13 +631,19 @@ export default function AddItem() {
                   </label>
                   <label className="label">
                     Brand
-                    <CustomSelect
+                    <Select
+                      ref={subcategoryRef}
+                      required={true}
+                      className="select"
                       name="brand"
+                      isLoading={isBrandsLoading}
                       placeholder="Select a brand"
                       options={brands}
-                      isLoading={isBrandsLoading}
-                      error={brandsError || errors.brand}
-                      handleSelectChange={handleSelectChange}
+                      isClearable={true}
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={(e) => handleSelectChange(e, "brand")}
+                      onInputChange={onInputBrandChange}
                     />
                     {errors.brand && <p className="error">{errors.brand}</p>}
                   </label>

@@ -18,6 +18,14 @@ import {
   setIsFavorite,
 } from "@store/reducers/favorite/CheckIsFavoriteSlice";
 import { toggleFavorite } from "@store/reducers/favorite/ToggleFavoriteSlice";
+import {
+  setCategory,
+  setGender,
+  setSubcategory,
+} from "@store/reducers/filter/FilterSlice";
+import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
+import { getSubcategories } from "@store/reducers/item/GetSubcategoriesSlice";
+import { Gender } from "@store/types/gender.enum";
 
 const arrowStyles: CSSProperties = {
   position: "absolute",
@@ -103,21 +111,79 @@ const ShopItem = () => {
     }
   };
 
+  const genderRedirect = () => {
+    if (item?.gender) {
+      dispatch(setGender(item?.gender));
+      dispatch(getCategories(item?.gender)).catch((err) => console.log(err));
+    }
+
+    Router.push("/shop");
+  };
+  const categoryRedirect = () => {
+    if (item?.gender && item.id) {
+      dispatch(setGender(item?.gender));
+      dispatch(setCategory(item.category.id));
+
+      dispatch(getCategories(item?.gender)).catch((err) => console.log(err));
+      dispatch(getSubcategories(item.category.id)).catch((err) =>
+        console.log(err)
+      );
+    }
+
+    Router.push("/shop");
+  };
+  const subcategoryRedirect = () => {
+    if (item?.gender && item.id) {
+      dispatch(setGender(item?.gender));
+      dispatch(setCategory(item.category.id));
+      dispatch(setSubcategory([item.subcategory.id]));
+
+      dispatch(getCategories(item?.gender)).catch((err) => console.log(err));
+      dispatch(getSubcategories(item.category.id)).catch((err) =>
+        console.log(err)
+      );
+    }
+
+    Router.push("/shop");
+  };
+
   return (
     <ShopItemStyles>
       <Header />
       <Categories />
 
       <div className="container">
-        <div className="url">
-          <p className="url-item">Main page</p>
-          <Image src={ArrowRight} alt="url" width={10} height={10} />
-          <p className="url-item">{item?.category.value}</p>
-          <Image src={ArrowRight} alt="url" width={10} height={10} />
-          <p className="url-item">{item?.subcategory.value}</p>
-          <Image src={ArrowRight} alt="url" width={10} height={10} />
-          <p className="url-item current-url">{item?.name}</p>
-        </div>
+        {!isLoading && (
+          <div className="url">
+            <Link href={"/"}>
+              <p className="url-item">Main page</p>
+            </Link>
+            <Image src={ArrowRight} alt="url" width={10} height={10} />
+            {item?.gender && (
+              <div>
+                <p className="url-item" onClick={genderRedirect}>
+                  {item?.gender === Gender.MEN ? "Menswear" : "Womenswear"}
+                </p>
+              </div>
+            )}
+            <Image src={ArrowRight} alt="url" width={10} height={10} />
+            {item?.category && (
+              <p className="url-item" onClick={categoryRedirect}>
+                {item?.category.value}
+              </p>
+            )}
+            <Image src={ArrowRight} alt="url" width={10} height={10} />
+            {item?.subcategory && (
+              <p className="url-item" onClick={subcategoryRedirect}>
+                {item?.subcategory.value}
+              </p>
+            )}
+
+            <Image src={ArrowRight} alt="url" width={10} height={10} />
+            {item?.name && <p className="url-item current-url">{item?.name}</p>}
+          </div>
+        )}
+
         {isLoading ? (
           <LoadingItemStyles>
             <div className="wrapper">
@@ -246,6 +312,7 @@ const ShopItem = () => {
                       className="user-photo"
                       width={50}
                       height={50}
+                      style={{ objectFit: "cover" }}
                     />
                   </Link>
                   <Link href={`/user/${item?.user.id}`}>
@@ -275,7 +342,10 @@ const ShopItem = () => {
                   )}
                 </div>
                 <h2 className="item-price">{item?.price} PLN</h2>
-                <button className="button item--button">Message</button>
+                <button className="button item--button">Buy now</button>
+                <button className="button item--button message--button">
+                  Message
+                </button>
               </div>
               <div className="item-info">
                 <div className="item-info__item">
@@ -509,9 +579,19 @@ const ShopItemStyles = styled.div`
       margin-top: 1rem;
       width: 100%;
       font-family: var(--font-medium);
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       display: flex;
       justify-content: center;
+    }
+
+    .message--button {
+      color: var(--grey);
+      background: transparent;
+      border: 1px solid var(--grey-30);
+
+      &:hover {
+        background-color: var(--grey-10);
+      }
     }
 
     .item-price {

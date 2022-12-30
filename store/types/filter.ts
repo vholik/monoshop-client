@@ -14,6 +14,7 @@ export interface IFilter {
   colour: string[];
   sortBy: SortBy;
   page: number;
+  search: string;
 }
 
 export interface IFileringData {
