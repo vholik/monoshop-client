@@ -7,6 +7,8 @@ import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import Link from "next/link";
 import { getUserItems } from "@store/reducers/item/GetUserItemsSlice";
 import Loading from "@components/Loading/Loading";
+import Footer from "@components/Footer/Footer";
+import { FlexPage } from "@utils/FlexStyle";
 
 const MyProfile = () => {
   const dispatch = useAppDispatch();
@@ -26,34 +28,37 @@ const MyProfile = () => {
   }, []);
 
   return (
-    <MyProfileStyles>
-      <Header />
-      <Categories />
+    <FlexPage>
+      <MyProfileStyles>
+        <Header />
+        <Categories />
 
-      <div className="container">
-        <h2 className="profile-title">My profile</h2>
-        <div className="settings-list">
-          <Link href={"/settings"}>
-            <p className="settings-list__item">Profile settings</p>
-          </Link>
-          <Link href={"/my-items"}>
-            <p className="settings-list__item active">My items</p>
-          </Link>
-          <Link href={"/favorites"}>
-            <p className="settings-list__item">My favorites</p>
-          </Link>
-        </div>
-      </div>
-      <div className="wrapper">
         <div className="container">
-          {isItemsLoading || isLoading ? (
-            <Loading />
-          ) : (
-            <ProfileItems items={items} />
-          )}
+          <h2 className="profile-title">My profile</h2>
+          <div className="settings-list">
+            <Link href={"/settings"}>
+              <p className="settings-list__item">Profile settings</p>
+            </Link>
+            <Link href={"/my-items"}>
+              <p className="settings-list__item active">My items</p>
+            </Link>
+            <Link href={"/favorites"}>
+              <p className="settings-list__item">My favorites</p>
+            </Link>
+          </div>
         </div>
-      </div>
-    </MyProfileStyles>
+        <div className="wrapper">
+          <div className="container">
+            {isItemsLoading || isLoading ? (
+              <Loading />
+            ) : (
+              <ProfileItems items={items} />
+            )}
+          </div>
+        </div>
+      </MyProfileStyles>
+      <Footer />
+    </FlexPage>
   );
 };
 

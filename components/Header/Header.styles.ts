@@ -12,18 +12,20 @@ export const HeaderStyles = styled.div`
     font-size: 0.9rem;
     padding-left: 1em;
     padding-right: 1em;
+    border-radius: 2em;
   }
 
   .input-wrapper {
-    border-radius: 0.2em;
-    border: 1px solid var(--dark);
+    border-radius: 2em;
+    /* border: 1px solid var(--dark); */
     display: flex;
     align-items: center;
-    padding: 0 0.5em;
+    padding: 0 1em;
     background-color: white;
     width: fit-content;
     width: 100%;
     margin: 0 5rem;
+    background-color: #f5f5f5;
   }
 
   .logo {
@@ -34,6 +36,11 @@ export const HeaderStyles = styled.div`
     padding-left: 0.5em;
     width: 100%;
     border: none;
+    background-color: #f5f5f5;
+
+    &::placeholder {
+      color: #ccc !important;
+    }
   }
 
   .search-icon {
@@ -50,5 +57,11 @@ export const HeaderStyles = styled.div`
     background-color: transparent;
     color: var(--dark);
     padding: 0;
+  }
+
+  .search-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 `;

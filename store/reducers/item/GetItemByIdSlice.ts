@@ -5,10 +5,14 @@ import { Gender } from "@store/types/gender.enum";
 import { Item } from "@store/types/item";
 import { IFilter } from "@store/types/filter";
 
+interface IItem extends Item {
+  userItems: Item[];
+}
+
 interface ItemState {
   isLoading: boolean;
   error: string;
-  item: Item | null;
+  item: IItem | null;
 }
 
 const initialState: ItemState = {
@@ -17,17 +21,17 @@ const initialState: ItemState = {
   item: null,
 };
 
-export const getItemById = createAsyncThunk<Item, string>(
+export const getItemById = createAsyncThunk<IItem, string>(
   "item",
   async (id: string, thunkAPI: any) => {
     try {
-      const response = await instance.get<Item>(`item/${id}`);
+      const response = await instance.get<IItem>(`item/${id}`);
       return response.data;
     } catch (e) {
       if (e instanceof AxiosError) {
         return thunkAPI.rejectWithValue(e.response!.data.message);
       }
-      return e;
+      return thunkAPI.rejectWithValue(e);
     }
   }
 );
@@ -37,7 +41,7 @@ export const GetItemByIdSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: {
-    [getItemById.fulfilled.type]: (state, action: PayloadAction<Item>) => {
+    [getItemById.fulfilled.type]: (state, action: PayloadAction<IItem>) => {
       state.item = action.payload;
       state.isLoading = false;
       state.error = "";

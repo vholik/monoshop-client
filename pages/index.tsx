@@ -1,7 +1,7 @@
 import Header from "@components/Header";
 import Head from "next/head";
 import styled from "styled-components";
-import HeroBg from "@public/images/hero-bg.png";
+import HeroBg from "@public/images/hero-bg.jpg";
 import Categories from "@components/Categories/Categories";
 import Footer from "@components/Footer/Footer";
 import Link from "next/link";
@@ -149,7 +149,7 @@ export default function Home() {
 
 const HomeStyles = styled.div`
   .hero {
-    padding: 7rem 0;
+    padding: 10rem 0;
     font-family: var(--font-default);
     color: white;
     background-image: url(${HeroBg.src});

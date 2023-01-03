@@ -7,6 +7,8 @@ import { getProfile } from "@store/reducers/user/ProfileSlice";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import Loading from "@components/Loading/Loading";
 import Link from "next/link";
+import Footer from "@components/Footer/Footer";
+import { FlexPage } from "@utils/FlexStyle";
 
 const MyProfile = () => {
   const dispatch = useAppDispatch();
@@ -24,29 +26,32 @@ const MyProfile = () => {
   }, []);
 
   return (
-    <MyProfileStyles>
-      <Header />
-      <Categories />
-      <div className="container">
-        <h2 className="profile-title">My profile</h2>
-        <div className="settings-list">
-          <Link href={"/settings"}>
-            <p className="settings-list__item  active">Profile settings</p>
-          </Link>
-          <Link href={"/my-items"}>
-            <p className="settings-list__item">My items</p>
-          </Link>
-          <Link href={"/favorites"}>
-            <p className="settings-list__item">My favorites</p>
-          </Link>
-        </div>
-      </div>
-      <div className="wrapper">
+    <FlexPage>
+      <MyProfileStyles>
+        <Header />
+        <Categories />
         <div className="container">
-          {isLoading ? <Loading /> : <ProfileSettings user={user} />}
+          <h2 className="profile-title">My profile</h2>
+          <div className="settings-list">
+            <Link href={"/settings"}>
+              <p className="settings-list__item  active">Profile settings</p>
+            </Link>
+            <Link href={"/my-items"}>
+              <p className="settings-list__item">My items</p>
+            </Link>
+            <Link href={"/favorites"}>
+              <p className="settings-list__item">My favorites</p>
+            </Link>
+          </div>
         </div>
-      </div>
-    </MyProfileStyles>
+        <div className="wrapper">
+          <div className="container">
+            {isLoading ? <Loading /> : <ProfileSettings user={user} />}
+          </div>
+        </div>
+      </MyProfileStyles>
+      <Footer />
+    </FlexPage>
   );
 };
 

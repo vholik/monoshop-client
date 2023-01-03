@@ -1,12 +1,13 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
 import { AxiosError } from "axios";
-import { ItemEntity } from "@store/types/item-entity";
+import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
+import { MultiValue } from "react-select";
 
 interface BrandsState {
   isBrandsLoading: boolean;
   brandsError: string;
-  brands: ItemEntity[];
+  brands: ItemEntityWithId[];
 }
 
 const initialState: BrandsState = {
@@ -15,11 +16,11 @@ const initialState: BrandsState = {
   brands: [],
 };
 
-export const getBrands = createAsyncThunk<ItemEntity[], string, any>(
+export const getBrands = createAsyncThunk<ItemEntityWithId[], string, any>(
   "brand",
   async (search: string, thunkAPI) => {
     try {
-      const response = await instance.get<ItemEntity[]>("brand", {
+      const response = await instance.get<ItemEntityWithId[]>("brand", {
         params: {
           search: search || "",
         },
@@ -41,7 +42,7 @@ export const GetBrandsSlice = createSlice({
   extraReducers: {
     [getBrands.fulfilled.type]: (
       state,
-      action: PayloadAction<ItemEntity[]>
+      action: PayloadAction<ItemEntityWithId[]>
     ) => {
       state.brands = action.payload;
       state.isBrandsLoading = false;

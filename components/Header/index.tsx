@@ -9,8 +9,11 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { checkIsAuth } from "@store/reducers/auth/LoginSlice";
 import ChatIcon from "@public/images/chat.svg";
 import UserIcon from "@public/images/user.svg";
-import { setSearchValue } from "@store/reducers/filter/FilterSlice";
-import { getItems } from "@store/reducers/item/GetItemsSlice";
+import Cross from "@public/images/cross.svg";
+import {
+  resetFilter,
+  setSearchValue,
+} from "@store/reducers/filter/FilterSlice";
 import Router from "next/router";
 
 export default function Header() {
@@ -27,29 +30,32 @@ export default function Header() {
       .catch((error) => {
         console.error("rejected", error);
       });
+
+    // Set filter search value
+    if (filter.search) {
+      setValue(filter.search);
+    }
   }, []);
 
+  const clearSearch = () => {
+    setValue("");
+    dispatch(setSearchValue(""));
+  };
+
   const inputHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    dispatch(setSearchValue(e.target.value));
+    setValue(e.target.value);
+
+    if (!e.target.value) {
+      dispatch(setSearchValue(""));
+    }
   };
 
   const searchSubmit = () => {
-    console.log(filter.search);
     if (value.length > 50) return;
     if (isItemsLoading) return;
 
-    dispatch(getItems(filter))
-      .unwrap()
-      .then(() => {
-        window.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: "smooth",
-        });
-      })
-      .catch((error: Error) => {
-        console.error("rejected", error);
-      });
+    dispatch(resetFilter());
+    dispatch(setSearchValue(value));
 
     Router.push("/shop");
   };
@@ -73,13 +79,23 @@ export default function Header() {
           placeholder="Search for brand, color etc."
           className="input"
           onChange={inputHandler}
-          value={filter.search}
+          value={value}
           maxLength={50}
         />
-        {!!filter.search.length && (
-          <button className="button input--button" onClick={searchSubmit}>
-            Search
-          </button>
+        {!!value.length && (
+          <div className="search-buttons">
+            <Image
+              src={Cross}
+              height={25}
+              width={25}
+              alt="Cross"
+              className="cross-icon"
+              onClick={clearSearch}
+            />
+            <button className="button input--button" onClick={searchSubmit}>
+              Search
+            </button>
+          </div>
         )}
       </div>
       {isAuth ? (

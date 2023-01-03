@@ -7,6 +7,8 @@ import { useEffect } from "react";
 import styled from "styled-components";
 import Image from "next/image";
 import Loading from "@components/Loading/Loading";
+import Footer from "@components/Footer/Footer";
+import { FlexPage } from "@utils/FlexStyle";
 
 const Favorites = () => {
   const dispatch = useAppDispatch();
@@ -22,53 +24,56 @@ const Favorites = () => {
   }, []);
 
   return (
-    <FavoritesStyles>
-      <Header />
-      <Categories />
-      <div className="container">
-        <h2 className="profile-title">My profile</h2>
-        <div className="settings-list">
-          <Link href={"/settings"}>
-            <p className="settings-list__item">Profile settings</p>
-          </Link>
-          <Link href={"/my-items"}>
-            <p className="settings-list__item">My items</p>
-          </Link>
-          <Link href={"/my-items"}>
-            <p className="settings-list__item active">My favorites</p>
-          </Link>
-        </div>
-      </div>
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <div className="wrapper">
-          <div className="container">
-            <div className="items-inner">
-              {items.map((item) => (
-                <div className="item" key={item.id}>
-                  <div className="item-image">
-                    <Link href={`shop/${item.id}`}>
-                      <Image
-                        src={item.images[0]}
-                        alt="Photo"
-                        fill
-                        objectFit="cover"
-                      />
-                    </Link>
-                  </div>
-                  <div className="bar">
-                    <div className="hero">
-                      <div className="item-price">{item.price} PLN</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+    <FlexPage>
+      <FavoritesStyles>
+        <Header />
+        <Categories />
+        <div className="container">
+          <h2 className="profile-title">My profile</h2>
+          <div className="settings-list">
+            <Link href={"/settings"}>
+              <p className="settings-list__item">Profile settings</p>
+            </Link>
+            <Link href={"/my-items"}>
+              <p className="settings-list__item">My items</p>
+            </Link>
+            <Link href={"/my-items"}>
+              <p className="settings-list__item active">My favorites</p>
+            </Link>
           </div>
         </div>
-      )}
-    </FavoritesStyles>
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <div className="wrapper">
+            <div className="container">
+              <div className="items-inner">
+                {items.map((item) => (
+                  <div className="item" key={item.id}>
+                    <div className="item-image">
+                      <Link href={`shop/${item.id}`}>
+                        <Image
+                          src={item.images[0]}
+                          alt="Photo"
+                          fill
+                          objectFit="cover"
+                        />
+                      </Link>
+                    </div>
+                    <div className="bar">
+                      <div className="hero">
+                        <div className="item-price">{item.price} PLN</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </FavoritesStyles>
+      <Footer />
+    </FlexPage>
   );
 };
 

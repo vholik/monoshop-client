@@ -12,7 +12,7 @@ export interface Item {
   size: Size;
   category: ItemEntityWithId;
   subcategory: ItemEntityWithId;
-  brand: ItemEntity;
+  brand: ItemEntityWithId[];
   colour: ItemEntity;
   condition: number;
   description: string;
@@ -27,7 +27,7 @@ export interface IAddItemFormData {
   subcategoryId: number;
   condition: number;
   style: string;
-  brand: string;
+  brand: number[];
   colour: string;
   size: string;
   price: number;

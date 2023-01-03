@@ -16,12 +16,12 @@ li {
 }
 
 :root {
-  --font-default: "HelveticaNeueCyr", sans-serif;
+  /* --font-default: "HelveticaNeueCyr", sans-serif;
   --font-medium: "HelveticaNeueCyr", sans-serif;
-  --font-wide: "HelveticaNeueCyr", sans-serif;
-  /* --font-default: "Euclid Circular A", sans-serif;
-  --font-medium: "Euclid Circular A", sans-serif;
-  --font-wide: "Euclid Circular A", sans-serif; */
+  --font-wide: "HelveticaNeueCyr", sans-serif; */
+  --font-default: "Halvar Breit Rg", sans-serif;
+  --font-medium: "Halvar Breit Md", sans-serif;
+  --font-wide: "Halvar Breit Blk", sans-serif;
   --dark: #131313;
   --dark-hover: #414141;
   --loading: #ebebeb;

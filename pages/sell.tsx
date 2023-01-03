@@ -2,14 +2,13 @@ import Categories from "@components/Categories/Categories";
 import Header from "@components/Header";
 import styled from "styled-components";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
-import { SingleValue } from "react-select";
+import StateManagedSelect, { MultiValue, SingleValue } from "react-select";
 import Footer from "@components/Footer/Footer";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { setError, uploadImage } from "@store/reducers/item/UploadImageSlice";
 import Image from "next/image";
-import CustomSelect from "@components/CustomSelect/CustomSelect";
 import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
-import { ItemEntity } from "@store/types/item-entity";
+import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
 import { getBrands } from "@store/reducers/item/GetBrandsSlice";
 import { getStyles } from "@store/reducers/item/GetStylesSlice";
 import { getColours } from "@store/reducers/item/GetColoursSlice";
@@ -32,8 +31,6 @@ import Router from "next/router";
 
 export default function AddItem() {
   const dispatch = useAppDispatch();
-
-  const subcategoryRef = useRef<any>();
 
   const { isLoading, error } = useAppSelector(
     (state) => state.uploadImageReducer
@@ -58,31 +55,31 @@ export default function AddItem() {
 
   const [formImages, setFormImages] = useState<string[]>([]);
   const [formData, setFormData] = useState<{
-    categoryId: number;
-    condition: number;
-    style: string;
-    brand: string;
-    colour: string;
-    size: string;
+    category: ItemEntityWithId | null;
+    condition: ItemEntity | null;
+    style: ItemEntity | null;
+    brand: MultiValue<ItemEntityWithId> | null;
+    colour: ItemEntity | null;
+    size: ItemEntity | null;
     price: number;
-    gender: string;
+    gender: ItemEntity | null;
     description: string;
     hashtags: string[];
     name: string;
-    subcategoryId: number;
+    subcategory: ItemEntityWithId | null;
   }>({
-    categoryId: 0,
-    condition: 0,
-    style: "",
-    brand: "",
-    colour: "",
-    size: "",
+    category: null,
+    condition: null,
+    style: null,
+    brand: null,
+    colour: null,
+    size: null,
     price: 0,
-    gender: "",
+    gender: null,
     description: "",
     hashtags: [],
     name: "",
-    subcategoryId: 0,
+    subcategory: null,
   });
 
   const [errors, setErrors] = useState({
@@ -135,6 +132,7 @@ export default function AddItem() {
           }
         })
         .catch((error) => {
+          setErrors({ ...errors, images: error.message });
           console.error("rejected", error);
         });
     }
@@ -170,10 +168,8 @@ export default function AddItem() {
       return;
     }
 
-    setFormData({ ...formData, categoryId: 0, subcategoryId: 0 });
-
     // Categories
-    dispatch(getCategories(formData.gender as Gender))
+    dispatch(getCategories(formData.gender.value as Gender))
       .unwrap()
       .catch((error) => {
         console.error("rejected", error);
@@ -181,58 +177,17 @@ export default function AddItem() {
   }, [formData.gender]);
 
   useEffect(() => {
-    if (!formData.categoryId) {
+    if (!formData.category) {
       return;
     }
 
     // Categories
-    dispatch(getSubcategories(formData.categoryId))
+    dispatch(getSubcategories(formData.category?.id))
       .unwrap()
       .catch((error) => {
         console.error("rejected", error);
       });
-  }, [formData.categoryId]);
-
-  const handleSelectChange = (e: SingleValue<ItemEntity>, name: string) => {
-    const value = e?.value;
-
-    // Get the category id only
-    if (name === "category") {
-      if (e?.id) {
-        setFormData({
-          ...formData,
-          categoryId: e?.id,
-        });
-      }
-
-      if (subcategoryRef.current) {
-        subcategoryRef.current.clearValue();
-      }
-
-      setErrors({ ...errors, category: "" });
-      return;
-    }
-
-    if (name === "subcategory") {
-      if (e?.id) {
-        setFormData({
-          ...formData,
-          subcategoryId: e?.id,
-        });
-      }
-      setErrors({ ...errors, subcategory: "" });
-      return;
-    }
-
-    if (value) {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-
-      setErrors({ ...errors, [name]: "" });
-    }
-  };
+  }, [formData.category]);
 
   const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -309,115 +264,165 @@ export default function AddItem() {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Don't envoke function
-    if (addItemLoading) {
+    if (errors.hashtags) {
+      setErrors({
+        ...errors,
+        hashtags: "Please fix hashtags",
+      });
       return;
     }
 
-    // Validations
+    // Reset errors
+    setErrors({
+      category: "",
+      subcategory: "",
+      condition: "",
+      style: "",
+      brand: "",
+      colour: "",
+      size: "",
+      price: "",
+      gender: "",
+      images: "",
+      description: "",
+      hashtags: "",
+      name: "",
+    });
+
     if (formData.name.length > 50) {
       setErrors({
         ...errors,
-        description: "Max length of name is 50",
+        name: "Name is too big",
+      });
+      return;
+    }
+    if (formData.name.length < 5) {
+      setErrors({
+        ...errors,
+        name: "Name is too small",
       });
       return;
     }
 
     if (!formData.gender) {
-      setErrors({ ...errors, gender: "Gender input is required" });
+      setErrors({
+        ...errors,
+        gender: "Choose a gender",
+      });
       return;
     }
 
-    if (!formData.categoryId) {
-      setErrors({ ...errors, category: "Select a category" });
+    if (!formData.category) {
+      setErrors({
+        ...errors,
+        category: "Choose a category",
+      });
       return;
     }
-    if (!formData.subcategoryId) {
-      setErrors({ ...errors, category: "Select a subcategory" });
+
+    if (!formData.subcategory) {
+      setErrors({
+        ...errors,
+        subcategory: "Choose a subcategory",
+      });
       return;
     }
+
     if (!formData.style) {
-      setErrors({ ...errors, style: "Select a style" });
+      setErrors({
+        ...errors,
+        style: "Choose a style",
+      });
       return;
     }
+
     if (!formData.condition) {
-      setErrors({ ...errors, condition: "Choose a condition" });
+      setErrors({
+        ...errors,
+        condition: "Choose a condition",
+      });
       return;
     }
+
     if (!formData.colour) {
-      setErrors({ ...errors, colour: "Choose a colour" });
+      setErrors({
+        ...errors,
+        colour: "Choose a colour",
+      });
       return;
     }
+
     if (!formData.brand) {
-      setErrors({ ...errors, brand: "Choose a brand" });
+      setErrors({
+        ...errors,
+        brand: "Choose a brand",
+      });
       return;
     }
+
     if (!formData.price) {
-      setErrors({ ...errors, price: "Type a price" });
+      setErrors({
+        ...errors,
+        price: "Choose a price",
+      });
       return;
     }
-    if (formData.price < 0 || formData.price > 100000) {
-      setErrors({ ...errors, price: "Min value is 0, max 100000" });
-      return;
-    }
+
     if (!formData.size) {
-      setErrors({ ...errors, size: "Choose a size" });
-      return;
-    }
-
-    if (formImages.length === 0) {
-      setErrors({ ...errors, images: "Please upload photo" });
-      return;
-    }
-    if (formImages.length < 1 || formImages.length > 5) {
-      setErrors({ ...errors, images: "Min one picture and maximum is 5" });
-      return;
-    }
-    if (
-      formData.description &&
-      (formData.description.length < 10 || formData.description.length > 200)
-    ) {
       setErrors({
         ...errors,
-        description: "Description min 10 symbols max 200",
+        size: "Choose a size",
       });
       return;
     }
 
-    if (formData.name.length < 5) {
+    if (formData.hashtags.length > 5) {
       setErrors({
         ...errors,
-        name: "Min length of name is 5",
+        hashtags: "Too many hashtags",
       });
       return;
     }
-    if (formData.name.length > 50) {
+    if (formData.hashtags.length > 200) {
       setErrors({
         ...errors,
-        name: "Max length of name is 50",
+        description: "Description is to big",
       });
       return;
     }
 
-    if (errors.hashtags) {
-      return;
-    }
-
-    if (!formData.hashtags.length && formData.hashtags.length >= 10) {
+    if (!formImages.length) {
       setErrors({
         ...errors,
-        hashtags: "Max 10 hashtags",
+        images: "Please upload photos",
+      });
+      return;
+    }
+    if (formImages.length > 5) {
+      setErrors({
+        ...errors,
+        images: "There is too many images",
       });
       return;
     }
 
     const patchedData = {
-      ...formData,
+      categoryId: formData.category.id,
+      subcategoryId: formData.subcategory.id,
+      condition: Number(formData.condition.value),
+      style: formData.style.value,
+      brand: formData.brand.map((brand) => brand.id),
       images: formImages,
-      condition: Number(formData.condition),
-      categoryId: formData.categoryId,
+      colour: formData.colour.value,
+      size: formData.size.value,
+      price: formData.price,
+      gender: formData.gender.value,
+      name: formData.name,
+      hashtags: formData.hashtags,
+      description: formData.description,
     };
 
+    console.log(formData.brand);
     dispatch(addItem(patchedData))
       .unwrap()
       .then(() => Router.push("/success"))
@@ -426,12 +431,68 @@ export default function AddItem() {
       });
   };
 
+  const handleBrandChange = (e: MultiValue<ItemEntityWithId>) => {
+    setFormData({
+      ...formData,
+      brand: e,
+    });
+  };
+
   const onInputBrandChange = (e: string) => {
     dispatch(getBrands(e))
       .unwrap()
       .catch((error: Error) => {
         console.error("rejected", error);
       });
+  };
+
+  const categoryChange = (e: SingleValue<ItemEntityWithId>) => {
+    setFormData({
+      ...formData,
+      category: e,
+      subcategory: null,
+    });
+  };
+
+  const genderChange = (e: SingleValue<ItemEntity>) => {
+    setFormData({
+      ...formData,
+      gender: e,
+      category: null,
+      subcategory: null,
+    });
+  };
+
+  const subcategoryChange = (e: SingleValue<ItemEntityWithId>) => {
+    setFormData({
+      ...formData,
+      subcategory: e,
+    });
+  };
+
+  const colourChange = (e: SingleValue<ItemEntity>) => {
+    setFormData({
+      ...formData,
+      colour: e,
+    });
+  };
+  const styleChange = (e: SingleValue<ItemEntity>) => {
+    setFormData({
+      ...formData,
+      style: e,
+    });
+  };
+  const conditionChange = (e: SingleValue<ItemEntity>) => {
+    setFormData({
+      ...formData,
+      condition: e,
+    });
+  };
+  const sizeChange = (e: SingleValue<ItemEntity>) => {
+    setFormData({
+      ...formData,
+      size: e,
+    });
   };
 
   return (
@@ -511,21 +572,27 @@ export default function AddItem() {
                       className="input"
                       placeholder="Item name"
                       required
-                      min={5}
-                      max={50}
+                      minLength={5}
+                      maxLength={50}
                     />
                     {errors.name && <p className="error">{errors.name}</p>}
                   </label>
                   <label className="label">
                     Category
-                    <CustomSelect
-                      name="category"
-                      placeholder="Select a category"
-                      options={categories}
+                    <Select
+                      instanceId="select"
+                      required={true}
+                      className="select"
+                      name="subcategory"
                       isLoading={isCategoriesLoading}
-                      disabled={!formData.gender}
-                      error={categoriesError || errors.category}
-                      handleSelectChange={handleSelectChange}
+                      isDisabled={!formData.gender}
+                      placeholder="Select a scategory"
+                      options={categories}
+                      isClearable={true}
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={categoryChange}
+                      value={formData.category}
                     />
                     {errors.category && (
                       <p className="error">{errors.category}</p>
@@ -534,25 +601,59 @@ export default function AddItem() {
 
                   <label className="label">
                     Style
-                    <CustomSelect
+                    <Select
+                      instanceId="select"
+                      required={true}
+                      className="select"
                       name="style"
+                      isLoading={isStylesLoading}
                       placeholder="Select a style"
                       options={styles}
-                      isLoading={isStylesLoading}
-                      error={stylesError || errors.style}
-                      handleSelectChange={handleSelectChange}
+                      isClearable={true}
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={styleChange}
                     />
                     {errors.style && <p className="error">{errors.style}</p>}
                   </label>
                   <label className="label">
                     Colour
-                    <CustomSelect
+                    <Select
+                      instanceId="select"
+                      required={true}
+                      className="select"
                       name="colour"
+                      isLoading={isColoursLoading}
                       placeholder="Select a colour"
                       options={colours}
-                      isLoading={isColoursLoading}
-                      error={coloursError || errors.colour}
-                      handleSelectChange={handleSelectChange}
+                      isClearable={true}
+                      styles={colourStyles}
+                      onChange={colourChange}
+                      formatOptionLabel={(option) => (
+                        <div>
+                          {option.hexCode ? (
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "10px",
+                                alignItems: "center",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  height: "30px",
+                                  width: "30px",
+                                  borderRadius: "50%",
+                                  backgroundColor: `#${option.hexCode}`,
+                                }}
+                              ></div>
+                              <span>{option.label}</span>
+                            </div>
+                          ) : (
+                            <span>{option.label}</span>
+                          )}
+                        </div>
+                      )}
                     />
                     {errors.price && <p className="error">{errors.colour}</p>}
                   </label>
@@ -585,31 +686,35 @@ export default function AddItem() {
                 <div className="row">
                   <label className="label">
                     Sex
-                    <CustomSelect
+                    <Select
+                      instanceId="select"
+                      required={true}
+                      className="select"
                       name="gender"
-                      placeholder="Select a sex"
+                      placeholder="Select a gender"
                       options={genders}
-                      isLoading={false}
-                      error={errors.gender}
-                      handleSelectChange={handleSelectChange}
+                      styles={colourStyles}
+                      onChange={genderChange}
+                      value={formData.gender}
                     />
                     {errors.gender && <p className="error">{errors.gender}</p>}
                   </label>
                   <label className="label">
                     Subcategory
                     <Select
-                      ref={subcategoryRef}
+                      instanceId="select"
                       required={true}
                       className="select"
                       name="subcategory"
                       isLoading={isSubcategoriesLoading}
-                      isDisabled={!formData.categoryId}
+                      isDisabled={!formData.category}
                       placeholder="Select a subcategory"
                       options={subcategories}
                       isClearable={true}
                       isSearchable={true}
                       styles={colourStyles}
-                      onChange={(e) => handleSelectChange(e, "subcategory")}
+                      onChange={subcategoryChange}
+                      value={formData.subcategory}
                     />
                     {errors.subcategory && (
                       <p className="error">{errors.subcategory}</p>
@@ -617,13 +722,17 @@ export default function AddItem() {
                   </label>
                   <label className="label">
                     Condition
-                    <CustomSelect
+                    <Select
+                      instanceId="select"
+                      required={true}
+                      className="select"
                       name="condition"
                       placeholder="Select a condition"
                       options={conditions}
-                      isLoading={false}
-                      error={errors.condition}
-                      handleSelectChange={handleSelectChange}
+                      isClearable={true}
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={conditionChange}
                     />
                     {errors.condition && (
                       <p className="error">{errors.condition}</p>
@@ -632,30 +741,40 @@ export default function AddItem() {
                   <label className="label">
                     Brand
                     <Select
-                      ref={subcategoryRef}
+                      instanceId="select"
                       required={true}
                       className="select"
                       name="brand"
                       isLoading={isBrandsLoading}
                       placeholder="Select a brand"
                       options={brands}
+                      isMulti
                       isClearable={true}
                       isSearchable={true}
                       styles={colourStyles}
-                      onChange={(e) => handleSelectChange(e, "brand")}
+                      onChange={handleBrandChange}
                       onInputChange={onInputBrandChange}
+                      isOptionDisabled={() => {
+                        if (formData.brand) return formData.brand.length >= 5;
+
+                        return false;
+                      }}
                     />
                     {errors.brand && <p className="error">{errors.brand}</p>}
                   </label>
                   <label className="label">
                     Size
-                    <CustomSelect
+                    <Select
+                      instanceId="select"
+                      required={true}
+                      className="select"
                       name="size"
                       placeholder="Select a size"
                       options={sizes}
-                      isLoading={false}
-                      error={errors.size}
-                      handleSelectChange={handleSelectChange}
+                      isClearable={true}
+                      isSearchable={true}
+                      styles={colourStyles}
+                      onChange={sizeChange}
                     />
                     {errors.size && <p className="error">{errors.size}</p>}
                   </label>

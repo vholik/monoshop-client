@@ -2,14 +2,14 @@ import Categories from "@components/Categories/Categories";
 import Header from "@components/Header";
 import styled from "styled-components";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
-import { SingleValue } from "react-select";
+import { MultiValue, SingleValue } from "react-select";
 import Footer from "@components/Footer/Footer";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { setError, uploadImage } from "@store/reducers/item/UploadImageSlice";
 import Image from "next/image";
 import CustomSelect from "@components/CustomSelect/CustomSelect";
 import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
-import { ItemEntity } from "@store/types/item-entity";
+import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
 import { getBrands } from "@store/reducers/item/GetBrandsSlice";
 import { getStyles } from "@store/reducers/item/GetStylesSlice";
 import { getColours } from "@store/reducers/item/GetColoursSlice";
@@ -62,17 +62,19 @@ interface EditItemProps {
 }
 
 export default function AddItem({ item }: EditItemProps) {
+  const { editItemError, editItemLoading } = useAppSelector(
+    (state) => state.editItemReducer
+  );
   const dispatch = useAppDispatch();
-  const categoryRef = useRef<any>();
-  const subcategoryRef = useRef<any>();
 
   const { isLoading, error } = useAppSelector(
     (state) => state.uploadImageReducer
   );
-
   const { categories, categoriesError, isCategoriesLoading } = useAppSelector(
     (state) => state.getCategoriesReducer
   );
+  const { subcategories, isSubcategoriesLoading, subcategoriesError } =
+    useAppSelector((state) => state.getSubcategoriesReducer);
   const { brands, brandsError, isBrandsLoading } = useAppSelector(
     (state) => state.getBrandsReducer
   );
@@ -82,41 +84,34 @@ export default function AddItem({ item }: EditItemProps) {
   const { colours, coloursError, isColoursLoading } = useAppSelector(
     (state) => state.getColoursReducer
   );
-  const { isSubcategoriesLoading, subcategories, subcategoriesError } =
-    useAppSelector((state) => state.getSubcategoriesReducer);
-  const { editItemError, editItemLoading } = useAppSelector(
-    (state) => state.editItemReducer
-  );
 
   const [formImages, setFormImages] = useState<string[]>([]);
   const [formData, setFormData] = useState<{
-    id: number;
-    categoryId: number;
-    subcategoryId: number;
-    condition: number;
-    style: string;
-    brand: string;
-    colour: string;
-    size: string;
+    category: ItemEntityWithId | null;
+    condition: ItemEntity | null;
+    style: ItemEntity | null;
+    brand: MultiValue<ItemEntityWithId> | null;
+    colour: ItemEntity | null;
+    size: ItemEntity | null;
     price: number;
-    gender: string;
+    gender: ItemEntity | null;
     description: string;
     hashtags: string[];
     name: string;
+    subcategory: ItemEntityWithId | null;
   }>({
-    id: 0,
-    categoryId: 0,
-    subcategoryId: 0,
-    condition: 0,
-    style: "",
-    brand: "",
-    colour: "",
-    size: "",
+    category: null,
+    condition: null,
+    style: null,
+    brand: null,
+    colour: null,
+    size: null,
     price: 0,
-    gender: "",
+    gender: null,
     description: "",
     hashtags: [],
     name: "",
+    subcategory: null,
   });
 
   const [errors, setErrors] = useState({
@@ -133,7 +128,6 @@ export default function AddItem({ item }: EditItemProps) {
     description: "",
     hashtags: "",
     name: "",
-    form: "",
   });
 
   const handleImageSubmit = (e: ChangeEvent<HTMLInputElement>) => {
@@ -161,7 +155,6 @@ export default function AddItem({ item }: EditItemProps) {
         .then((result) => {
           // Add image url to the form images state
           const image = result.data.url;
-
           const find = formImages.find((url) => url === image);
 
           if (find) {
@@ -171,6 +164,7 @@ export default function AddItem({ item }: EditItemProps) {
           }
         })
         .catch((error) => {
+          setErrors({ ...errors, images: error.message });
           console.error("rejected", error);
         });
     }
@@ -181,28 +175,6 @@ export default function AddItem({ item }: EditItemProps) {
   };
 
   useEffect(() => {
-    setFormImages(item.images);
-
-    const categoryId = item.category.id;
-
-    if (categoryId) {
-      setFormData({
-        brand: item.brand.value,
-        colour: item.colour.value,
-        condition: item.condition,
-        description: item.description,
-        gender: item.gender,
-        hashtags: item.hashtags,
-        name: item.name,
-        price: item.price,
-        size: item.size,
-        style: item.style.value,
-        categoryId,
-        id: item.id,
-        subcategoryId: item.subcategory.id,
-      });
-    }
-
     //Brands
     dispatch(getBrands(""))
       .unwrap()
@@ -221,17 +193,29 @@ export default function AddItem({ item }: EditItemProps) {
       .catch((error) => {
         console.error("rejected", error);
       });
-    // Categories
-    dispatch(getCategories(item.gender))
-      .unwrap()
-      .catch((error) => {
-        console.error("rejected", error);
-      });
-    dispatch(getSubcategories(item.subcategory.id))
-      .unwrap()
-      .catch((error) => {
-        console.error("rejected", error);
-      });
+
+    // Set default form data
+    setFormImages(item.images);
+    setFormData({
+      brand: item.brand.map((brand) => ({ ...brand, label: brand.value })),
+      category: { ...item.category, label: item.category.value },
+      colour: { ...item.colour, label: item.colour.value },
+      condition: {
+        label: String(item.condition),
+        value: String(item.condition),
+      },
+      description: item.description,
+      gender: {
+        value: item.gender,
+        label: item.gender === Gender.MEN ? "Menswear" : "Womenswear",
+      },
+      hashtags: item.hashtags,
+      name: item.name,
+      price: item.price,
+      size: { value: item.size, label: item.size },
+      style: { ...item.style, label: item.style.value },
+      subcategory: { ...item.subcategory, label: item.subcategory.value },
+    });
   }, []);
 
   useEffect(() => {
@@ -240,7 +224,7 @@ export default function AddItem({ item }: EditItemProps) {
     }
 
     // Categories
-    dispatch(getCategories(formData.gender as Gender))
+    dispatch(getCategories(formData.gender.value as Gender))
       .unwrap()
       .catch((error) => {
         console.error("rejected", error);
@@ -248,77 +232,17 @@ export default function AddItem({ item }: EditItemProps) {
   }, [formData.gender]);
 
   useEffect(() => {
-    if (!formData.categoryId) {
+    if (!formData.category) {
       return;
     }
 
     // Categories
-    dispatch(getSubcategories(formData.categoryId))
+    dispatch(getSubcategories(formData.category?.id))
       .unwrap()
       .catch((error) => {
         console.error("rejected", error);
       });
-  }, [formData.categoryId]);
-
-  const handleSelectChange = (e: SingleValue<ItemEntity>, name: string) => {
-    const value = e?.value;
-
-    //Clear categories on gender change
-    if (name === "gender") {
-      if (value) {
-        setFormData({
-          ...formData,
-          gender: value,
-        });
-      }
-
-      setFormData({ ...formData, categoryId: 0 });
-
-      if (categoryRef.current) {
-        categoryRef.current.clearValue();
-      }
-
-      setErrors({ ...errors, gender: "" });
-      return;
-    }
-
-    // Get the category id only
-    if (name === "category") {
-      if (e?.id) {
-        setFormData({
-          ...formData,
-          categoryId: e?.id,
-        });
-      }
-
-      if (subcategoryRef.current) {
-        subcategoryRef.current.clearValue();
-      }
-
-      setErrors({ ...errors, category: "" });
-      return;
-    }
-
-    if (name === "subcategory") {
-      if (e?.id) {
-        setFormData({
-          ...formData,
-          subcategoryId: e?.id,
-        });
-      }
-      setErrors({ ...errors, subcategory: "" });
-      return;
-    }
-
-    if (value) {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-
-      setErrors({ ...errors, [name]: "" });
-    }
-  };
+  }, [formData.category]);
 
   const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -371,18 +295,6 @@ export default function AddItem({ item }: EditItemProps) {
     });
   };
 
-  const textAreaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      description: e.target.value.replaceAll(/\r\n|\r|\n/g, "<br />"),
-    });
-
-    setErrors({
-      ...errors,
-      description: "",
-    });
-  };
-
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
@@ -396,183 +308,190 @@ export default function AddItem({ item }: EditItemProps) {
     }
   };
 
-  const onSubmit = () => {
-    // Don't envoke function
-    if (editItemLoading) {
+  const textareaHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      description: e.target.value.replace(/\r\n|\r|\n/g, "<br />"),
+    });
+    setErrors({ ...errors, description: "" });
+  };
+
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (errors.hashtags) {
+      setErrors({
+        ...errors,
+        hashtags: "Please fix hashtags",
+      });
       return;
     }
 
-    // Validations
+    // Reset errors
+    setErrors({
+      category: "",
+      subcategory: "",
+      condition: "",
+      style: "",
+      brand: "",
+      colour: "",
+      size: "",
+      price: "",
+      gender: "",
+      images: "",
+      description: "",
+      hashtags: "",
+      name: "",
+    });
+
     if (formData.name.length > 50) {
       setErrors({
         ...errors,
-        description: "Max length of name is 50",
+        name: "Name is too big",
+      });
+      return;
+    }
+    if (formData.name.length < 5) {
+      setErrors({
+        ...errors,
+        name: "Name is too small",
       });
       return;
     }
 
     if (!formData.gender) {
-      setErrors({ ...errors, gender: "Gender input is required" });
+      setErrors({
+        ...errors,
+        gender: "Choose a gender",
+      });
       return;
     }
 
-    if (!formData.categoryId) {
-      setErrors({ ...errors, category: "Select a category" });
+    if (!formData.category) {
+      setErrors({
+        ...errors,
+        category: "Choose a category",
+      });
       return;
     }
-    if (!formData.subcategoryId) {
-      setErrors({ ...errors, category: "Select a subcategory" });
+
+    if (!formData.subcategory) {
+      setErrors({
+        ...errors,
+        subcategory: "Choose a subcategory",
+      });
       return;
     }
+
     if (!formData.style) {
-      setErrors({ ...errors, style: "Select a style" });
+      setErrors({
+        ...errors,
+        style: "Choose a style",
+      });
       return;
     }
+
     if (!formData.condition) {
-      setErrors({ ...errors, condition: "Choose a condition" });
+      setErrors({
+        ...errors,
+        condition: "Choose a condition",
+      });
       return;
     }
+
     if (!formData.colour) {
-      setErrors({ ...errors, colour: "Choose a colour" });
+      setErrors({
+        ...errors,
+        colour: "Choose a colour",
+      });
       return;
     }
+
     if (!formData.brand) {
-      setErrors({ ...errors, brand: "Choose a brand" });
+      setErrors({
+        ...errors,
+        brand: "Choose a brand",
+      });
       return;
     }
+
     if (!formData.price) {
-      setErrors({ ...errors, price: "Type a price" });
+      setErrors({
+        ...errors,
+        price: "Choose a price",
+      });
       return;
     }
-    if (formData.price < 0 || formData.price > 100000) {
-      setErrors({ ...errors, price: "Min value is 0, max 100000" });
-      return;
-    }
+
     if (!formData.size) {
-      setErrors({ ...errors, size: "Choose a size" });
-      return;
-    }
-
-    if (formImages.length === 0) {
-      setErrors({ ...errors, images: "Please upload photo" });
-      return;
-    }
-    if (formImages.length < 1 || formImages.length > 5) {
-      setErrors({ ...errors, images: "Min one picture and maximum is 5" });
-      return;
-    }
-    if (
-      formData.description &&
-      (formData.description.length < 10 || formData.description.length > 200)
-    ) {
       setErrors({
         ...errors,
-        description: "Description min 10 symbols max 200",
+        size: "Choose a size",
       });
       return;
     }
 
-    if (formData.name.length < 5) {
+    if (formData.hashtags.length > 5) {
       setErrors({
         ...errors,
-        description: "Min length of name is 5",
+        hashtags: "Too many hashtags",
       });
       return;
     }
-    if (formData.name.length > 50) {
+    if (formData.hashtags.length > 200) {
       setErrors({
         ...errors,
-        description: "Max length of name is 50",
-      });
-      return;
-    }
-
-    if (errors.hashtags) {
-      return;
-    }
-
-    if (!formData.hashtags.length && formData.hashtags.length >= 10) {
-      setErrors({
-        ...errors,
-        hashtags: "Max 10 hashtags",
+        description: "Description is to big",
       });
       return;
     }
 
-    const isEqualResults =
-      formData.brand === item.brand.value &&
-      formData.categoryId === item.category.id &&
-      formData.colour === item.colour.value &&
-      formData.condition === item.condition &&
-      formData.description === item.description &&
-      formData.gender === item.gender &&
-      formData.hashtags === item.hashtags &&
-      formData.name === item.name &&
-      formData.price === item.price &&
-      formData.size === item.size &&
-      formData.style === item.style.value &&
-      formData.subcategoryId === item.subcategory.id &&
-      formImages === item.images;
-
-    if (isEqualResults) {
+    if (!formImages.length) {
       setErrors({
         ...errors,
-        form: "Please make some changes",
+        images: "Please upload photos",
       });
-
+      return;
+    }
+    if (formImages.length > 5) {
+      setErrors({
+        ...errors,
+        images: "There is too many images",
+      });
       return;
     }
 
     const patchedData = {
-      ...formData,
+      categoryId: formData.category.id,
+      subcategoryId: formData.subcategory.id,
+      condition: Number(formData.condition.value),
+      style: formData.style.value,
+      brand: formData.brand.map((brand) => brand.id),
       images: formImages,
-      condition: Number(formData.condition),
+      colour: formData.colour.value,
+      size: formData.size.value,
+      price: formData.price,
+      gender: formData.gender.value,
+      name: formData.name,
+      id: item.id,
+      hashtags: formData.hashtags,
+      description: formData.description,
     };
 
     dispatch(editItem(patchedData))
       .unwrap()
-      .then(() => Router.push("/success-update"))
+      .then(() => Router.push("/success"))
       .catch((err) => {
         console.log("rejected", err), Router.push("/404");
       });
   };
 
-  const genderDefaultValue = {
-    value: item.gender as string,
-    label: item.gender === Gender.MEN ? "Menswear" : "Womenswear",
+  const handleBrandChange = (e: MultiValue<ItemEntityWithId>) => {
+    setFormData({
+      ...formData,
+      brand: e,
+    });
   };
-
-  const categoryDefaultValue: ItemEntity = {
-    value: item.category.value,
-    label: item.category.value,
-  };
-  const conditionDefaultValue: ItemEntity = {
-    value: String(item.condition),
-    label: String(item.condition),
-  };
-  const styleDefaultValue: ItemEntity = {
-    value: item.style.value,
-    label: item.style.value,
-  };
-  const brandDefaultValue: ItemEntity = {
-    value: item.brand.value,
-    label: item.brand.value,
-  };
-  const colourDefaultValue: ItemEntity = {
-    value: item.colour.value,
-    label: item.colour.value,
-    hexCode: item.colour.hexCode,
-  };
-  const sizeDefaultValue: ItemEntity = {
-    value: item.size,
-    label: item.size,
-  };
-  const subcategoryDefaultValue: ItemEntity = {
-    value: item.subcategory.value,
-    label: item.subcategory.value,
-  };
-
-  const hashtags = item.hashtags.join(",").replaceAll("#", ",");
 
   const onInputBrandChange = (e: string) => {
     dispatch(getBrands(e))
@@ -582,22 +501,72 @@ export default function AddItem({ item }: EditItemProps) {
       });
   };
 
+  const categoryChange = (e: SingleValue<ItemEntityWithId>) => {
+    setFormData({
+      ...formData,
+      category: e,
+      subcategory: null,
+    });
+  };
+
+  const genderChange = (e: SingleValue<ItemEntity>) => {
+    setFormData({
+      ...formData,
+      gender: e,
+      category: null,
+      subcategory: null,
+    });
+  };
+
+  const subcategoryChange = (e: SingleValue<ItemEntityWithId>) => {
+    setFormData({
+      ...formData,
+      subcategory: e,
+    });
+  };
+
+  const colourChange = (e: SingleValue<ItemEntity>) => {
+    setFormData({
+      ...formData,
+      colour: e,
+    });
+  };
+  const styleChange = (e: SingleValue<ItemEntity>) => {
+    setFormData({
+      ...formData,
+      style: e,
+    });
+  };
+  const conditionChange = (e: SingleValue<ItemEntity>) => {
+    setFormData({
+      ...formData,
+      condition: e,
+    });
+  };
+  const sizeChange = (e: SingleValue<ItemEntity>) => {
+    setFormData({
+      ...formData,
+      size: e,
+    });
+  };
+
+  console.log(item);
+
   return (
     <EditItemStyles>
       <Header />
       <Categories />
       <div className="container">
         <div className="wrapper">
-          <h1 className="title-md">Edit item</h1>
+          <h1 className="title-md">Sell new item</h1>
           {editItemLoading ? (
             <Loading />
           ) : (
-            <form className="inner">
+            <form className="inner" onSubmit={onSubmit}>
               {/* First row */}
               <div className="row">
                 <label className="image-upload">
                   <input
-                    required
                     type="file"
                     className="image-upload-input"
                     accept="image/*"
@@ -659,29 +628,28 @@ export default function AddItem({ item }: EditItemProps) {
                       className="input"
                       placeholder="Item name"
                       required
-                      min={5}
-                      max={50}
-                      defaultValue={item.name || ""}
+                      minLength={5}
+                      maxLength={50}
+                      defaultValue={formData.name}
                     />
                     {errors.name && <p className="error">{errors.name}</p>}
                   </label>
-
                   <label className="label">
                     Category
                     <Select
-                      required
+                      instanceId="select"
+                      required={true}
                       className="select"
-                      name="category"
-                      placeholder="Select a category"
-                      options={categories}
+                      name="subcategory"
                       isLoading={isCategoriesLoading}
+                      isDisabled={!formData.gender}
+                      placeholder="Select a scategory"
+                      options={categories}
                       isClearable={true}
                       isSearchable={true}
-                      instanceId="select"
                       styles={colourStyles}
-                      ref={categoryRef}
-                      onChange={(e) => handleSelectChange(e, "category")}
-                      defaultValue={categoryDefaultValue || ""}
+                      onChange={categoryChange}
+                      value={formData.category}
                     />
                     {errors.category && (
                       <p className="error">{errors.category}</p>
@@ -691,37 +659,35 @@ export default function AddItem({ item }: EditItemProps) {
                   <label className="label">
                     Style
                     <Select
+                      instanceId="select"
                       required={true}
                       className="select"
                       name="style"
+                      isLoading={isStylesLoading}
                       placeholder="Select a style"
                       options={styles}
-                      isLoading={isStylesLoading}
                       isClearable={true}
-                      instanceId="select"
                       isSearchable={true}
                       styles={colourStyles}
-                      onChange={(e) => handleSelectChange(e, "style")}
-                      defaultValue={styleDefaultValue}
+                      onChange={styleChange}
+                      value={formData.style}
                     />
                     {errors.style && <p className="error">{errors.style}</p>}
                   </label>
-
                   <label className="label">
                     Colour
                     <Select
+                      instanceId="select"
                       required={true}
                       className="select"
                       name="colour"
+                      isLoading={isColoursLoading}
                       placeholder="Select a colour"
                       options={colours}
-                      isLoading={isColoursLoading}
                       isClearable={true}
-                      instanceId="select"
-                      isSearchable={true}
                       styles={colourStyles}
-                      onChange={(e) => handleSelectChange(e, "colour")}
-                      defaultValue={colourDefaultValue}
+                      onChange={colourChange}
+                      value={formData.colour}
                       formatOptionLabel={(option) => (
                         <div>
                           {option.hexCode ? (
@@ -748,13 +714,11 @@ export default function AddItem({ item }: EditItemProps) {
                         </div>
                       )}
                     />
-                    {errors.colour && <p className="error">{errors.colour}</p>}
+                    {errors.price && <p className="error">{errors.colour}</p>}
                   </label>
-
                   <label className="label">
                     Price
                     <input
-                      required
                       type="number"
                       className="input"
                       placeholder="Select a price"
@@ -772,7 +736,7 @@ export default function AddItem({ item }: EditItemProps) {
                       className="input"
                       placeholder="Hashtags"
                       onChange={handleHashtagsChange}
-                      defaultValue={hashtags}
+                      defaultValue={item.hashtags.join(",")}
                     />
                     {errors.hashtags && (
                       <p className="error">{errors.hashtags}</p>
@@ -784,94 +748,100 @@ export default function AddItem({ item }: EditItemProps) {
                   <label className="label">
                     Sex
                     <Select
+                      instanceId="select"
                       required={true}
                       className="select"
                       name="gender"
                       placeholder="Select a gender"
-                      instanceId="select"
                       options={genders}
-                      isClearable={true}
-                      isSearchable={true}
                       styles={colourStyles}
-                      onChange={(e) => handleSelectChange(e, "gender")}
-                      defaultValue={genderDefaultValue}
+                      onChange={genderChange}
+                      value={formData.gender}
                     />
                     {errors.gender && <p className="error">{errors.gender}</p>}
                   </label>
                   <label className="label">
                     Subcategory
                     <Select
+                      instanceId="select"
                       required={true}
                       className="select"
-                      name="style"
-                      ref={subcategoryRef}
+                      name="subcategory"
+                      isLoading={isSubcategoriesLoading}
+                      isDisabled={!formData.category}
                       placeholder="Select a subcategory"
                       options={subcategories}
-                      isLoading={isSubcategoriesLoading}
                       isClearable={true}
-                      instanceId="select"
                       isSearchable={true}
                       styles={colourStyles}
-                      onChange={(e) => handleSelectChange(e, "subcategory")}
-                      defaultValue={subcategoryDefaultValue}
+                      onChange={subcategoryChange}
+                      value={formData.subcategory}
                     />
-                    {errors.gender && <p className="error">{errors.gender}</p>}
+                    {errors.subcategory && (
+                      <p className="error">{errors.subcategory}</p>
+                    )}
                   </label>
-
                   <label className="label">
                     Condition
                     <Select
+                      instanceId="select"
                       required={true}
                       className="select"
                       name="condition"
                       placeholder="Select a condition"
                       options={conditions}
                       isClearable={true}
-                      instanceId="select"
                       isSearchable={true}
                       styles={colourStyles}
-                      onChange={(e) => handleSelectChange(e, "condition")}
-                      defaultValue={conditionDefaultValue}
+                      onChange={conditionChange}
+                      defaultValue={{
+                        label: String(item.condition),
+                        value: String(item.condition),
+                      }}
                     />
                     {errors.condition && (
                       <p className="error">{errors.condition}</p>
                     )}
                   </label>
-
                   <label className="label">
                     Brand
                     <Select
+                      instanceId="select"
                       required={true}
                       className="select"
                       name="brand"
+                      isLoading={isBrandsLoading}
                       placeholder="Select a brand"
                       options={brands}
+                      isMulti
                       isClearable={true}
-                      instanceId="select"
-                      isLoading={isBrandsLoading}
                       isSearchable={true}
                       styles={colourStyles}
-                      onChange={(e) => handleSelectChange(e, "gender")}
-                      defaultValue={brandDefaultValue}
+                      onChange={handleBrandChange}
                       onInputChange={onInputBrandChange}
+                      value={formData.brand}
+                      isOptionDisabled={() => {
+                        if (formData.brand) return formData.brand.length >= 5;
+
+                        return false;
+                      }}
                     />
                     {errors.brand && <p className="error">{errors.brand}</p>}
                   </label>
-
                   <label className="label">
                     Size
                     <Select
+                      instanceId="select"
                       required={true}
                       className="select"
                       name="size"
                       placeholder="Select a size"
                       options={sizes}
+                      value={formData.size}
                       isClearable={true}
                       isSearchable={true}
-                      instanceId="select"
                       styles={colourStyles}
-                      onChange={(e) => handleSelectChange(e, "size")}
-                      defaultValue={sizeDefaultValue}
+                      onChange={sizeChange}
                     />
                     {errors.size && <p className="error">{errors.size}</p>}
                   </label>
@@ -883,22 +853,24 @@ export default function AddItem({ item }: EditItemProps) {
                     placeholder="Describe your item..."
                     minLength={10}
                     maxLength={200}
-                    defaultValue={item.description.replaceAll("<br />", "\n")}
-                    onChange={textAreaChange}
+                    onChange={textareaHandler}
+                    defaultValue={
+                      item.description
+                        ? item.description.replaceAll("<br />", "\n")
+                        : ""
+                    }
                   ></textarea>
                   {errors.description && (
                     <p className="error">{errors.description}</p>
                   )}
-                  {errors.form && <p className="error">{errors.form}</p>}
                 </label>
-
                 <button
                   className="button submit--buton"
                   disabled={editItemLoading}
-                  onClick={onSubmit}
                 >
                   Save
                 </button>
+                {editItemError && <p className="error">{editItemError}</p>}
               </div>
             </form>
           )}

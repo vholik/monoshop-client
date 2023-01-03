@@ -26,7 +26,7 @@ export const FilterSlice = createSlice({
       state.sortBy = action.payload;
     },
     resetFilter: (state) => {
-      return;
+      Object.assign(state, initialState);
     },
     setPrice: (state, action: PayloadAction<[number, number]>) => {
       state.price = action.payload;
