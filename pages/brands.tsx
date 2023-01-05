@@ -5,7 +5,7 @@ import Image from "next/image";
 import SearchIcon from "@public/images/search.svg";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { ChangeEvent, useEffect, useState } from "react";
-import { getBrands } from "@store/reducers/item/GetBrandsSlice";
+import { getBrands } from "@store/reducers/brand/GetBrandsSlice";
 import Loading from "@components/Loading/Loading";
 import { resetFilter, setBrand } from "@store/reducers/filter/FilterSlice";
 import Router from "next/router";

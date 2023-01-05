@@ -22,7 +22,7 @@ import { getItems, setFavorite } from "@store/reducers/item/GetItemsSlice";
 import Image from "next/image";
 import { getTrackBackground, Range } from "react-range";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { getBrands } from "@store/reducers/item/GetBrandsSlice";
+import { getBrands } from "@store/reducers/brand/GetBrandsSlice";
 import { getStyles } from "@store/reducers/item/GetStylesSlice";
 import { getColours } from "@store/reducers/item/GetColoursSlice";
 import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";

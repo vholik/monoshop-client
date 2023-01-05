@@ -30,17 +30,20 @@ export const fetchLogin = createAsyncThunk(
   }
 );
 
-export const checkIsAuth = createAsyncThunk("auth/me", async (_, thunkAPI) => {
-  try {
-    const response = await instance.get<boolean>("auth/me");
-    return response.data;
-  } catch (e) {
-    if (e instanceof AxiosError) {
-      return thunkAPI.rejectWithValue(e.response!.data.message);
+export const checkIsAuth = createAsyncThunk(
+  "auth/refresh",
+  async (_, thunkAPI) => {
+    try {
+      const response = await instance.get<boolean>("auth/refresh");
+      return response.data;
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        return thunkAPI.rejectWithValue(e.response!.data.message);
+      }
+      return e;
     }
-    return e;
   }
-});
+);
 
 export const LoginSlice = createSlice({
   name: "login",
@@ -63,6 +66,7 @@ export const LoginSlice = createSlice({
     [fetchLogin.rejected.type]: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
       state.error = action.payload;
+      state.isAuth = false;
     },
   },
 });

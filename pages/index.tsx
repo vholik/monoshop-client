@@ -5,8 +5,67 @@ import HeroBg from "@public/images/hero-bg.jpg";
 import Categories from "@components/Categories/Categories";
 import Footer from "@components/Footer/Footer";
 import Link from "next/link";
+import { wrapper } from "@store/reducers/store";
+import { getPopularBrands } from "@store/reducers/brand/GetPopularBrandsSlice";
+import { ItemEntityWithImage } from "@store/types/item-entity";
+import { getPopularStyles } from "@store/reducers/style/GetPopularStylesSlice";
+import { getPopularItems } from "@store/reducers/item/GetPopularItemsSlice";
+import { Item } from "@store/types/item";
+import { useAppDispatch } from "@store/hooks/redux";
+import {
+  resetFilter,
+  setBrand,
+  setStyle,
+} from "@store/reducers/filter/FilterSlice";
+import Router from "next/router";
 
-export default function Home() {
+export const getServerSideProps = wrapper.getServerSideProps(
+  (store) => async () => {
+    const brands = (await store.dispatch(getPopularBrands())).payload;
+    const styles = (await store.dispatch(getPopularStyles())).payload;
+    const items = (await store.dispatch(getPopularItems())).payload;
+
+    if (!brands || !styles || !items) {
+      return {
+        props: {
+          items: [],
+          styles: [],
+          brands: [],
+        },
+      };
+    }
+
+    return {
+      props: {
+        brands,
+        styles,
+        items,
+      },
+    };
+  }
+);
+
+interface HomeProps {
+  brands: ItemEntityWithImage[];
+  styles: ItemEntityWithImage[];
+  items: Item[];
+}
+
+export default function Home({ brands, items, styles }: HomeProps) {
+  const dispatch = useAppDispatch();
+
+  const brandRedirect = (brand: ItemEntityWithImage) => {
+    dispatch(resetFilter());
+    dispatch(setBrand([brand.value]));
+    Router.push("/shop");
+  };
+
+  const styleRedirect = (style: ItemEntityWithImage) => {
+    dispatch(resetFilter());
+    dispatch(setStyle([style.value]));
+    Router.push("/shop");
+  };
+
   return (
     <HomeStyles>
       <Head>
@@ -26,28 +85,24 @@ export default function Home() {
       {/* Popular categories */}
       <div className="container">
         <div className="popular-categories">
-          <h1 className="title-sm">Popular categories</h1>
+          <h1 className="title-sm">Popular styles</h1>
           <div className="wrapper">
-            <div className="popular-categories__item">
-              <div className="popular-categories__image"></div>
-              <h2 className="popular-categories__name-tag">Name tag</h2>
-            </div>
-            <div className="popular-categories__item">
-              <div className="popular-categories__image"></div>
-              <h2 className="popular-categories__name-tag">Name tag</h2>
-            </div>
-            <div className="popular-categories__item">
-              <div className="popular-categories__image"></div>
-              <h2 className="popular-categories__name-tag">Name tag</h2>
-            </div>
-            <div className="popular-categories__item">
-              <div className="popular-categories__image"></div>
-              <h2 className="popular-categories__name-tag">Name tag</h2>
-            </div>
-            <div className="popular-categories__item">
-              <div className="popular-categories__image"></div>
-              <h2 className="popular-categories__name-tag">Name tag</h2>
-            </div>
+            {Array.isArray(items) &&
+              styles.map((style) => (
+                <div className="popular-categories__item" key={style.value}>
+                  <div
+                    className="popular-categories__image"
+                    style={{ backgroundImage: `url(${style.image})` }}
+                    onClick={() => styleRedirect(style)}
+                  ></div>
+                  <h2
+                    className="popular-categories__name-tag"
+                    onClick={() => styleRedirect(style)}
+                  >
+                    {style.value}
+                  </h2>
+                </div>
+              ))}
           </div>
         </div>
       </div>
@@ -56,14 +111,21 @@ export default function Home() {
         <section className="popular-brands">
           <div className="top">
             <h2 className="title-sm">Popular brands</h2>
-            <p className="see-all-button">See all</p>
+            <Link href="/brands">
+              <p className="see-all-button">See all</p>
+            </Link>
           </div>
           <div className="wrapper">
-            <div className="brand"></div>
-            <div className="brand"></div>
-            <div className="brand"></div>
-            <div className="brand"></div>
-            <div className="brand"></div>
+            {Array.isArray(brands) &&
+              brands.map((brand) => (
+                <div className="popular-categories__item" key={brand.value}>
+                  <div
+                    className="brand"
+                    style={{ backgroundImage: `url(${brand.image})` }}
+                    onClick={() => brandRedirect(brand)}
+                  ></div>
+                </div>
+              ))}
           </div>
         </section>
       </div>
@@ -75,46 +137,18 @@ export default function Home() {
             <p className="see-all-button">See all</p>
           </div>
           <div className="wrapper">
-            <div className="hot-item">
-              <div className="hot-item__image"></div>
-              <p className="hot-item__price">99 PLN</p>
-            </div>
-            <div className="hot-item">
-              <div className="hot-item__image"></div>
-              <p className="hot-item__price">99 PLN</p>
-            </div>
-            <div className="hot-item">
-              <div className="hot-item__image"></div>
-              <p className="hot-item__price">99 PLN</p>
-            </div>
-            <div className="hot-item">
-              <div className="hot-item__image"></div>
-              <p className="hot-item__price">99 PLN</p>
-            </div>
-            <div className="hot-item">
-              <div className="hot-item__image"></div>
-              <p className="hot-item__price">99 PLN</p>
-            </div>
-            <div className="hot-item">
-              <div className="hot-item__image"></div>
-              <p className="hot-item__price">99 PLN</p>
-            </div>
-            <div className="hot-item">
-              <div className="hot-item__image"></div>
-              <p className="hot-item__price">99 PLN</p>
-            </div>
-            <div className="hot-item">
-              <div className="hot-item__image"></div>
-              <p className="hot-item__price">99 PLN</p>
-            </div>
-            <div className="hot-item">
-              <div className="hot-item__image"></div>
-              <p className="hot-item__price">99 PLN</p>
-            </div>
-            <div className="hot-item">
-              <div className="hot-item__image"></div>
-              <p className="hot-item__price">99 PLN</p>
-            </div>
+            {Array.isArray(items) &&
+              items.map((item) => (
+                <div className="hot-item" key={item.id}>
+                  <Link href={`/shop/${item.id}`}>
+                    <div
+                      className="hot-item__image"
+                      style={{ backgroundImage: `url(${item.images[0]})` }}
+                    ></div>
+                  </Link>
+                  <p className="hot-item__price">{item.price} PLN</p>
+                </div>
+              ))}
           </div>
         </section>
       </div>
@@ -195,12 +229,15 @@ const HomeStyles = styled.div`
       margin-top: 1rem;
       font-size: var(--font-md);
       text-align: center;
+      cursor: pointer;
     }
 
     &__image {
       height: 100%;
       border-radius: 50%;
-      background-color: var(--grey-30);
+      background-size: cover;
+      background-color: var(--loading);
+      cursor: pointer;
     }
   }
 
@@ -224,7 +261,11 @@ const HomeStyles = styled.div`
       background-color: var(--white);
       aspect-ratio: 1 / 1;
       width: 100%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
       border-radius: 50%;
+      cursor: pointer;
     }
   }
 
@@ -248,13 +289,15 @@ const HomeStyles = styled.div`
 
     .hot-item {
       &__image {
+        background-size: cover;
         width: 100%;
         aspect-ratio: 1 / 1;
-        background-color: var(--white);
+        background-color: var(--loading);
       }
 
       &__price {
         font-family: var(--font-default);
+        font-weight: 700;
         margin-top: 1rem;
       }
     }

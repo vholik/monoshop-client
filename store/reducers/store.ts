@@ -11,7 +11,7 @@ import registerReducer from "./auth/RegisterSlice";
 import loginReducer from "./auth/LoginSlice";
 import uploadImageReducer from "./item/UploadImageSlice";
 import getCategoriesReducer from "./item/GetCategoriesSlice";
-import getBrandsReducer from "./item/GetBrandsSlice";
+import getBrandsReducer from "./brand/GetBrandsSlice";
 import getStylesReducer from "./item/GetStylesSlice";
 import getColoursReducer from "./item/GetColoursSlice";
 import addItemReducer from "./item/AddItemSlice";

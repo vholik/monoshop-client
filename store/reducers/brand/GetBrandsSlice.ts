@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
 import { AxiosError } from "axios";
-import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
-import { MultiValue } from "react-select";
+import { ItemEntityWithId } from "@store/types/item-entity";
 
 interface BrandsState {
   isBrandsLoading: boolean;
