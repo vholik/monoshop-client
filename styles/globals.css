@@ -19,9 +19,9 @@ li {
   /* --font-default: "HelveticaNeueCyr", sans-serif;
   --font-medium: "HelveticaNeueCyr", sans-serif;
   --font-wide: "HelveticaNeueCyr", sans-serif; */
-  --font-default: "Halvar Breit Rg", sans-serif;
-  --font-medium: "Halvar Breit Md", sans-serif;
-  --font-wide: "Halvar Breit Blk", sans-serif;
+  --font-default: "Halvar Breit Rg", "HelveticaNeueCyr", sans-serif;
+  --font-medium: "Halvar Breit Md", "HelveticaNeueCyr", sans-serif;
+  --font-wide: "Halvar Breit Blk", "HelveticaNeueCyr", sans-serif;
   --dark: #131313;
   --dark-hover: #414141;
   --loading: #ebebeb;
@@ -40,6 +40,23 @@ li {
   --font-xxxl: 2.8rem;
   --component-margin: 5rem;
   --gap: 2rem;
+}
+
+.no-items {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-top: 2rem;
+  font-weight: 400;
+  width: 100%;
+  grid-column: 1/5;
+}
+
+.no-items .bold {
+  text-decoration: underline;
+}
+
+.bold {
+  font-weight: 700;
 }
 
 .label {
@@ -157,6 +174,7 @@ a {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  font-family: var(--font-default);
 }
 
 @keyframes placeHolderShimmer {

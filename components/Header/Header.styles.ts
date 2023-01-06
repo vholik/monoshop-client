@@ -8,6 +8,15 @@ export const HeaderStyles = styled.div`
   padding-left: 50px;
   padding-right: 50px;
 
+  .cross-icon {
+    cursor: pointer;
+    transition: background 0.1s linear;
+    border-radius: 50%;
+    &:hover {
+      background-color: var(--grey-10);
+    }
+  }
+
   .input--button {
     font-size: 0.9rem;
     padding-left: 1em;

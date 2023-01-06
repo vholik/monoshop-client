@@ -8,9 +8,15 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import styled from "styled-components";
 import { useCookies } from "react-cookie";
 import Router from "next/router";
+import instance, { AuthResponse } from "@utils/axios";
+import {
+  CredentialResponse,
+  GoogleLogin,
+  GoogleOAuthProvider,
+} from "@react-oauth/google";
+import { hasGrantedAllScopesGoogle } from "@react-oauth/google";
 
 export default function Login() {
-  const [cookies, setCookie] = useCookies(["token"]);
   const dispatch = useAppDispatch();
   const { error } = useAppSelector((state) => state.loginReducer);
   const {
@@ -22,22 +28,30 @@ export default function Login() {
   const onSubmit: SubmitHandler<ILoginFormData> = (data) => {
     dispatch(fetchLogin(data))
       .unwrap()
-      .then((result) => {
-        const token = cookies["token"];
+      .then((res) => {
+        localStorage.setItem("access_token", res.accessToken);
+        localStorage.setItem("refresh_token", res.refreshToken);
 
-        const date = new Date();
-        date.setDate(date.getDate() + 7);
-
-        if (token) {
-          setCookie("token", token, { expires: date });
-        }
-
-        console.log(token);
         Router.push("/");
       })
       .catch((error) => {
         console.error("rejected", error);
       });
+  };
+
+  const successHandler = async (response: CredentialResponse) => {
+    console.log(response);
+    await instance
+      .post<AuthResponse>("google-authentication", {
+        token: response.credential,
+      })
+      .then((res) => {
+        localStorage.setItem("access_token", res.data.accessToken);
+        localStorage.setItem("refresh_token", res.data.refreshToken);
+
+        Router.push("/");
+      })
+      .catch((err) => Router.push("/404"));
   };
 
   return (
@@ -97,6 +111,21 @@ export default function Login() {
           </p>
           <button className="button">Login</button>
           <div className="error">{error && error}</div>
+
+          <GoogleOAuthProvider
+            clientId={process.env.NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID!}
+          >
+            <div className="google-login-btn">
+              <GoogleLogin
+                context="signin"
+                useOneTap
+                onSuccess={successHandler}
+                onError={() => {
+                  console.log("Login Failed");
+                }}
+              />
+            </div>
+          </GoogleOAuthProvider>
         </form>
       </div>
     </LoginStyles>
@@ -104,6 +133,10 @@ export default function Login() {
 }
 
 const LoginStyles = styled.div`
+  .google-login-btn {
+    max-width: 10rem;
+  }
+
   .wrapper {
     display: grid;
     grid-template-columns: 1fr 1fr;

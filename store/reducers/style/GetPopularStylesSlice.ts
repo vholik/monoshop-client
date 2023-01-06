@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import instance from "@utils/axios";
-import { AxiosError, isAxiosError } from "axios";
+import instance, { API_URL } from "@utils/axios";
+import axios, { AxiosError, isAxiosError } from "axios";
 import { ItemEntityWithImage } from "@store/types/item-entity";
 import { ReduxError } from "@store/types/error";
 
@@ -24,12 +24,15 @@ export const getPopularStyles = createAsyncThunk<
   }
 >("popularStyles", async (_, thunkAPI) => {
   try {
-    const response = await instance.get<ItemEntityWithImage[]>("style/popular");
+    const response = await axios.get<ItemEntityWithImage[]>(
+      `${API_URL}/style/popular`
+    );
     return response.data;
   } catch (err) {
     if (isAxiosError(err) && err.response) {
       return thunkAPI.rejectWithValue(err.response!.data.message);
     }
+    console.log(err);
     return thunkAPI.rejectWithValue({ message: "Can not loading the data" });
   }
 });

@@ -520,6 +520,7 @@ const ShopItemStyles = styled.div`
         aspect-ratio: 1 / 1.1;
       }
       &__price {
+        font-weight: 700;
         margin-top: 0.5rem;
         font-family: var(--font-medium);
       }

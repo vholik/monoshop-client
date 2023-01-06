@@ -10,7 +10,7 @@ import Image from "next/image";
 import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
 import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
 import { getBrands } from "@store/reducers/brand/GetBrandsSlice";
-import { getStyles } from "@store/reducers/item/GetStylesSlice";
+import { getStyles } from "@store/reducers/style/GetStylesSlice";
 import { getColours } from "@store/reducers/item/GetColoursSlice";
 import { Gender } from "@store/types/gender.enum";
 import { addItem } from "@store/reducers/item/AddItemSlice";

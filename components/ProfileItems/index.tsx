@@ -78,6 +78,14 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
           </div>
         </div>
       </Modal>
+      {!items.length && (
+        <h2 className="no-items">
+          You don't have any items on sell.{" "}
+          <Link href="/sell">
+            <span className="bold">Sell</span>
+          </Link>
+        </h2>
+      )}
       {items.map((item) => (
         <div className="item" key={item.id}>
           <div className="item-image">

@@ -48,6 +48,12 @@ const Favorites = () => {
           <div className="wrapper">
             <div className="container">
               <div className="items-inner">
+                {!items.length && (
+                  <h2 className="no-items">
+                    You don't have any items added to favorites.{" "}
+                  </h2>
+                )}
+
                 {items.map((item) => (
                   <div className="item" key={item.id}>
                     <div className="item-image">

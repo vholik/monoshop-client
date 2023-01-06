@@ -15,9 +15,11 @@ import { useAppDispatch } from "@store/hooks/redux";
 import {
   resetFilter,
   setBrand,
+  setSortBy,
   setStyle,
 } from "@store/reducers/filter/FilterSlice";
 import Router from "next/router";
+import { SortBy } from "@store/types/filter-by.enum";
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) => async () => {
@@ -66,6 +68,11 @@ export default function Home({ brands, items, styles }: HomeProps) {
     Router.push("/shop");
   };
 
+  const popularItemsRedirect = () => {
+    dispatch(setSortBy(SortBy.Recent));
+    Router.push("/shop");
+  };
+
   return (
     <HomeStyles>
       <Head>
@@ -83,12 +90,12 @@ export default function Home({ brands, items, styles }: HomeProps) {
         </div>
       </main>
       {/* Popular categories */}
-      <div className="container">
-        <div className="popular-categories">
-          <h1 className="title-sm">Popular styles</h1>
-          <div className="wrapper">
-            {Array.isArray(items) &&
-              styles.map((style) => (
+      {Array.isArray(styles) && (
+        <div className="container">
+          <div className="popular-categories">
+            <h1 className="title-sm">Popular styles</h1>
+            <div className="wrapper">
+              {styles.map((style) => (
                 <div className="popular-categories__item" key={style.value}>
                   <div
                     className="popular-categories__image"
@@ -103,21 +110,22 @@ export default function Home({ brands, items, styles }: HomeProps) {
                   </h2>
                 </div>
               ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
       {/* Popular brands */}
-      <div className="container">
-        <section className="popular-brands">
-          <div className="top">
-            <h2 className="title-sm">Popular brands</h2>
-            <Link href="/brands">
-              <p className="see-all-button">See all</p>
-            </Link>
-          </div>
-          <div className="wrapper">
-            {Array.isArray(brands) &&
-              brands.map((brand) => (
+      {Array.isArray(brands) && (
+        <div className="container">
+          <section className="popular-brands">
+            <div className="top">
+              <h2 className="title-sm">Popular brands</h2>
+              <Link href="/brands">
+                <p className="see-all-button">See all</p>
+              </Link>
+            </div>
+            <div className="wrapper">
+              {brands.map((brand) => (
                 <div className="popular-categories__item" key={brand.value}>
                   <div
                     className="brand"
@@ -126,19 +134,22 @@ export default function Home({ brands, items, styles }: HomeProps) {
                   ></div>
                 </div>
               ))}
-          </div>
-        </section>
-      </div>
+            </div>
+          </section>
+        </div>
+      )}
       {/* Hot on monoshop */}
-      <div className="container">
-        <section className="hot">
-          <div className="top">
-            <h2 className="title-sm">Hot on Monoshop</h2>
-            <p className="see-all-button">See all</p>
-          </div>
-          <div className="wrapper">
-            {Array.isArray(items) &&
-              items.map((item) => (
+      {Array.isArray(items) && (
+        <div className="container">
+          <section className="hot">
+            <div className="top">
+              <h2 className="title-sm">Hot on Monoshop</h2>
+              <p className="see-all-button" onClick={popularItemsRedirect}>
+                See all
+              </p>
+            </div>
+            <div className="wrapper">
+              {items.map((item) => (
                 <div className="hot-item" key={item.id}>
                   <Link href={`/shop/${item.id}`}>
                     <div
@@ -149,9 +160,11 @@ export default function Home({ brands, items, styles }: HomeProps) {
                   <p className="hot-item__price">{item.price} PLN</p>
                 </div>
               ))}
-          </div>
-        </section>
-      </div>
+            </div>
+          </section>
+        </div>
+      )}
+
       {/* Ad section */}
       <div className="container">
         <div className="advertisement-section">

@@ -12,7 +12,7 @@ import loginReducer from "./auth/LoginSlice";
 import uploadImageReducer from "./item/UploadImageSlice";
 import getCategoriesReducer from "./item/GetCategoriesSlice";
 import getBrandsReducer from "./brand/GetBrandsSlice";
-import getStylesReducer from "./item/GetStylesSlice";
+import getStylesReducer from "./style/GetStylesSlice";
 import getColoursReducer from "./item/GetColoursSlice";
 import addItemReducer from "./item/AddItemSlice";
 import getItemsReducer from "./item/GetItemsSlice";

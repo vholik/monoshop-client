@@ -23,7 +23,7 @@ import Image from "next/image";
 import { getTrackBackground, Range } from "react-range";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { getBrands } from "@store/reducers/brand/GetBrandsSlice";
-import { getStyles } from "@store/reducers/item/GetStylesSlice";
+import { getStyles } from "@store/reducers/style/GetStylesSlice";
 import { getColours } from "@store/reducers/item/GetColoursSlice";
 import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
 import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
@@ -53,6 +53,7 @@ import SortingIcon from "@public/images/filter.svg";
 import { toggleFavorite } from "@store/reducers/favorite/ToggleFavoriteSlice";
 import { FlexPage } from "@utils/FlexStyle";
 import Footer from "@components/Footer/Footer";
+import useDebounce from "@utils/useDebounce";
 
 const STEP = 1;
 const MIN = 0;
@@ -62,7 +63,6 @@ const Shop = () => {
   const dispatch = useAppDispatch();
 
   const filter = useAppSelector((state) => state.filterReducer);
-
   const { items, isItemsLoading, itemsError, total } = useAppSelector(
     (state) => state.getItemsReducer
   );
@@ -89,23 +89,28 @@ const Shop = () => {
 
   const [values, setValues] = useState([0, 10000]);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
+  const debouncedValue = useDebounce<IFilter>(filter, 500);
+
+  const dispatchItems = () => {
+    dispatch(getItems(filter))
+      .unwrap()
+      .then(() => {
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: "smooth",
+        });
+      })
+      .catch((error: Error) => {
+        console.error("rejected", error);
+      });
+  };
 
   useEffect(() => {
     if (filter && items && !isItemsLoading) {
-      dispatch(getItems(filter))
-        .unwrap()
-        .then(() => {
-          window.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: "smooth",
-          });
-        })
-        .catch((error: Error) => {
-          console.error("rejected", error);
-        });
+      dispatchItems();
     }
-  }, [filter]);
+  }, [debouncedValue]);
 
   useEffect(() => {
     dispatch(getBrands(""))

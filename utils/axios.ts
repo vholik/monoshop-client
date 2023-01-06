@@ -1,12 +1,26 @@
 import { User } from "@store/types/user";
 import axios from "axios";
 
-const API_URL = "http://localhost:8000";
+export const API_URL = "http://localhost:8000";
 
 const instance = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
 });
+
+instance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
+
+  if (token) {
+    config.headers!.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+}
 
 instance.interceptors.response.use(
   (config) => {
@@ -21,12 +35,20 @@ instance.interceptors.response.use(
     ) {
       originalRequest._isRetry = true;
       try {
-        const response = await axios.get<User>(`${API_URL}/refresh`, {
-          withCredentials: true,
-        });
+        const response = await axios.get<AuthResponse>(
+          `${API_URL}/auth/refresh`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("refresh_token")}`,
+            },
+          }
+        );
+        localStorage.setItem("access_token", response.data.accessToken);
+        localStorage.setItem("refresh_token", response.data.refreshToken);
+
         return instance.request(originalRequest);
       } catch (e) {
-        console.log("Is not authorized");
+        console.log("Is not authorized after retry request");
       }
     }
     throw error;

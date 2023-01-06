@@ -54,6 +54,8 @@ export default function Header() {
     if (value.length > 50) return;
     if (isItemsLoading) return;
 
+    if (value === filter.search) return;
+
     dispatch(resetFilter());
     dispatch(setSearchValue(value));
 
