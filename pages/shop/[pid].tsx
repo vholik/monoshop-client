@@ -152,6 +152,10 @@ const ShopItem = () => {
     Router.push("/shop");
   };
 
+  const sendMessage = () => {
+    Router.push(`/chat/?send=${item?.user.id}`);
+  };
+
   return (
     <FlexPage>
       <ShopItemStyles>
@@ -351,7 +355,11 @@ const ShopItem = () => {
                   </div>
                   <h2 className="item-price">{item?.price} PLN</h2>
                   <button className="button item--button">Buy now</button>
-                  <button className="button item--button message--button">
+
+                  <button
+                    className="button item--button message--button"
+                    onClick={sendMessage}
+                  >
                     Message
                   </button>
                 </div>

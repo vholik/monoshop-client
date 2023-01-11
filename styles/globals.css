@@ -6,7 +6,7 @@ body {
     Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
   /* background-color: var(--bg-grey); */
-  font-size: 14px;
+  font-size: 16px;
   color: var(--dark);
 }
 
@@ -16,12 +16,12 @@ li {
 }
 
 :root {
-  /* --font-default: "HelveticaNeueCyr", sans-serif;
+  --font-default: "HelveticaNeueCyr", sans-serif;
   --font-medium: "HelveticaNeueCyr", sans-serif;
-  --font-wide: "HelveticaNeueCyr", sans-serif; */
-  --font-default: "Halvar Breit Rg", "HelveticaNeueCyr", sans-serif;
+  --font-wide: "HelveticaNeueCyr", sans-serif;
+  /* --font-default: "Halvar Breit Rg", "HelveticaNeueCyr", sans-serif;
   --font-medium: "Halvar Breit Md", "HelveticaNeueCyr", sans-serif;
-  --font-wide: "Halvar Breit Blk", "HelveticaNeueCyr", sans-serif;
+  --font-wide: "Halvar Breit Blk", "HelveticaNeueCyr", sans-serif; */
   --dark: #131313;
   --dark-hover: #414141;
   --loading: #ebebeb;
@@ -29,6 +29,7 @@ li {
   --grey-30: rgba(40, 40, 40, 0.3);
   --blue-msg: #ceddff;
   --grey-10: rgba(40, 40, 40, 0.1);
+  --grey-5: rgba(40, 40, 40, 0.05);
   --bg-grey: #f5f5f5;
   --white: #fff;
   --white-hover: rgb(243, 243, 243);

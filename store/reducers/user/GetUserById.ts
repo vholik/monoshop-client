@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import instance from "@utils/axios";
-import { AxiosError } from "axios";
+import instance, { API_URL } from "@utils/axios";
+import axios, { AxiosError } from "axios";
 
 import { User } from "@store/types/user";
 
@@ -20,7 +20,7 @@ export const getUserById = createAsyncThunk<User, string>(
   "user",
   async (id: string, thunkAPI: any) => {
     try {
-      const response = await instance.get<User>(`user/${id}`);
+      const response = await axios.get<User>(`${API_URL}/user/${id}`);
       return response.data;
     } catch (e) {
       if (e instanceof AxiosError) {

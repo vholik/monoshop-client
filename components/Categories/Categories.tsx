@@ -80,15 +80,16 @@ const Categories: FC = () => {
           >
             See all
           </div>
-          {menCategories.map((category) => (
-            <div
-              className="category-dropdown__subcategory"
-              key={category.id}
-              onClick={() => categoryHandler(category.id, Gender.MEN)}
-            >
-              {category.value}
-            </div>
-          ))}
+          {Array.isArray(menCategories) &&
+            menCategories.map((category) => (
+              <div
+                className="category-dropdown__subcategory"
+                key={category.id}
+                onClick={() => categoryHandler(category.id, Gender.MEN)}
+              >
+                {category.value}
+              </div>
+            ))}
         </div>
       </div>
       <div className="category">
@@ -105,15 +106,16 @@ const Categories: FC = () => {
           >
             See all
           </div>
-          {womenCategories.map((category) => (
-            <div
-              className="category-dropdown__subcategory"
-              key={category.id}
-              onClick={() => categoryHandler(category.id, Gender.WOMEN)}
-            >
-              {category.value}
-            </div>
-          ))}
+          {Array.isArray(womenCategories) &&
+            womenCategories.map((category) => (
+              <div
+                className="category-dropdown__subcategory"
+                key={category.id}
+                onClick={() => categoryHandler(category.id, Gender.WOMEN)}
+              >
+                {category.value}
+              </div>
+            ))}
         </div>
       </div>
       <div className="category">

@@ -33,6 +33,7 @@
     "react-responsive-carousel": "^3.2.23",
     "react-select": "^5.7.0",
     "react-swipe": "^6.0.4",
+    "socket.io-client": "^4.5.4",
     "styled-components": "^5.3.6",
     "swipe-js-iso": "^2.1.5",
     "typescript": "4.9.4"

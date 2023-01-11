@@ -43,6 +43,7 @@ instance.interceptors.response.use(
             },
           }
         );
+        console.log(response.data);
         localStorage.setItem("access_token", response.data.accessToken);
         localStorage.setItem("refresh_token", response.data.refreshToken);
 
