@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
-import { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 interface ImageState {
   isLoading: boolean;
@@ -19,10 +19,13 @@ export const uploadImage = createAsyncThunk<
   FormData
 >("image/upload", async (formData, { rejectWithValue }: any) => {
   try {
-    const response: AxiosResponse<{ data: { url: string } }> =
-      await instance.post("https://api.imgbb.com/1/upload", formData, {
+    const response: AxiosResponse<{ data: { url: string } }> = await axios.post(
+      "https://api.imgbb.com/1/upload",
+      formData,
+      {
         withCredentials: false,
-      });
+      }
+    );
     return response.data;
   } catch (e) {
     if (e instanceof AxiosError) {

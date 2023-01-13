@@ -9,7 +9,7 @@ import Footer from "@components/Footer/Footer";
 import Link from "next/link";
 import ArrowRight from "@public/images/arrow-right.svg";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
-import { CSSProperties, useEffect, useState } from "react";
+import { CSSProperties, Fragment, useEffect, useState } from "react";
 import Router, { useRouter } from "next/router";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
@@ -43,23 +43,23 @@ const ShopItem = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { pid } = router.query;
-  const { isAuth } = useAppSelector((state) => state.loginReducer);
+  const { isAuth, userId } = useAppSelector((state) => state.loginReducer);
   const { isFavoriteLoading, isFavorite } = useAppSelector(
     (state) => state.checkIsFavoriteReducer
   );
   const { isFavoriteToggleLoading } = useAppSelector(
     (state) => state.toggleFavoriteReducer
   );
-
-  const [images, setImages] = useState<{ image: string }[]>([]);
-
   const { item, isLoading, error } = useAppSelector(
     (state) => state.getItemByIdReducer
   );
 
+  const [images, setImages] = useState<{ image: string }[]>([]);
+
   useEffect(() => {
-    if (router.isReady && typeof pid === "string") {
-      dispatch(getItemById(pid))
+    if (router.isReady) {
+      console.log("get Item");
+      dispatch(getItemById(pid as string))
         .unwrap()
         .then((res) => {
           window.scrollTo({
@@ -75,7 +75,7 @@ const ShopItem = () => {
           setImages(mappedImages);
           // Check favorite
           if (isAuth) {
-            dispatch(checkIsFavorite(pid))
+            dispatch(checkIsFavorite(pid as string))
               .unwrap()
               .catch((error: Error) => {
                 console.error("rejected", error);
@@ -153,7 +153,11 @@ const ShopItem = () => {
   };
 
   const sendMessage = () => {
-    Router.push(`/chat/?send=${item?.user.id}`);
+    Router.push(`/chat/?send=${item?.user.id}&item=${item?.id}`);
+  };
+
+  const handleLinkClink = (pid: number) => {
+    Router.push(`/shop/${pid}`, `/shop/${pid}`);
   };
 
   return (
@@ -354,14 +358,22 @@ const ShopItem = () => {
                     )}
                   </div>
                   <h2 className="item-price">{item?.price} PLN</h2>
-                  <button className="button item--button">Buy now</button>
+                  {userId === item?.user?.id ? (
+                    <Link href={`/edit/${item.id}`}>
+                      <button className="button item--button">Edit</button>
+                    </Link>
+                  ) : (
+                    <Fragment>
+                      <button className="button item--button">Buy now</button>
 
-                  <button
-                    className="button item--button message--button"
-                    onClick={sendMessage}
-                  >
-                    Message
-                  </button>
+                      <button
+                        className="button item--button message--button"
+                        onClick={sendMessage}
+                      >
+                        Message
+                      </button>
+                    </Fragment>
+                  )}
                 </div>
                 <div className="item-info">
                   <div className="item-info__item">
@@ -380,9 +392,12 @@ const ShopItem = () => {
                     <h2 className="item-info__tag">Brand</h2>
                     <h2 className="item-info__value">
                       {item?.brand.map((brand, key) => {
-                        if (key === item.brand.length - 1) return brand.value;
+                        if (key === item.brand.length - 1)
+                          return <Fragment key={key}>{brand.value}</Fragment>;
 
-                        return `${brand.value}, `;
+                        return (
+                          <Fragment key={key}>{`${brand.value}, `}</Fragment>
+                        );
                       })}
                     </h2>
                   </div>
@@ -427,23 +442,29 @@ const ShopItem = () => {
                   </div>
                 )}
               </div>
-              {item?.userItems.length && (
-                <div className="user-items-wrapper">
-                  <h2 className="title">Also from this user:</h2>
-                  {item?.userItems.map((item) => (
-                    <div className="user-item">
-                      <Link href={`/shop/${item.id}`} key={item.id}>
-                        <div
-                          className="user-item__photo"
-                          style={{ backgroundImage: `url(${item.images[0]})` }}
-                        ></div>
-                      </Link>
-                      <div className="user-item__price">{item.price} PLN</div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
+          )}
+          {item?.userItems.length && (
+            <Fragment>
+              <div className="user-items-head">
+                <h2 className="title">Also from this user</h2>
+                <Link href={`/user/${item.user.id}`}>
+                  <p className="user-items-link">See all items</p>
+                </Link>
+              </div>
+              <div className="user-items-wrapper">
+                {item?.userItems.map((wear) => (
+                  <div className="user-item" key={wear.id}>
+                    <div
+                      onClick={() => handleLinkClink(wear.id)}
+                      className="user-item__photo"
+                      style={{ backgroundImage: `url(${wear.images[0]})` }}
+                    ></div>
+                    <div className="user-item__price">{wear.price} PLN</div>
+                  </div>
+                ))}
+              </div>
+            </Fragment>
           )}
         </div>
       </ShopItemStyles>
@@ -507,17 +528,27 @@ const LoadingItemStyles = styled.div`
 `;
 
 const ShopItemStyles = styled.div`
+  .user-items-head {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    justify-content: space-between;
+
+    .user-items-link {
+    }
+  }
+
   .user-items-wrapper {
     grid-column: 1 / 4;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-column-gap: 1vw;
-    margin-top: 2rem;
+    margin-top: 1rem;
 
     .title {
       font-size: 1.3rem;
       grid-column: 1/6;
-      margin-bottom: 1rem;
       font-family: var(--font-default);
     }
 
@@ -526,6 +557,7 @@ const ShopItemStyles = styled.div`
         background-position: center;
         background-size: cover;
         aspect-ratio: 1 / 1.1;
+        cursor: pointer;
       }
       &__price {
         font-weight: 700;
@@ -570,10 +602,16 @@ const ShopItemStyles = styled.div`
 
     .hashtags-wrapper {
       display: flex;
-      gap: 1rem;
+      gap: 0.5rem;
       font-weight: 600;
-      font-size: 1.1rem;
+      font-size: 1;
       margin-top: 1rem;
+      flex-wrap: wrap;
+
+      .hashtag {
+        padding: 0.5em 1em;
+        border: 1px solid var(--grey-30);
+      }
     }
 
     .item-description {

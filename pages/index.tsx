@@ -225,10 +225,10 @@ const HomeStyles = styled.div`
     margin-top: var(--component-margin);
 
     .wrapper {
-      display: flex;
+      display: grid;
       align-items: center;
-      gap: var(--gap);
-      justify-content: space-between;
+      grid-template-columns: repeat(5, 1fr);
+      grid-column-gap: var(--gap);
       margin-top: 2rem;
     }
 

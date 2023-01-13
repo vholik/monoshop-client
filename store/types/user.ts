@@ -7,8 +7,9 @@ export interface User {
   location?: string;
   phone?: string;
   image: string;
-  id: string;
+  id: number;
   favorites?: Item[];
+  lastActivity: string;
 }
 
 export interface IProfileFormData {

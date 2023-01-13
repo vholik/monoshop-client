@@ -1,3 +1,4 @@
+import { Room } from "./chat";
 import { Gender } from "./gender.enum";
 import { ItemEntity, ItemEntityWithId } from "./item-entity";
 import { Size } from "./size.enum";
@@ -20,6 +21,8 @@ export interface Item {
   name: string;
   hashtags: string[];
   isFavorite?: boolean;
+  room: Room;
+  roomId: number;
 }
 
 export interface IAddItemFormData {

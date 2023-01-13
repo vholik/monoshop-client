@@ -89,7 +89,7 @@ const Shop = () => {
 
   const [values, setValues] = useState([0, 10000]);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
-  const debouncedValue = useDebounce<IFilter>(filter, 500);
+  const debouncedValue = useDebounce<IFilter>(filter, 1000);
 
   const dispatchItems = () => {
     dispatch(getItems(filter))

@@ -8,9 +8,10 @@ export const CategoriesStyles = styled.div`
   border-bottom: 1px solid var(--grey-10);
   display: flex;
   align-items: center;
-  gap: 4rem;
-  margin-left: 50px;
-  margin-right: 50px;
+  gap: 2rem;
+  padding-left: 50px;
+  padding-right: 50px;
+  background-color: #fbfaf9;
 
   .category {
     position: relative;
@@ -21,9 +22,10 @@ export const CategoriesStyles = styled.div`
   }
 
   .category-name {
+    /* color: #7e7367; */
     font-size: 1rem;
-    text-transform: uppercase;
     cursor: pointer;
+    font-weight: 500;
     font-family: var(--font-medium);
   }
 
@@ -31,7 +33,7 @@ export const CategoriesStyles = styled.div`
     position: absolute;
     background-color: white;
     border: 1px solid var(--grey-10);
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-family: var(--font-default);
     border-bottom: 0;
     transition: opacity var(--transition);

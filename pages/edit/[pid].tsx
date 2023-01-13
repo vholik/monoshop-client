@@ -62,11 +62,11 @@ interface EditItemProps {
 }
 
 export default function AddItem({ item }: EditItemProps) {
+  const dispatch = useAppDispatch();
+
   const { editItemError, editItemLoading } = useAppSelector(
     (state) => state.editItemReducer
   );
-  const dispatch = useAppDispatch();
-
   const { isLoading, error } = useAppSelector(
     (state) => state.uploadImageReducer
   );
@@ -84,6 +84,7 @@ export default function AddItem({ item }: EditItemProps) {
   const { colours, coloursError, isColoursLoading } = useAppSelector(
     (state) => state.getColoursReducer
   );
+  const { isAuth, userId } = useAppSelector((state) => state.loginReducer);
 
   const [formImages, setFormImages] = useState<string[]>([]);
   const [formData, setFormData] = useState<{
@@ -175,6 +176,10 @@ export default function AddItem({ item }: EditItemProps) {
   };
 
   useEffect(() => {
+    if (item.user.id !== userId) {
+      Router.push("/404");
+    }
+
     //Brands
     dispatch(getBrands(""))
       .unwrap()
