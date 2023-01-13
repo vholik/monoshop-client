@@ -1,11 +1,28 @@
 import styled from "styled-components";
 
 export const ProfileSettingsStyles = styled.div`
+  .status {
+    grid-column: 1;
+  }
+
   .form {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 2rem;
-    grid-area: "row";
+    grid-template-columns: 2fr 1fr;
+    grid-column-gap: 2rem;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 2rem;
+    height: fit-content;
+
+    &:nth-child(2) {
+      grid-column: 2/4;
+      .label {
+        grid-column: 1/3;
+      }
+    }
   }
 
   .submit--buton {
@@ -14,6 +31,11 @@ export const ProfileSettingsStyles = styled.div`
 
   .input {
     margin-top: 0.5rem;
+  }
+
+  .button {
+    grid-column: 1;
+    width: fit-content;
   }
 
   .photo {

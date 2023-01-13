@@ -28,6 +28,7 @@ import deleteItemReducer from "./item/DeleteItemSlice";
 import checkIsFavoriteReducer from "./favorite/CheckIsFavoriteSlice";
 import toggleFavoriteReducer from "./favorite/ToggleFavoriteSlice";
 import getFavoriteReducer from "./favorite/GetFavoriteSlice";
+import cartReducer from "./item/CartSlice";
 
 export type AppDispatch = Store["dispatch"];
 export type RootState = ReturnType<Store["getState"]>;
@@ -60,6 +61,7 @@ const combinedReducer = combineReducers({
   checkIsFavoriteReducer,
   toggleFavoriteReducer,
   getFavoriteReducer,
+  cartReducer,
 });
 
 const reducer: typeof combinedReducer = (state, action) => {

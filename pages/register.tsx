@@ -55,8 +55,8 @@ export default function Login() {
                 },
               })}
             />
+            <div className="error">{errors?.email && errors.email.message}</div>
           </label>
-          <div className="error">{errors?.email && errors.email.message}</div>
           {/* Fullname  */}
           <label className="label">
             Fullname

@@ -199,7 +199,7 @@ export const colourStyles = {
   }),
   valueContainer: (provided: any) => ({
     ...provided,
-    padding: "1.2em 1em",
+    padding: "0.8em 0.5em",
     fontSize: "1rem",
     margin: "0",
   }),

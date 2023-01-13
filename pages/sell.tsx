@@ -565,7 +565,6 @@ export default function AddItem() {
                 {/* Second row */}
                 <div className="row">
                   <label className="label">
-                    Item name
                     <input
                       onChange={handleNameChange}
                       type="text"
@@ -578,7 +577,6 @@ export default function AddItem() {
                     {errors.name && <p className="error">{errors.name}</p>}
                   </label>
                   <label className="label">
-                    Category
                     <Select
                       instanceId="select"
                       required={true}
@@ -600,7 +598,6 @@ export default function AddItem() {
                   </label>
 
                   <label className="label">
-                    Style
                     <Select
                       instanceId="select"
                       required={true}
@@ -617,7 +614,6 @@ export default function AddItem() {
                     {errors.style && <p className="error">{errors.style}</p>}
                   </label>
                   <label className="label">
-                    Colour
                     <Select
                       instanceId="select"
                       required={true}
@@ -658,7 +654,6 @@ export default function AddItem() {
                     {errors.price && <p className="error">{errors.colour}</p>}
                   </label>
                   <label className="label">
-                    Price
                     <input
                       type="number"
                       className="input"
@@ -670,7 +665,6 @@ export default function AddItem() {
                     {errors.price && <p className="error">{errors.price}</p>}
                   </label>
                   <label className="label">
-                    Hashtags
                     <input
                       type="text"
                       className="input"
@@ -685,7 +679,6 @@ export default function AddItem() {
                 {/* Third row */}
                 <div className="row">
                   <label className="label">
-                    Sex
                     <Select
                       instanceId="select"
                       required={true}
@@ -700,7 +693,6 @@ export default function AddItem() {
                     {errors.gender && <p className="error">{errors.gender}</p>}
                   </label>
                   <label className="label">
-                    Subcategory
                     <Select
                       instanceId="select"
                       required={true}
@@ -721,7 +713,6 @@ export default function AddItem() {
                     )}
                   </label>
                   <label className="label">
-                    Condition
                     <Select
                       instanceId="select"
                       required={true}
@@ -739,7 +730,6 @@ export default function AddItem() {
                     )}
                   </label>
                   <label className="label">
-                    Brand
                     <Select
                       instanceId="select"
                       required={true}
@@ -763,7 +753,6 @@ export default function AddItem() {
                     {errors.brand && <p className="error">{errors.brand}</p>}
                   </label>
                   <label className="label">
-                    Size
                     <Select
                       instanceId="select"
                       required={true}
@@ -780,7 +769,6 @@ export default function AddItem() {
                   </label>
                 </div>
                 <label className="label description--label">
-                  Description
                   <textarea
                     id="description"
                     placeholder="Describe your item..."

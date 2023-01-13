@@ -74,11 +74,10 @@ const Chat = () => {
     const user = router.query.send || "";
     const item = router.query.item || "";
 
-    if (user) {
-      socket?.emit("joinRoom", { user, item });
-      console.log("emitting");
+    if (user && socket) {
+      socket.emit("joinRoom", { user, item });
     }
-  }, [router.isReady]);
+  }, [router.isReady, socket]);
 
   useEffect(() => {
     const accessToken = localStorage.getItem("access_token");
@@ -114,7 +113,6 @@ const Chat = () => {
             : -1;
         });
 
-        console.log(rooms);
         setRooms(rooms);
       });
 
@@ -199,7 +197,7 @@ const Chat = () => {
       <Header />
       <ChatStyles>
         <div className="container">
-          <div className="title-md">Messages id {userId}</div>
+          <div className="title-md">Messages</div>
           <div className="chat-wrapper">
             <div className="rooms-wrapper">
               {rooms?.map((room, key) => (
@@ -282,25 +280,7 @@ const Chat = () => {
                           : "message"
                       }
                     >
-                      <div className="message-inner">
-                        {message.text}
-                        {message.userId === userId && message.markedSeen && (
-                          <Image
-                            src={CheckedIcon}
-                            alt="Checked"
-                            height={20}
-                            width={20}
-                          />
-                        )}
-                        {message.userId === userId && !message.markedSeen && (
-                          <Image
-                            src={SendedIcon}
-                            alt="Checked"
-                            height={20}
-                            width={20}
-                          />
-                        )}
-                      </div>
+                      <div className="message-inner">{message.text}</div>
                       <p className="message-time">
                         {new Date(message.date).toLocaleString("en-US", {
                           hour: "numeric",
@@ -357,6 +337,8 @@ const ChatStyles = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
+    min-height: 600px;
+    max-height: 600px;
 
     .chat-header {
       padding: 1rem 1rem;
@@ -426,8 +408,6 @@ const ChatStyles = styled.div`
   .chat-inner {
     padding: 1rem;
     overflow-y: auto;
-    max-height: 500px;
-    min-height: 500px;
 
     .message {
       margin-bottom: 0.5rem;
@@ -446,7 +426,7 @@ const ChatStyles = styled.div`
 
       .message-time {
         margin-top: 0.5rem;
-        font-size: 1rem;
+        font-size: 0.9rem;
       }
     }
 

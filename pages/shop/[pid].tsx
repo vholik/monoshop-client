@@ -28,6 +28,7 @@ import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
 import { getSubcategories } from "@store/reducers/item/GetSubcategoriesSlice";
 import { Gender } from "@store/types/gender.enum";
 import { FlexPage } from "@utils/FlexStyle";
+import { addToCart } from "@store/reducers/item/CartSlice";
 
 const arrowStyles: CSSProperties = {
   position: "absolute",
@@ -112,7 +113,6 @@ const ShopItem = () => {
         });
     }
   };
-
   const genderRedirect = () => {
     if (item?.gender) {
       dispatch(resetFilter());
@@ -150,6 +150,13 @@ const ShopItem = () => {
     }
 
     Router.push("/shop");
+  };
+
+  const buyHandler = () => {
+    if (item) {
+      dispatch(addToCart(item));
+      Router.push("/pay");
+    }
   };
 
   const sendMessage = () => {
@@ -364,7 +371,12 @@ const ShopItem = () => {
                     </Link>
                   ) : (
                     <Fragment>
-                      <button className="button item--button">Buy now</button>
+                      <button
+                        className="button item--button"
+                        onClick={buyHandler}
+                      >
+                        Buy now
+                      </button>
 
                       <button
                         className="button item--button message--button"

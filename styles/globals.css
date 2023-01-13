@@ -61,10 +61,6 @@ li {
   font-weight: 700;
 }
 
-.label {
-  margin-bottom: 1rem;
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -83,7 +79,8 @@ h3 {
 
 .label {
   font-family: var(--font-default);
-  font-size: var(--font-md);
+  font-size: 1rem;
+  margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
 }
@@ -120,7 +117,7 @@ h3 {
   border: none;
   border: 1px solid var(--grey-10);
   outline: none;
-  padding: 1.2em 1em;
+  padding: 0.8em 0.8em;
   font-size: 1rem;
   font-family: var(--font-default);
   color: var(--dark);
@@ -234,4 +231,28 @@ a {
 }
 .cancel--button:hover {
   color: var(--dark-hover);
+}
+
+.PhoneInputInput,
+.country-dropdown select {
+  margin-top: 0.5rem;
+  background-color: var(--white);
+  border: none;
+  border: 1px solid var(--grey-10);
+  outline: none;
+  padding: 0.8em 0.8em;
+  font-size: 1rem;
+  font-family: var(--font-default);
+  color: var(--dark);
+  width: 100%;
+  appearance: none;
+}
+
+.PhoneInputInput::placeholder,
+.country-dropdown select::placeholder {
+  color: var(--grey-30);
+}
+
+select {
+  font-size: 1rem;
 }

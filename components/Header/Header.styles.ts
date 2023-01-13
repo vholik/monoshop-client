@@ -29,7 +29,7 @@ export const HeaderStyles = styled.div`
     /* border: 1px solid var(--dark); */
     display: flex;
     align-items: center;
-    padding: 0 1em;
+    padding: 0.5em 1em;
     background-color: white;
     width: fit-content;
     width: 100%;

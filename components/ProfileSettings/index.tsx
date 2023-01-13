@@ -2,12 +2,14 @@ import { IProfileFormData, User } from "@store/types/user";
 import { ProfileSettingsStyles } from "./ProfileSettings.styles";
 import { ChangeEvent, useRef, useState } from "react";
 import Image from "next/image";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { uploadImage } from "@store/reducers/item/UploadImageSlice";
 import { editProfile } from "@store/reducers/user/EditProfileSlice";
 import Loading from "@components/Loading/Loading";
 import Router from "next/router";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 interface IProfileSetting {
   user: User | null;
@@ -26,8 +28,14 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
-  } = useForm<IProfileFormData>({ mode: "onBlur" });
+  } = useForm<IProfileFormData>({
+    mode: "onBlur",
+    defaultValues: {
+      phone: user?.phone || "",
+    },
+  });
 
   const [profilePhoto, setProfilePhoto] = useState("");
   const [formError, setFormError] = useState("");
@@ -93,6 +101,8 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
       });
   };
 
+  console.log(user);
+
   return (
     <ProfileSettingsStyles>
       <form onSubmit={handleSubmit(onSubmit)} className="form">
@@ -102,7 +112,6 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
             <input
               type="text"
               className="input"
-              placeholder="Your fullname"
               defaultValue={user?.fullName}
               {...register("fullName", {
                 maxLength: {
@@ -115,8 +124,26 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
                 },
               })}
             />
-            {errors.fullName && (
+            {errors.fullName?.message && (
               <p className="error">{errors.fullName.message}</p>
+            )}
+          </label>
+          <label className="label">
+            Phone
+            <Controller
+              name="phone"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <PhoneInput
+                  value={value}
+                  onChange={onChange}
+                  defaultCountry="UA"
+                  id="phone-input"
+                />
+              )}
+            />
+            {errors.phone?.message && (
+              <p className="error">{errors.phone.message}</p>
             )}
           </label>
           <label className="label">
@@ -124,7 +151,6 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
             <input
               type="text"
               className="input"
-              placeholder="Location"
               defaultValue={user?.location}
               {...register("location", {
                 minLength: {
@@ -137,10 +163,11 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
                 },
               })}
             />
+            {errors.location?.message && (
+              <p className="error">{errors.location.message}</p>
+            )}
           </label>
-          {errors.location && (
-            <p className="error">{errors.location.message}</p>
-          )}
+
           <button
             className="button submit--buton"
             type="submit"
@@ -148,38 +175,13 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
           >
             Save
           </button>
-          {formError && <p className="error">{formError}</p>}
-          {profileError && <p className="error">{profileError}</p>}
-          {profile && <p className="success">Saved succesfully</p>}
+          <div className="status">
+            {formError && <p className="error">{formError}</p>}
+            {profileError && <p className="error">{profileError}</p>}
+            {profile && <p className="success">Saved succesfully</p>}
+          </div>
         </div>
-        <div className="row">
-          <label className="label">
-            Phone
-            <input
-              defaultValue={user?.phone}
-              type="tel"
-              maxLength={12}
-              minLength={12}
-              className="input"
-              placeholder="Your phone"
-              {...register("phone", {
-                minLength: {
-                  value: 12,
-                  message: "Phone must contains 12 numbers",
-                },
-                maxLength: {
-                  value: 12,
-                  message: "Phone max length is 12 numbers",
-                },
-                pattern: {
-                  message: "Please type valid phone number",
-                  value: /^(0|[1-9]\d*)(\.\d+)?$/,
-                },
-              })}
-            />
-          </label>
-          {errors.phone && <p className="error">{errors.phone.message}</p>}
-        </div>
+
         <div className="row">
           {user?.image && (
             <label className="label">
