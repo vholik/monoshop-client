@@ -1,10 +1,11 @@
 import Categories from "@components/Categories/Categories";
-import Header from "@components/Header";
+import Header from "@components/Header/Header";
 import styled from "styled-components";
 import Select, {
   components,
   GroupBase,
   MultiValue,
+  SelectInstance,
   SingleValue,
   ValueContainerProps,
 } from "react-select";
@@ -17,43 +18,37 @@ import {
   sortingColourStyles,
   sortingValues,
 } from "@utils/react-select-utils";
-import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
+import {
+  useActionCreators,
+  useAppDispatch,
+  useAppSelector,
+} from "@store/hooks/redux";
 import { getItems, setFavorite } from "@store/reducers/item/GetItemsSlice";
 import Image from "next/image";
 import { getTrackBackground, Range } from "react-range";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { getBrands } from "@store/reducers/brand/GetBrandsSlice";
 import { getStyles } from "@store/reducers/style/GetStylesSlice";
-import { getColours } from "@store/reducers/item/GetColoursSlice";
+import { getColours } from "@store/reducers/colour/GetColoursSlice";
 import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
-import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
+import { getCategories } from "@store/reducers/category/GetCategoriesSlice";
 import { Gender } from "@store/types/gender.enum";
 import { IFilter } from "@store/types/filter";
 import { SortBy } from "@store/types/filter-by.enum";
 import Link from "next/link";
 import Pagination from "rc-pagination";
 import "rc-pagination/assets/index.css";
-import {
-  changePage,
-  setBrand,
-  setCategory,
-  setColour,
-  setCondition,
-  setGender,
-  setPrice,
-  setSize,
-  setSortBy,
-  setStyle,
-  setSubcategory,
-} from "@store/reducers/filter/FilterSlice";
 import UnfilledWhiteHeart from "@public/images/unfilled-white-heart.svg";
 import FilledHeart from "@public/images/filled-heart.svg";
-import { getSubcategories } from "@store/reducers/item/GetSubcategoriesSlice";
+import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
 import SortingIcon from "@public/images/filter.svg";
 import { toggleFavorite } from "@store/reducers/favorite/ToggleFavoriteSlice";
 import { FlexPage } from "@utils/FlexStyle";
 import Footer from "@components/Footer/Footer";
 import useDebounce from "@utils/useDebounce";
+import StateManagedSelect from "react-select";
+import ReactSelect from "react-select";
+import { filterActions } from "@store/reducers/filter/FilterSlice";
 
 const STEP = 1;
 const MIN = 0;
@@ -63,36 +58,78 @@ const Shop = () => {
   const dispatch = useAppDispatch();
 
   const filter = useAppSelector((state) => state.filterReducer);
-  const { items, isItemsLoading, itemsError, total } = useAppSelector(
-    (state) => state.getItemsReducer
-  );
-  const { isFavoriteToggleLoading } = useAppSelector(
-    (state) => state.toggleFavoriteReducer
-  );
-  const { brands, isBrandsLoading } = useAppSelector(
-    (state) => state.getBrandsReducer
-  );
-  const { colours, isColoursLoading } = useAppSelector(
-    (state) => state.getColoursReducer
-  );
-  const { styles, isStylesLoading } = useAppSelector(
-    (state) => state.getStylesReducer
-  );
-  const { isSubcategoriesLoading, subcategories, subcategoriesError } =
-    useAppSelector((state) => state.getSubcategoriesReducer);
-  const { categories, categoriesError, isCategoriesLoading } = useAppSelector(
-    (state) => state.getCategoriesReducer
+
+  const items = useAppSelector((state) => state.getItemsReducer.items);
+  const itemsStatus = useAppSelector((state) => state.getItemsReducer.status);
+  const itemsTotal = useAppSelector((state) => state.getItemsReducer.total);
+
+  const favoriteToggleStatus = useAppSelector(
+    (state) => state.toggleFavoriteReducer.status
   );
 
-  const categorieRef = useRef<any>(null);
-  const subcategorieRef = useRef<any>(null);
+  const brandStatus = useAppSelector((state) => state.getBrandsReducer.status);
+  const brands = useAppSelector((state) => state.getBrandsReducer.brands);
+
+  const colours = useAppSelector((state) => state.getColoursReducer.colours);
+  const coloursStatus = useAppSelector(
+    (state) => state.getColoursReducer.status
+  );
+
+  const stylesStatus = useAppSelector((state) => state.getStylesReducer.status);
+  const styles = useAppSelector((state) => state.getStylesReducer.styles);
+
+  const subcategories = useAppSelector(
+    (state) => state.getSubcategoriesReducer.subcategories
+  );
+  const subcategoriesStatus = useAppSelector(
+    (state) => state.getSubcategoriesReducer.status
+  );
+
+  const categoriesStatus = useAppSelector(
+    (state) => state.getCategoriesReducer.status
+  );
+  const categories = useAppSelector(
+    (state) => state.getCategoriesReducer.categories
+  );
 
   const [values, setValues] = useState([0, 10000]);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
   const debouncedValue = useDebounce<IFilter>(filter, 1000);
 
+  const convertFilterToQuery = useMemo(
+    () => (): IFilter => {
+      const obj = {
+        brand: filter.brand
+          ? filter.brand.map((brand) => brand.value)
+          : undefined,
+        category: filter.category ? filter.category.id : undefined,
+        colour: filter.colour
+          ? filter.colour.map((colour) => colour.value)
+          : undefined,
+        condition: filter.condition
+          ? filter.condition.map((condition) => condition.value)
+          : undefined,
+        gender: filter.gender ? filter.gender.value : undefined,
+        page: filter.page ? filter.page : undefined,
+        price: filter.price ? filter.price : undefined,
+        search: filter.search ? filter.search : undefined,
+        size: filter.size ? filter.size.map((size) => size.value) : undefined,
+        sortBy: filter.sortBy ? filter.sortBy.value : undefined,
+        style: filter.style
+          ? filter.style.map((style) => style.value)
+          : undefined,
+        subcategory: filter.subcategory
+          ? filter.subcategory.map((category) => category.id)
+          : undefined,
+      };
+
+      return JSON.parse(JSON.stringify(obj));
+    },
+    [filter]
+  );
+
   const dispatchItems = () => {
-    dispatch(getItems(filter))
+    dispatch(getItems(convertFilterToQuery()))
       .unwrap()
       .then(() => {
         window.scrollTo({
@@ -107,13 +144,13 @@ const Shop = () => {
   };
 
   useEffect(() => {
-    if (filter && items && !isItemsLoading) {
+    if (items && itemsStatus !== "loading") {
       dispatchItems();
     }
   }, [debouncedValue]);
 
   useEffect(() => {
-    dispatch(getBrands(""))
+    dispatch(getBrands(undefined))
       .unwrap()
       .catch((error: Error) => {
         console.error("rejected", error);
@@ -128,76 +165,45 @@ const Shop = () => {
       .catch((error: Error) => {
         console.error("rejected", error);
       });
-
-    setValues(filter.price);
   }, []);
-
-  const genderHandler = (
-    e: SingleValue<{
-      value: string;
-      label: string;
-    }>
-  ) => {
-    dispatch(changePage(1));
-
-    if (e && e.value !== filter.gender) {
-      dispatch(setGender(e?.value as Gender));
-      dispatch(setCategory(0));
-      dispatch(setSubcategory([]));
-    }
-
-    if (e?.value && e.value !== filter.gender) {
-      dispatch(getCategories(e.value as Gender))
-        .unwrap()
-        .catch((err) => console.log("rejected", err));
-
-      if (categorieRef.current) {
-        categorieRef.current.clearValue();
-      }
-      if (subcategorieRef.current) {
-        subcategorieRef.current.clearValue();
-      }
-    }
-  };
 
   const priceValuesHandler = (values: number[]) => {
     setValues(values);
   };
 
   const priceHandler = () => {
-    if (isItemsLoading) return;
+    if (filter.price) {
+      const isPreviousPrice =
+        Math.round(values[0]) === filter.price[0] &&
+        Math.round(values[1]) === filter.price[1];
 
-    dispatch(changePage(1));
+      if (!isPreviousPrice) {
+        const roundedPrice = [
+          Math.round(values[0]),
+          Math.round(values[1]),
+        ] as const;
 
-    const isPreviousPrice =
-      Math.round(values[0]) === filter.price[0] &&
-      Math.round(values[1]) === filter.price[1];
+        dispatch(filterActions.setPrice([roundedPrice[0], roundedPrice[1]]));
 
-    if (!isPreviousPrice) {
-      dispatch(setPrice([Math.round(values[0]), Math.round(values[1])]));
+        //Change page to first
+        dispatch(filterActions.changePage(1));
+      }
     }
   };
 
   const categoryHandler = (e: SingleValue<ItemEntity>) => {
-    if (e?.id === filter.category) return;
-
-    if (!e) {
-      dispatch(setCategory(0));
+    if (e) {
+      // Fetch subcategories with this id
+      if (typeof e.id === "number") {
+        dispatch(getSubcategories(e.id))
+          .unwrap()
+          .catch((err) => console.log("rejected", err));
+      }
     }
 
-    if (e?.id) {
-      dispatch(setCategory(e.id));
-
-      dispatch(getSubcategories(e?.id))
-        .unwrap()
-        .catch((err) => console.log("rejected", err));
-    }
-
-    if (subcategorieRef.current) {
-      subcategorieRef.current.clearValue();
-    }
-
-    dispatch(changePage(1));
+    dispatch(filterActions.setCategory(e));
+    // Clear subcategory value
+    dispatch(filterActions.setSubcategory([]));
   };
 
   const subcategoriesHandler = (e: MultiValue<ItemEntityWithId>) => {
@@ -205,11 +211,7 @@ const Shop = () => {
       return subcategory.id;
     });
 
-    if (mapped === filter.subcategory) return; // Dont re-render
-
-    dispatch(setSubcategory(mapped));
-
-    dispatch(changePage(1));
+    dispatch(filterActions.setSubcategory(e));
   };
 
   const brandHandler = (e: MultiValue<ItemEntity>) => {
@@ -218,7 +220,7 @@ const Shop = () => {
         return item.value;
       });
 
-      dispatch(setBrand(mapped));
+      dispatch(filterActions.setBrand(e));
     }
   };
 
@@ -227,134 +229,30 @@ const Shop = () => {
     filterName: keyof IFilter
   ) => {
     if (e) {
-      console.log(e);
-
-      const mapped = e.map((item) => {
-        return item.value;
-      });
-
       if (filterName === "condition") {
-        dispatch(setCondition(mapped.map((it) => Number(it))));
-        return;
+        dispatch(filterActions.setCondition(e));
+      } else if (filterName === "style") {
+        dispatch(filterActions.setStyle(e));
+      } else if (filterName === "colour") {
+        dispatch(filterActions.setColour(e));
+      } else if (filterName === "size") {
+        dispatch(filterActions.setSize(e));
       }
-
-      if (filterName === "style") {
-        dispatch(setStyle(mapped));
-        return;
-      }
-
-      if (filterName === "colour") {
-        dispatch(setColour(mapped));
-        return;
-      }
-
-      if (filterName === "size") {
-        dispatch(setSize(mapped));
-        return;
-      }
-
-      dispatch(changePage(1));
     }
   };
 
-  const sortingHandler = (
-    e: SingleValue<{
-      value: SortBy;
-      label: string;
-    }>
-  ) => {
-    if (e?.value) {
-      dispatch(setSortBy(e.value));
+  const sortingHandler = (e: SingleValue<ItemEntity>) => {
+    if (e) {
+      dispatch(filterActions.setSortBy(e));
     }
   };
 
   const nextPage = (page: number) => {
-    dispatch(changePage(page));
+    dispatch(filterActions.changePage(page));
   };
 
-  const setDefaultSizeValue = (): ItemEntity[] => {
-    return filter.size.map((size) => {
-      return {
-        value: size,
-        label: size,
-      };
-    });
-  };
-  const setDefaultBrandValue = (): ItemEntity[] => {
-    return filter.brand.map((brand) => {
-      return {
-        value: brand,
-        label: brand,
-      };
-    });
-  };
-  const setDefaultColourValue = (): ItemEntity[] => {
-    return filter.colour.map((colour) => {
-      return {
-        value: colour,
-        label: colour,
-      };
-    });
-  };
-  const setDefaultStyleValue = (): ItemEntity[] => {
-    return filter.style.map((style) => {
-      return {
-        value: style,
-        label: style,
-      };
-    });
-  };
-  const setDefaultConditionValue = (): ItemEntity[] => {
-    return filter.condition.map((condition) => {
-      return {
-        value: String(condition),
-        label: String(condition),
-      };
-    });
-  };
-  const setDefaultCategoryValue = (): ItemEntityWithId | undefined => {
-    const find = categories.find((category) => category.id === filter.category);
-
-    if (find) {
-      return find;
-    }
-  };
-  const setDefaultSubcategoryValue = (): ItemEntityWithId[] => {
-    const mapped = subcategories.filter((subcategory) => {
-      if (subcategory.id) {
-        return filter.subcategory.indexOf(subcategory.id) > -1;
-      }
-    });
-
-    if (mapped.length) {
-      return mapped;
-    }
-
-    return [];
-  };
-  const setDefaultGenderValue = ():
-    | SingleValue<{
-        value: string;
-        label: string;
-      }>
-    | undefined => {
-    if (filter.gender) {
-      return {
-        value: filter.gender,
-        label: filter.gender === Gender.MEN ? "Menswear" : "Womenswear",
-      };
-    }
-  };
-  const setDefaultSortingValue = () => {
-    const find = sortingValues.find((obj) => obj.value === filter.sortBy);
-    if (find) {
-      return find;
-    }
-
-    return sortingValues[3];
-  };
   const favoriteHandler = (id: number) => {
-    if (!isFavoriteToggleLoading) {
+    if (favoriteToggleStatus !== "loading") {
       dispatch(toggleFavorite(id))
         .unwrap()
         .then((isFavorite) => {
@@ -365,12 +263,30 @@ const Shop = () => {
         });
     }
   };
+
   const onInputBrandChange = (e: string) => {
     dispatch(getBrands(e))
       .unwrap()
       .catch((error: Error) => {
         console.error("rejected", error);
       });
+  };
+
+  const genderHandler = (
+    e: SingleValue<{
+      value: string;
+      label: string;
+    }>
+  ) => {
+    if (e) {
+      dispatch(filterActions.setGender(e));
+      dispatch(filterActions.setCategory(null));
+      dispatch(filterActions.setSubcategory([]));
+
+      dispatch(getCategories(e.value as Gender))
+        .unwrap()
+        .catch((err) => console.log("rejected", err));
+    }
   };
 
   return (
@@ -490,7 +406,7 @@ const Shop = () => {
                     />
                   </div>
                   <button
-                    disabled={isItemsLoading}
+                    disabled={itemsStatus === "loading"}
                     className="button price--buton"
                     onClick={priceHandler}
                   >
@@ -511,26 +427,24 @@ const Shop = () => {
                 isClearable={false}
                 name={"gender"}
                 instanceId="gender-select"
-                value={setDefaultGenderValue()}
+                value={filter.gender}
               />
               <Select
-                ref={categorieRef}
                 placeholder={"Categories"}
                 styles={multiplefilterColourStyles}
                 onChange={categoryHandler}
                 options={categories}
                 className="select"
                 required={true}
-                isDisabled={!filter.gender || Boolean(categoriesError)}
-                isLoading={isCategoriesLoading}
+                isDisabled={!filter.gender}
+                isLoading={categoriesStatus === "loading"}
                 isSearchable={true}
                 name={"category"}
                 instanceId="category-select"
                 isClearable={true}
-                value={setDefaultCategoryValue()}
+                value={filter.category}
               />
               <Select
-                ref={subcategorieRef}
                 placeholder={"Subcategories"}
                 styles={multiplefilterColourStyles}
                 onChange={subcategoriesHandler}
@@ -538,15 +452,15 @@ const Shop = () => {
                 isMulti
                 className="select"
                 required={true}
-                isDisabled={!filter.category || Boolean(subcategoriesError)}
-                isLoading={isSubcategoriesLoading}
+                isDisabled={!filter.category}
+                isLoading={subcategoriesStatus === "loading"}
                 isSearchable={true}
                 name={"subcategory"}
                 instanceId="category-select"
                 isClearable={true}
                 closeMenuOnSelect={false}
                 hideSelectedOptions={false}
-                value={setDefaultSubcategoryValue()}
+                value={filter.subcategory}
                 components={{
                   ValueContainer,
                 }}
@@ -567,7 +481,7 @@ const Shop = () => {
                 isClearable={true}
                 closeMenuOnSelect={false}
                 hideSelectedOptions={false}
-                value={setDefaultSizeValue()}
+                value={filter.size}
                 components={{
                   ValueContainer,
                 }}
@@ -588,7 +502,7 @@ const Shop = () => {
                 instanceId="condition-select"
                 closeMenuOnSelect={false}
                 hideSelectedOptions={false}
-                value={setDefaultConditionValue()}
+                value={filter.condition}
                 components={{
                   ValueContainer,
                 }}
@@ -602,15 +516,15 @@ const Shop = () => {
                 onChange={brandHandler}
                 required={true}
                 isDisabled={false}
-                isLoading={isBrandsLoading}
+                isLoading={brandStatus === "loading"}
                 isSearchable={true}
                 name={"brand"}
                 isClearable={true}
                 instanceId="brand-select"
                 closeMenuOnSelect={false}
                 hideSelectedOptions={false}
-                value={setDefaultBrandValue()}
                 onInputChange={onInputBrandChange}
+                value={filter.brand}
                 components={{
                   ValueContainer,
                 }}
@@ -624,14 +538,14 @@ const Shop = () => {
                 onChange={(e) => filterHandler(e, "style" as keyof IFilter)}
                 required={true}
                 isDisabled={false}
-                isLoading={isStylesLoading}
+                isLoading={stylesStatus === "loading"}
                 isSearchable={true}
                 name={"style"}
                 isClearable={true}
                 instanceId="style-select"
                 closeMenuOnSelect={false}
                 hideSelectedOptions={false}
-                value={setDefaultStyleValue()}
+                value={filter.style}
                 components={{
                   ValueContainer,
                 }}
@@ -644,7 +558,7 @@ const Shop = () => {
                 className="select"
                 required={true}
                 isDisabled={false}
-                isLoading={isColoursLoading}
+                isLoading={coloursStatus === "loading"}
                 isSearchable={true}
                 name={"colour"}
                 onChange={(e) => filterHandler(e, "colour" as keyof IFilter)}
@@ -652,7 +566,7 @@ const Shop = () => {
                 instanceId="colour-select"
                 closeMenuOnSelect={false}
                 hideSelectedOptions={false}
-                value={setDefaultColourValue()}
+                value={filter.colour}
                 components={{
                   ValueContainer,
                 }}
@@ -689,14 +603,14 @@ const Shop = () => {
                 onChange={sortingHandler}
                 options={sortingValues}
                 styles={sortingColourStyles}
-                value={setDefaultSortingValue()}
                 instanceId="select"
+                value={filter.sortBy}
               />
               <Image src={SortingIcon} alt="Sort by" />
             </div>
           </div>
           <div className="item-container">
-            {isItemsLoading ? (
+            {itemsStatus === "loading" ? (
               <LoadindShopStyling>
                 <div className="items-wrapper">
                   <div className="item">
@@ -757,12 +671,12 @@ const Shop = () => {
               </div>
             )}
             <Pagination
-              disabled={isItemsLoading}
+              disabled={itemsStatus === "loading"}
               simple
-              current={filter.page}
+              current={filter.page || 1}
               onChange={(page) => nextPage(page)}
               defaultCurrent={filter.page}
-              total={items.length === 0 ? 1 : total}
+              total={items.length === 0 ? 1 : itemsTotal}
               pageSize={12}
             />
           </div>
@@ -877,7 +791,7 @@ const ShopStyling = styled.div`
     .price-handler {
       top: 220px;
       z-index: 5;
-      position: fixed;
+      position: absolute;
       background-color: white;
       padding: 1rem 1rem;
       width: 14rem;

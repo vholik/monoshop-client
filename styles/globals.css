@@ -7,6 +7,7 @@ body {
     sans-serif;
   /* background-color: var(--bg-grey); */
   font-size: 16px;
+  /* letter-spacing: -0.04rem; */
   color: var(--dark);
 }
 
@@ -19,9 +20,6 @@ li {
   --font-default: "HelveticaNeueCyr", sans-serif;
   --font-medium: "HelveticaNeueCyr", sans-serif;
   --font-wide: "HelveticaNeueCyr", sans-serif;
-  /* --font-default: "Halvar Breit Rg", "HelveticaNeueCyr", sans-serif;
-  --font-medium: "Halvar Breit Md", "HelveticaNeueCyr", sans-serif;
-  --font-wide: "Halvar Breit Blk", "HelveticaNeueCyr", sans-serif; */
   --dark: #131313;
   --dark-hover: #414141;
   --loading: #ebebeb;
@@ -41,7 +39,7 @@ li {
   --font-xxxl: 2.8rem;
   --component-margin: 5rem;
   --gap: 2rem;
-  --primary: #306fff;
+  --primary: #7152f3;
 }
 
 .no-items {
@@ -138,7 +136,7 @@ h3 {
   color: var(--white);
   background-color: var(--dark);
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
   min-width: max-content;
   font-size: 1rem;
@@ -146,6 +144,7 @@ h3 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  border-radius: 4px;
   transition: background var(--transition);
 }
 

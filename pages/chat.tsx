@@ -1,5 +1,5 @@
 import Footer from "@components/Footer/Footer";
-import Header from "@components/Header";
+import Header from "@components/Header/Header";
 import { FlexPage } from "@utils/FlexStyle";
 import styled from "styled-components";
 import io, { Socket } from "socket.io-client";
@@ -30,7 +30,7 @@ const Chat = () => {
   const [rooms, setRooms] = useState<Room[]>();
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentUser, setCurrentUser] = useState<User>();
-  const { userId } = useAppSelector((state) => state.loginReducer);
+  const userId = useAppSelector((state) => state.authReducer.userId);
   const [timeStamps, setTimeStamps] = useState<Timestamp[]>([]);
   const [roomItem, setRoomItem] = useState<Item>();
 
@@ -39,6 +39,7 @@ const Chat = () => {
   };
 
   const send = () => {
+    if (!value) return;
     if (currentUser) {
       socket?.emit("sendMessage", { text: value });
       setValue("");

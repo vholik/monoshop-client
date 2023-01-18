@@ -1,10 +1,10 @@
 export interface PayFormData {
   fullName: string;
-  adressLineFirst: string;
-  adressLineSecond?: string;
+  line1: string;
+  line2?: string;
   city: string;
   state: string;
-  zip: string;
+  postalCode: string;
   country: string;
   email: string;
   phone?: string;

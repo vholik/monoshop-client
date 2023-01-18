@@ -1,59 +1,57 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
-import { AxiosError } from "axios";
+import { AxiosError, isAxiosError } from "axios";
 import { ItemEntityWithId } from "@store/types/item-entity";
+import { RejectError } from "@store/types/error";
 
 interface BrandsState {
-  isBrandsLoading: boolean;
-  brandsError: string;
+  status: "init" | "loading" | "error" | "success";
   brands: ItemEntityWithId[];
 }
 
 const initialState: BrandsState = {
-  isBrandsLoading: false,
-  brandsError: "",
+  status: "init",
   brands: [],
 };
 
-export const getBrands = createAsyncThunk<ItemEntityWithId[], string, any>(
-  "brand",
-  async (search: string, thunkAPI) => {
-    try {
-      const response = await instance.get<ItemEntityWithId[]>("brand", {
-        params: {
-          search: search || "",
-        },
-      });
-      return response.data;
-    } catch (e) {
-      if (e instanceof AxiosError) {
-        return thunkAPI.rejectWithValue(e.response!.data.message);
-      }
-      return thunkAPI.rejectWithValue(e);
-    }
+export const getBrands = createAsyncThunk<
+  ItemEntityWithId[],
+  string | undefined,
+  {
+    rejectValue: RejectError;
   }
-);
+>("brand", async (keywords: string | undefined, thunkAPI) => {
+  try {
+    const response = await instance.get<ItemEntityWithId[]>("brand", {
+      params: {
+        search: keywords || "",
+      },
+    });
+    return response.data;
+  } catch (e) {
+    if (isAxiosError(e) && e.response) {
+      return thunkAPI.rejectWithValue(e.response.data);
+    }
+    return thunkAPI.rejectWithValue({ message: "Can not load brands" });
+  }
+});
 
 export const GetBrandsSlice = createSlice({
   name: "brand",
   initialState,
   reducers: {},
-  extraReducers: {
-    [getBrands.fulfilled.type]: (
-      state,
-      action: PayloadAction<ItemEntityWithId[]>
-    ) => {
-      state.brands = action.payload;
-      state.isBrandsLoading = false;
-      state.brandsError = "";
-    },
-    [getBrands.pending.type]: (state) => {
-      state.isBrandsLoading = true;
-    },
-    [getBrands.rejected.type]: (state, action: PayloadAction<string>) => {
-      state.isBrandsLoading = false;
-      state.brandsError = action.payload;
-    },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getBrands.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getBrands.fulfilled, (state, action) => {
+        state.brands = action.payload;
+        state.status = "success";
+      })
+      .addCase(getBrands.rejected, (state, action) => {
+        state.status = "error";
+      });
   },
 });
 

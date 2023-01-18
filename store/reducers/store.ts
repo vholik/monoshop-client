@@ -7,13 +7,13 @@ import {
   ThunkAction,
 } from "@reduxjs/toolkit";
 import { createWrapper, HYDRATE } from "next-redux-wrapper";
+import { authReducer } from "./auth/AuthSlice";
 import registerReducer from "./auth/RegisterSlice";
-import loginReducer from "./auth/LoginSlice";
-import uploadImageReducer from "./item/UploadImageSlice";
-import getCategoriesReducer from "./item/GetCategoriesSlice";
+import uploadImageReducer from "./image/UploadImageSlice";
+import getCategoriesReducer from "./category/GetCategoriesSlice";
 import getBrandsReducer from "./brand/GetBrandsSlice";
 import getStylesReducer from "./style/GetStylesSlice";
-import getColoursReducer from "./item/GetColoursSlice";
+import getColoursReducer from "./colour/GetColoursSlice";
 import addItemReducer from "./item/AddItemSlice";
 import getItemsReducer from "./item/GetItemsSlice";
 import getItemByIdReducer from "./item/GetItemByIdSlice";
@@ -23,12 +23,14 @@ import editProfileReducer from "./user/EditProfileSlice";
 import filterReducer from "./filter/FilterSlice";
 import getUserItemsReducer from "./item/GetUserItemsSlice";
 import editItemReducer from "./item/EditItemSlice";
-import getSubcategoriesReducer from "./item/GetSubcategoriesSlice";
+import getSubcategoriesReducer from "./subcategory/GetSubcategoriesSlice";
 import deleteItemReducer from "./item/DeleteItemSlice";
-import checkIsFavoriteReducer from "./favorite/CheckIsFavoriteSlice";
+import { checkIsFavoriteReducer } from "./favorite/CheckIsFavoriteSlice";
 import toggleFavoriteReducer from "./favorite/ToggleFavoriteSlice";
 import getFavoriteReducer from "./favorite/GetFavoriteSlice";
-import cartReducer from "./item/CartSlice";
+import cartReducer from "./cart/CartSlice";
+import payReducer from "./payments/PaySlice";
+import getOrdersReducer from "./order/getOrdersSlice";
 
 export type AppDispatch = Store["dispatch"];
 export type RootState = ReturnType<Store["getState"]>;
@@ -40,8 +42,8 @@ export type AppThunk<ReturnType = void> = ThunkAction<
 >;
 
 const combinedReducer = combineReducers({
+  authReducer,
   registerReducer,
-  loginReducer,
   uploadImageReducer,
   getCategoriesReducer,
   getBrandsReducer,
@@ -62,6 +64,8 @@ const combinedReducer = combineReducers({
   toggleFavoriteReducer,
   getFavoriteReducer,
   cartReducer,
+  payReducer,
+  getOrdersReducer,
 });
 
 const reducer: typeof combinedReducer = (state, action) => {
@@ -83,4 +87,4 @@ export const makeStore = () =>
 
 type Store = ReturnType<typeof makeStore>;
 
-export const wrapper = createWrapper(makeStore, { debug: true });
+export const wrapper = createWrapper(makeStore);

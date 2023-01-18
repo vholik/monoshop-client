@@ -1,17 +1,18 @@
-import Header from "@components/Header";
+import Header from "@components/Header/Header";
 import { IRegisterFormData } from "@store/types/auth";
 import Head from "next/head";
 import Link from "next/link";
 import styled from "styled-components";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
-import { fetchRegister } from "@store/reducers/auth/RegisterSlice";
+import { registerUser } from "@store/reducers/auth/RegisterSlice";
 import Router from "next/router";
 
 export default function Login() {
   const dispatch = useAppDispatch();
 
-  const { error } = useAppSelector((state) => state.registerReducer);
+  const status = useAppSelector((state) => state.registerReducer.status);
+  const error = useAppSelector((state) => state.registerReducer.error);
 
   const {
     register,
@@ -20,7 +21,7 @@ export default function Login() {
   } = useForm<IRegisterFormData>({ mode: "onBlur" });
 
   const onSubmit: SubmitHandler<IRegisterFormData> = (data) => {
-    dispatch(fetchRegister(data))
+    dispatch(registerUser(data))
       .unwrap()
       .then((result) => {
         Router.push("/login");
@@ -33,7 +34,7 @@ export default function Login() {
   return (
     <LoginStyles>
       <Head>
-        <title>Monoshop - Login to your account</title>
+        <title>Monoshop - Register your account</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="wrapper">
@@ -51,11 +52,13 @@ export default function Login() {
                 required: "Please provide your email",
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "invalid email address",
+                  message: "Invalid email address",
                 },
               })}
             />
-            <div className="error">{errors?.email && errors.email.message}</div>
+            {errors.email?.message && (
+              <div className="error">{errors.email.message}</div>
+            )}
           </label>
           {/* Fullname  */}
           <label className="label">
@@ -72,6 +75,9 @@ export default function Login() {
               placeholder="Joe Doe"
               className="input"
             />
+            {errors.fullName?.message && (
+              <div className="error">{errors.fullName.message}</div>
+            )}
           </label>
           {/* Password  */}
           <label className="label">
@@ -92,6 +98,10 @@ export default function Login() {
               placeholder="Password"
               className="input"
             />
+            {errors.password?.message && (
+              <div className="error">{errors.password.message}</div>
+            )}
+            {status === "error" && <div className="error">{error}</div>}
           </label>
           <p className="account-action">
             Already have an account?{" "}
@@ -99,10 +109,13 @@ export default function Login() {
               <span className="link">Login</span>
             </Link>
           </p>
-          <button className="button" type="submit">
+          <button
+            className="button"
+            type="submit"
+            disabled={status === "loading"}
+          >
             Register
           </button>
-          <div className="error">{error && error}</div>
         </form>
       </div>
     </LoginStyles>

@@ -1,7 +1,7 @@
 import { wrapper } from "@store/reducers/store";
 import styled from "styled-components";
 import { User } from "@store/types/user";
-import Header from "@components/Header";
+import Header from "@components/Header/Header";
 import Categories from "@components/Categories/Categories";
 import { getUserById } from "@store/reducers/user/GetUserById";
 import Image from "next/image";
@@ -38,11 +38,15 @@ interface UserProfileProps {
 const UserProfile = ({ user }: UserProfileProps) => {
   const router = useRouter();
 
-  const { error } = useAppSelector((state) => state.getUserByIdReducer);
+  const status = useAppSelector((state) => state.getUserByIdReducer.status);
 
   useEffect(() => {
-    if (error) {
-      Router.push("/404");
+    if (status) {
+      Router.push("/404", {
+        query: {
+          message: "Error while loading your profile",
+        },
+      });
     }
   }, []);
 

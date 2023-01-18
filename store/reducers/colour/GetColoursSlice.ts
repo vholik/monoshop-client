@@ -6,47 +6,47 @@ import { RejectError } from "@store/types/error";
 
 interface BrandsState {
   status: "init" | "loading" | "error" | "success";
-  styles: ItemEntity[];
+  colours: ItemEntity[];
 }
 
 const initialState: BrandsState = {
   status: "init",
-  styles: [],
+  colours: [],
 };
 
-export const getStyles = createAsyncThunk<
+export const getColours = createAsyncThunk<
   ItemEntity[],
   void,
   { rejectValue: RejectError }
->("styles", async (_: void, thunkAPI) => {
+>("colour", async (_, thunkAPI) => {
   try {
-    const response = await instance.get<ItemEntity[]>("style");
+    const response = await instance.get<ItemEntity[]>("colour");
     return response.data;
   } catch (e) {
     if (isAxiosError(e) && e.response) {
       return thunkAPI.rejectWithValue(e.response.data);
     }
-    return thunkAPI.rejectWithValue({ message: "Can not load the styles" });
+    return thunkAPI.rejectWithValue({ message: "Can not get colours" });
   }
 });
 
-export const GetStylesSlice = createSlice({
-  name: "styles",
+export const GetColoursSlice = createSlice({
+  name: "colour",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getStyles.pending, (state) => {
+      .addCase(getColours.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(getStyles.fulfilled, (state, action) => {
-        state.styles = action.payload;
+      .addCase(getColours.fulfilled, (state, action) => {
+        state.colours = action.payload;
         state.status = "success";
       })
-      .addCase(getStyles.rejected, (state) => {
+      .addCase(getColours.rejected, (state) => {
         state.status = "error";
       });
   },
 });
 
-export default GetStylesSlice.reducer;
+export default GetColoursSlice.reducer;

@@ -1,4 +1,4 @@
-import Header from "@components/Header";
+import Header from "@components/Header/Header";
 import Head from "next/head";
 import styled from "styled-components";
 import HeroBg from "@public/images/hero-bg.jpg";
@@ -12,14 +12,9 @@ import { getPopularStyles } from "@store/reducers/style/GetPopularStylesSlice";
 import { getPopularItems } from "@store/reducers/item/GetPopularItemsSlice";
 import { Item } from "@store/types/item";
 import { useAppDispatch } from "@store/hooks/redux";
-import {
-  resetFilter,
-  setBrand,
-  setSortBy,
-  setStyle,
-} from "@store/reducers/filter/FilterSlice";
 import Router from "next/router";
 import { SortBy } from "@store/types/filter-by.enum";
+import { filterActions } from "@store/reducers/filter/FilterSlice";
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) => async () => {
@@ -57,19 +52,14 @@ export default function Home({ brands, items, styles }: HomeProps) {
   const dispatch = useAppDispatch();
 
   const brandRedirect = (brand: ItemEntityWithImage) => {
-    dispatch(resetFilter());
-    dispatch(setBrand([brand.value]));
+    dispatch(filterActions.resetFilter());
+    dispatch(filterActions.setBrand([brand]));
     Router.push("/shop");
   };
 
   const styleRedirect = (style: ItemEntityWithImage) => {
-    dispatch(resetFilter());
-    dispatch(setStyle([style.value]));
-    Router.push("/shop");
-  };
-
-  const popularItemsRedirect = () => {
-    dispatch(setSortBy(SortBy.Recent));
+    dispatch(filterActions.resetFilter());
+    dispatch(filterActions.setStyle([style]));
     Router.push("/shop");
   };
 
@@ -144,9 +134,6 @@ export default function Home({ brands, items, styles }: HomeProps) {
           <section className="hot">
             <div className="top">
               <h2 className="title-sm">Hot on Monoshop</h2>
-              <p className="see-all-button" onClick={popularItemsRedirect}>
-                See all
-              </p>
             </div>
             <div className="wrapper">
               {items.map((item) => (

@@ -2,17 +2,15 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance, { API_URL } from "@utils/axios";
 import axios, { AxiosError, isAxiosError } from "axios";
 import { ItemEntityWithImage } from "@store/types/item-entity";
-import { ReduxError } from "@store/types/error";
+import { RejectError } from "@store/types/error";
 
 interface BrandsState {
-  isLoading: boolean;
-  error: string;
+  status: "init" | "loading" | "error" | "success";
   styles: ItemEntityWithImage[];
 }
 
 const initialState: BrandsState = {
-  isLoading: false,
-  error: "",
+  status: "init",
   styles: [],
 };
 
@@ -20,7 +18,7 @@ export const getPopularStyles = createAsyncThunk<
   ItemEntityWithImage[],
   void,
   {
-    rejectValue: ReduxError;
+    rejectValue: RejectError;
   }
 >("popularStyles", async (_, thunkAPI) => {
   try {
@@ -32,8 +30,7 @@ export const getPopularStyles = createAsyncThunk<
     if (isAxiosError(err) && err.response) {
       return thunkAPI.rejectWithValue(err.response!.data.message);
     }
-    console.log(err);
-    return thunkAPI.rejectWithValue({ message: "Can not loading the data" });
+    return thunkAPI.rejectWithValue({ message: "Can not load the data" });
   }
 });
 
@@ -41,25 +38,18 @@ export const GetPopularStylesSlice = createSlice({
   name: "popularStyles",
   initialState,
   reducers: {},
-  extraReducers: {
-    [getPopularStyles.fulfilled.type]: (
-      state,
-      action: PayloadAction<ItemEntityWithImage[]>
-    ) => {
-      state.styles = action.payload;
-      state.isLoading = false;
-      state.error = "";
-    },
-    [getPopularStyles.pending.type]: (state) => {
-      state.isLoading = true;
-    },
-    [getPopularStyles.rejected.type]: (
-      state,
-      action: PayloadAction<string>
-    ) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getPopularStyles.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getPopularStyles.fulfilled, (state, action) => {
+        state.styles = action.payload;
+        state.status = "success";
+      })
+      .addCase(getPopularStyles.rejected, (state) => {
+        state.status = "error";
+      });
   },
 });
 

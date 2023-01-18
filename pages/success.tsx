@@ -3,14 +3,13 @@ import SuccessIllustration from "@public/images/success.png";
 import ArrowLeft from "@public/images/arrow-left.svg";
 import Image from "next/image";
 import Link from "next/link";
-import Header from "@components/Header";
+import Header from "@components/Header/Header";
 import Router, { useRouter } from "next/router";
 
 export default function Success() {
   const router = useRouter();
   const { pid } = router.query;
 
-  console.log(pid);
   return (
     <>
       <Header />
@@ -23,9 +22,10 @@ export default function Success() {
             fill
           />
         </div>
-        <h1 className="text">
-          Congratulations. Your item has added succesfully.
-        </h1>
+        {router.query.message && (
+          <h1 className="text">{router.query.message}</h1>
+        )}
+
         <Link href={"/"}>
           <div className="return">
             <Image src={ArrowLeft} alt="Arrow" />

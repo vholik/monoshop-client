@@ -2,18 +2,20 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IFilter } from "@store/types/filter";
 import { SortBy } from "@store/types/filter-by.enum";
 import { Gender } from "@store/types/gender.enum";
+import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
+import { MultiValue, SingleValue } from "react-select";
 
 const initialState: IFilter = {
   price: [0, 10000],
   gender: null,
-  category: 0,
-  subcategory: [],
-  size: [],
-  condition: [],
-  brand: [],
-  style: [],
-  colour: [],
-  sortBy: SortBy.Recent,
+  category: null,
+  subcategory: null,
+  size: null,
+  condition: null,
+  brand: null,
+  style: null,
+  colour: null,
+  sortBy: null,
   page: 1,
   search: "",
 };
@@ -22,7 +24,7 @@ export const FilterSlice = createSlice({
   name: "filter",
   initialState,
   reducers: {
-    setSortBy: (state, action: PayloadAction<SortBy>) => {
+    setSortBy: (state, action: PayloadAction<ItemEntity>) => {
       state.sortBy = action.payload;
     },
     resetFilter: (state) => {
@@ -31,32 +33,41 @@ export const FilterSlice = createSlice({
     setPrice: (state, action: PayloadAction<[number, number]>) => {
       state.price = action.payload;
     },
-    setGender: (state, action: PayloadAction<Gender>) => {
+    setGender: (
+      state,
+      action: PayloadAction<{ value: string; label: string }>
+    ) => {
       state.gender = action.payload;
     },
     changePage: (state, action: PayloadAction<number>) => {
       state.page = action.payload;
     },
-    setCategory: (state, action: PayloadAction<number>) => {
+    setCategory: (
+      state,
+      action: PayloadAction<SingleValue<ItemEntity> | null>
+    ) => {
       state.category = action.payload;
     },
-    setSubcategory: (state, action: PayloadAction<number[]>) => {
-      state.subcategory = action.payload;
+    setSubcategory: (
+      state,
+      action: PayloadAction<MultiValue<ItemEntityWithId>>
+    ) => {
+      state.subcategory = [...action.payload];
     },
-    setCondition: (state, action: PayloadAction<number[]>) => {
-      state.condition = action.payload;
+    setCondition: (state, action: PayloadAction<MultiValue<ItemEntity>>) => {
+      state.condition = [...action.payload];
     },
-    setBrand: (state, action: PayloadAction<string[]>) => {
-      state.brand = action.payload;
+    setBrand: (state, action: PayloadAction<MultiValue<ItemEntity>>) => {
+      state.brand = [...action.payload];
     },
-    setStyle: (state, action: PayloadAction<string[]>) => {
-      state.style = action.payload;
+    setStyle: (state, action: PayloadAction<MultiValue<ItemEntity>>) => {
+      state.style = [...action.payload];
     },
-    setColour: (state, action: PayloadAction<string[]>) => {
-      state.colour = action.payload;
+    setColour: (state, action: PayloadAction<MultiValue<ItemEntity>>) => {
+      state.colour = [...action.payload];
     },
-    setSize: (state, action: PayloadAction<string[]>) => {
-      state.size = action.payload;
+    setSize: (state, action: PayloadAction<MultiValue<ItemEntity>>) => {
+      state.size = [...action.payload];
     },
     setSearchValue: (state, action: PayloadAction<string>) => {
       state.search = action.payload;
@@ -64,20 +75,6 @@ export const FilterSlice = createSlice({
   },
 });
 
-export const {
-  setGender,
-  setPrice,
-  changePage,
-  setBrand,
-  setCategory,
-  setColour,
-  setCondition,
-  setSize,
-  setStyle,
-  setSubcategory,
-  setSortBy,
-  resetFilter,
-  setSearchValue,
-} = FilterSlice.actions;
+export const filterActions = FilterSlice.actions;
 
 export default FilterSlice.reducer;

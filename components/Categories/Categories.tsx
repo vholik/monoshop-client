@@ -1,5 +1,5 @@
 import { useAppDispatch } from "@store/hooks/redux";
-import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
+import { getCategories } from "@store/reducers/category/GetCategoriesSlice";
 import { wrapper } from "@store/reducers/store";
 import { Gender } from "@store/types/gender.enum";
 import { ItemEntityWithId } from "@store/types/item-entity";
@@ -12,7 +12,7 @@ import {
   setGender,
 } from "@store/reducers/filter/FilterSlice";
 import instance from "@utils/axios";
-import { getSubcategories } from "@store/reducers/item/GetSubcategoriesSlice";
+import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
 import Link from "next/link";
 
 const Categories: FC = () => {

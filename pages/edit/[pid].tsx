@@ -1,18 +1,17 @@
 import Categories from "@components/Categories/Categories";
-import Header from "@components/Header";
+import Header from "@components/Header/Header";
 import styled from "styled-components";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { MultiValue, SingleValue } from "react-select";
 import Footer from "@components/Footer/Footer";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
-import { setError, uploadImage } from "@store/reducers/item/UploadImageSlice";
+import { uploadImage } from "@store/reducers/image/UploadImageSlice";
 import Image from "next/image";
-import CustomSelect from "@components/CustomSelect/CustomSelect";
-import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
+import { getCategories } from "@store/reducers/category/GetCategoriesSlice";
 import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
 import { getBrands } from "@store/reducers/brand/GetBrandsSlice";
 import { getStyles } from "@store/reducers/style/GetStylesSlice";
-import { getColours } from "@store/reducers/item/GetColoursSlice";
+import { getColours } from "@store/reducers/colour/GetColoursSlice";
 import { Gender } from "@store/types/gender.enum";
 import { addItem } from "@store/reducers/item/AddItemSlice";
 import ReactLoading from "react-loading";
@@ -28,12 +27,13 @@ import { wrapper } from "@store/reducers/store";
 import { Item } from "@store/types/item";
 import Select from "react-select";
 import { editItem } from "@store/reducers/item/EditItemSlice";
-import { getSubcategories } from "@store/reducers/item/GetSubcategoriesSlice";
+import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
 import Trash from "@public/images/trash.svg";
 import Upload from "@public/images/upload.svg";
 import Drag from "@public/images/drag.svg";
 import { Reorder } from "framer-motion";
 import Router from "next/router";
+import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) =>
@@ -64,27 +64,32 @@ interface EditItemProps {
 export default function AddItem({ item }: EditItemProps) {
   const dispatch = useAppDispatch();
 
-  const { editItemError, editItemLoading } = useAppSelector(
-    (state) => state.editItemReducer
+  const itemStatus = useAppSelector((state) => state.editItemReducer.status);
+  const imageStatus = useAppSelector(
+    (state) => state.uploadImageReducer.status
   );
-  const { isLoading, error } = useAppSelector(
-    (state) => state.uploadImageReducer
+  const categories = useAppSelector(
+    (state) => state.getCategoriesReducer.categories
   );
-  const { categories, categoriesError, isCategoriesLoading } = useAppSelector(
-    (state) => state.getCategoriesReducer
+  const categoriesStatus = useAppSelector(
+    (state) => state.getCategoriesReducer.status
   );
-  const { subcategories, isSubcategoriesLoading, subcategoriesError } =
-    useAppSelector((state) => state.getSubcategoriesReducer);
-  const { brands, brandsError, isBrandsLoading } = useAppSelector(
-    (state) => state.getBrandsReducer
+  const subcategoriesStatus = useAppSelector(
+    (state) => state.getSubcategoriesReducer.status
   );
-  const { isStylesLoading, styles, stylesError } = useAppSelector(
-    (state) => state.getStylesReducer
+  const subcategories = useAppSelector(
+    (state) => state.getSubcategoriesReducer.subcategories
   );
-  const { colours, coloursError, isColoursLoading } = useAppSelector(
-    (state) => state.getColoursReducer
+  const brands = useAppSelector((state) => state.getBrandsReducer.brands);
+  const brandsStatus = useAppSelector((state) => state.getBrandsReducer.status);
+  const styles = useAppSelector((state) => state.getStylesReducer.styles);
+  const stylesStatus = useAppSelector((state) => state.getStylesReducer.status);
+  const colours = useAppSelector((state) => state.getColoursReducer.colours);
+  const coloursStatus = useAppSelector(
+    (state) => state.getColoursReducer.status
   );
-  const { isAuth, userId } = useAppSelector((state) => state.loginReducer);
+  const userId = useAppSelector((state) => state.authReducer.userId);
+  const authStatus = useAppSelector((state) => state.authReducer.status);
 
   const [formImages, setFormImages] = useState<string[]>([]);
   const [formData, setFormData] = useState<{
@@ -133,16 +138,10 @@ export default function AddItem({ item }: EditItemProps) {
 
   const handleImageSubmit = (e: ChangeEvent<HTMLInputElement>) => {
     if (formImages.length >= 5) {
-      dispatch(setError("Max 5 images"));
-
-      setTimeout(() => {
-        dispatch(setError(""));
-      }, 5000);
+      showErrorToast("Can not upload more than 5 images");
 
       return;
     }
-
-    setErrors({ ...errors, images: "" });
 
     const image = e.target.files![0];
 
@@ -159,14 +158,13 @@ export default function AddItem({ item }: EditItemProps) {
           const find = formImages.find((url) => url === image);
 
           if (find) {
-            setErrors({ ...errors, images: "Images can't be the same" });
+            showErrorToast("Images can not be the same");
           } else {
             setFormImages([image, ...formImages]);
           }
         })
         .catch((error) => {
-          setErrors({ ...errors, images: error.message });
-          console.error("rejected", error);
+          showErrorToast("Error with uploading image");
         });
     }
   };
@@ -325,144 +323,80 @@ export default function AddItem({ item }: EditItemProps) {
     e.preventDefault();
 
     if (errors.hashtags) {
-      setErrors({
-        ...errors,
-        hashtags: "Please fix hashtags",
-      });
+      showErrorToast("Please fix hashtags");
       return;
     }
-
-    // Reset errors
-    setErrors({
-      category: "",
-      subcategory: "",
-      condition: "",
-      style: "",
-      brand: "",
-      colour: "",
-      size: "",
-      price: "",
-      gender: "",
-      images: "",
-      description: "",
-      hashtags: "",
-      name: "",
-    });
 
     if (formData.name.length > 50) {
-      setErrors({
-        ...errors,
-        name: "Name is too big",
-      });
+      showErrorToast("Item header are too big");
       return;
     }
+
     if (formData.name.length < 5) {
-      setErrors({
-        ...errors,
-        name: "Name is too small",
-      });
+      showErrorToast("Item header are too small");
       return;
     }
 
     if (!formData.gender) {
-      setErrors({
-        ...errors,
-        gender: "Choose a gender",
-      });
+      showErrorToast("Choose a gender");
       return;
     }
 
     if (!formData.category) {
-      setErrors({
-        ...errors,
-        category: "Choose a category",
-      });
+      showErrorToast("Please choose category");
       return;
     }
 
     if (!formData.subcategory) {
-      setErrors({
-        ...errors,
-        subcategory: "Choose a subcategory",
-      });
+      showErrorToast("Please choose subcategory");
       return;
     }
 
     if (!formData.style) {
-      setErrors({
-        ...errors,
-        style: "Choose a style",
-      });
+      showErrorToast("Please choose style");
       return;
     }
 
     if (!formData.condition) {
-      setErrors({
-        ...errors,
-        condition: "Choose a condition",
-      });
+      showErrorToast("Pick condition of your item");
       return;
     }
 
     if (!formData.colour) {
-      setErrors({
-        ...errors,
-        colour: "Choose a colour",
-      });
+      showErrorToast("Choose a colour");
       return;
     }
 
     if (!formData.brand) {
-      setErrors({
-        ...errors,
-        brand: "Choose a brand",
-      });
+      showErrorToast("Choose a brand");
       return;
     }
 
     if (!formData.price) {
-      setErrors({
-        ...errors,
-        price: "Choose a price",
-      });
+      showErrorToast("Enter the price");
       return;
     }
 
     if (!formData.size) {
-      setErrors({
-        ...errors,
-        size: "Choose a size",
-      });
+      showErrorToast("Please choose size");
       return;
     }
 
     if (formData.hashtags.length > 5) {
-      setErrors({
-        ...errors,
-        hashtags: "Too many hashtags",
-      });
+      showErrorToast("Can not be more than 5 hashtags");
       return;
     }
     if (formData.hashtags.length > 200) {
-      setErrors({
-        ...errors,
-        description: "Description is to big",
-      });
+      showErrorToast("Description are too big");
       return;
     }
 
     if (!formImages.length) {
-      setErrors({
-        ...errors,
-        images: "Please upload photos",
-      });
+      showErrorToast("Please upload at least 1 photo");
       return;
     }
     if (formImages.length > 5) {
-      setErrors({
-        ...errors,
-        images: "There is too many images",
-      });
+      showErrorToast("Too much images");
       return;
     }
 
@@ -485,9 +419,16 @@ export default function AddItem({ item }: EditItemProps) {
 
     dispatch(editItem(patchedData))
       .unwrap()
-      .then(() => Router.push("/success"))
+      .then(() => {
+        Router.push({
+          pathname: "/success",
+          query: {
+            message: "Successfully updated",
+          },
+        });
+      })
       .catch((err) => {
-        console.log("rejected", err), Router.push("/404");
+        showErrorToast("Error while editing item");
       });
   };
 
@@ -564,7 +505,7 @@ export default function AddItem({ item }: EditItemProps) {
       <div className="container">
         <div className="wrapper">
           <h1 className="title-md">Sell new item</h1>
-          {editItemLoading ? (
+          {itemStatus === "loading" ? (
             <Loading />
           ) : (
             <form className="inner" onSubmit={onSubmit}>
@@ -576,7 +517,7 @@ export default function AddItem({ item }: EditItemProps) {
                     className="image-upload-input"
                     accept="image/*"
                     onChange={handleImageSubmit}
-                    disabled={isLoading}
+                    disabled={imageStatus === "loading"}
                   />
                   <Image
                     src={Upload}
@@ -587,9 +528,7 @@ export default function AddItem({ item }: EditItemProps) {
                   />
                   Upload an image
                 </label>
-                {errors.images && <p className="error">{errors.images}</p>}
-                {error && <p className="error">{error}</p>}
-                {isLoading && (
+                {imageStatus === "loading" && (
                   <div className="item-image loading-background"></div>
                 )}
                 <Reorder.Group
@@ -626,18 +565,16 @@ export default function AddItem({ item }: EditItemProps) {
                 {/* Second row */}
                 <div className="row">
                   <label className="label">
-                    Item name
+                    Header
                     <input
                       onChange={handleNameChange}
                       type="text"
                       className="input"
-                      placeholder="Item name"
                       required
                       minLength={5}
                       maxLength={50}
                       defaultValue={formData.name}
                     />
-                    {errors.name && <p className="error">{errors.name}</p>}
                   </label>
                   <label className="label">
                     Category
@@ -646,9 +583,8 @@ export default function AddItem({ item }: EditItemProps) {
                       required={true}
                       className="select"
                       name="subcategory"
-                      isLoading={isCategoriesLoading}
+                      isLoading={categoriesStatus === "loading"}
                       isDisabled={!formData.gender}
-                      placeholder="Select a scategory"
                       options={categories}
                       isClearable={true}
                       isSearchable={true}
@@ -656,9 +592,6 @@ export default function AddItem({ item }: EditItemProps) {
                       onChange={categoryChange}
                       value={formData.category}
                     />
-                    {errors.category && (
-                      <p className="error">{errors.category}</p>
-                    )}
                   </label>
 
                   <label className="label">
@@ -668,8 +601,7 @@ export default function AddItem({ item }: EditItemProps) {
                       required={true}
                       className="select"
                       name="style"
-                      isLoading={isStylesLoading}
-                      placeholder="Select a style"
+                      isLoading={stylesStatus === "loading"}
                       options={styles}
                       isClearable={true}
                       isSearchable={true}
@@ -677,7 +609,6 @@ export default function AddItem({ item }: EditItemProps) {
                       onChange={styleChange}
                       value={formData.style}
                     />
-                    {errors.style && <p className="error">{errors.style}</p>}
                   </label>
                   <label className="label">
                     Colour
@@ -686,8 +617,7 @@ export default function AddItem({ item }: EditItemProps) {
                       required={true}
                       className="select"
                       name="colour"
-                      isLoading={isColoursLoading}
-                      placeholder="Select a colour"
+                      isLoading={coloursStatus === "loading"}
                       options={colours}
                       isClearable={true}
                       styles={colourStyles}
@@ -719,23 +649,20 @@ export default function AddItem({ item }: EditItemProps) {
                         </div>
                       )}
                     />
-                    {errors.price && <p className="error">{errors.colour}</p>}
                   </label>
                   <label className="label">
                     Price
                     <input
-                      type="number"
+                      type=""
                       className="input"
-                      placeholder="Select a price"
                       onChange={handlePriceChange}
+                      step="0.01"
                       min={0}
                       max={100000}
                       defaultValue={item.price}
                     />
-                    {errors.price && <p className="error">{errors.price}</p>}
                   </label>
                   <label className="label">
-                    Hashtags
                     <input
                       type="text"
                       className="input"
@@ -743,9 +670,6 @@ export default function AddItem({ item }: EditItemProps) {
                       onChange={handleHashtagsChange}
                       defaultValue={item.hashtags.join(",")}
                     />
-                    {errors.hashtags && (
-                      <p className="error">{errors.hashtags}</p>
-                    )}
                   </label>
                 </div>
                 {/* Third row */}
@@ -757,13 +681,11 @@ export default function AddItem({ item }: EditItemProps) {
                       required={true}
                       className="select"
                       name="gender"
-                      placeholder="Select a gender"
                       options={genders}
                       styles={colourStyles}
                       onChange={genderChange}
                       value={formData.gender}
                     />
-                    {errors.gender && <p className="error">{errors.gender}</p>}
                   </label>
                   <label className="label">
                     Subcategory
@@ -772,9 +694,8 @@ export default function AddItem({ item }: EditItemProps) {
                       required={true}
                       className="select"
                       name="subcategory"
-                      isLoading={isSubcategoriesLoading}
+                      isLoading={subcategoriesStatus === "loading"}
                       isDisabled={!formData.category}
-                      placeholder="Select a subcategory"
                       options={subcategories}
                       isClearable={true}
                       isSearchable={true}
@@ -782,9 +703,6 @@ export default function AddItem({ item }: EditItemProps) {
                       onChange={subcategoryChange}
                       value={formData.subcategory}
                     />
-                    {errors.subcategory && (
-                      <p className="error">{errors.subcategory}</p>
-                    )}
                   </label>
                   <label className="label">
                     Condition
@@ -793,7 +711,6 @@ export default function AddItem({ item }: EditItemProps) {
                       required={true}
                       className="select"
                       name="condition"
-                      placeholder="Select a condition"
                       options={conditions}
                       isClearable={true}
                       isSearchable={true}
@@ -804,9 +721,6 @@ export default function AddItem({ item }: EditItemProps) {
                         value: String(item.condition),
                       }}
                     />
-                    {errors.condition && (
-                      <p className="error">{errors.condition}</p>
-                    )}
                   </label>
                   <label className="label">
                     Brand
@@ -815,8 +729,7 @@ export default function AddItem({ item }: EditItemProps) {
                       required={true}
                       className="select"
                       name="brand"
-                      isLoading={isBrandsLoading}
-                      placeholder="Select a brand"
+                      isLoading={brandsStatus === "loading"}
                       options={brands}
                       isMulti
                       isClearable={true}
@@ -831,7 +744,6 @@ export default function AddItem({ item }: EditItemProps) {
                         return false;
                       }}
                     />
-                    {errors.brand && <p className="error">{errors.brand}</p>}
                   </label>
                   <label className="label">
                     Size
@@ -840,7 +752,6 @@ export default function AddItem({ item }: EditItemProps) {
                       required={true}
                       className="select"
                       name="size"
-                      placeholder="Select a size"
                       options={sizes}
                       value={formData.size}
                       isClearable={true}
@@ -848,14 +759,12 @@ export default function AddItem({ item }: EditItemProps) {
                       styles={colourStyles}
                       onChange={sizeChange}
                     />
-                    {errors.size && <p className="error">{errors.size}</p>}
                   </label>
                 </div>
                 <label className="label description--label">
                   Description
                   <textarea
                     id="description"
-                    placeholder="Describe your item..."
                     minLength={10}
                     maxLength={200}
                     onChange={textareaHandler}
@@ -865,17 +774,8 @@ export default function AddItem({ item }: EditItemProps) {
                         : ""
                     }
                   ></textarea>
-                  {errors.description && (
-                    <p className="error">{errors.description}</p>
-                  )}
                 </label>
-                <button
-                  className="button submit--buton"
-                  disabled={editItemLoading}
-                >
-                  Save
-                </button>
-                {editItemError && <p className="error">{editItemError}</p>}
+                <button className="button submit--buton">Save</button>
               </div>
             </form>
           )}

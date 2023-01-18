@@ -1,5 +1,5 @@
 import Categories from "@components/Categories/Categories";
-import Header from "@components/Header";
+import Header from "@components/Header/Header";
 import styled from "styled-components";
 import Image from "next/image";
 import SearchIcon from "@public/images/search.svg";
@@ -7,19 +7,18 @@ import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { ChangeEvent, useEffect, useState } from "react";
 import { getBrands } from "@store/reducers/brand/GetBrandsSlice";
 import Loading from "@components/Loading/Loading";
-import { resetFilter, setBrand } from "@store/reducers/filter/FilterSlice";
 import Router from "next/router";
 import Footer from "@components/Footer/Footer";
 import { FlexPage } from "@utils/FlexStyle";
+import { filterActions } from "@store/reducers/filter/FilterSlice";
 
 const Brands = () => {
   const dispatch = useAppDispatch();
 
   const [value, setValue] = useState("");
 
-  const { brands, brandsError, isBrandsLoading } = useAppSelector(
-    (state) => state.getBrandsReducer
-  );
+  const brands = useAppSelector((state) => state.getBrandsReducer.brands);
+  const status = useAppSelector((state) => state.getBrandsReducer.status);
 
   useEffect(() => {
     dispatch(getBrands(value))
@@ -32,8 +31,8 @@ const Brands = () => {
   };
 
   const filterBrand = (value: string) => {
-    dispatch(resetFilter());
-    dispatch(setBrand([value]));
+    dispatch(filterActions.resetFilter());
+    dispatch(filterActions.setBrand([{ value: value, label: value }]));
     Router.push("/shop");
   };
 
@@ -53,7 +52,7 @@ const Brands = () => {
               onChange={inputChange}
             />
           </div>
-          {isBrandsLoading ? (
+          {status === "loading" ? (
             <Loading />
           ) : (
             <div className="brands">

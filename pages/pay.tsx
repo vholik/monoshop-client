@@ -1,10 +1,10 @@
-import Header from "@components/Header";
+import Header from "@components/Header/Header";
 import styled from "styled-components";
 import Image from "next/image";
 import Security from "@public/images/security.svg";
 import { FlexPage } from "@utils/FlexStyle";
 import Footer from "@components/Footer/Footer";
-import { useAppSelector } from "@store/hooks/redux";
+import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import Router from "next/router";
 import Link from "next/link";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -12,8 +12,27 @@ import { PayFormData } from "@store/types/pay";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { CountryDropdown } from "react-country-region-selector";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+  PaymentElement,
+} from "@stripe/react-stripe-js";
+import { useEffect } from "react";
+
+import { getStripeSession } from "@store/reducers/payments/PaySlice";
+import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
 
 const Pay = () => {
+  const dispatch = useAppDispatch();
+  const status = useAppSelector((state) => state.payReducer.status);
+
   const {
     register,
     control,
@@ -28,18 +47,15 @@ const Pay = () => {
       country: "Ukraine",
     },
   });
-  const { item, error, isLoading } = useAppSelector(
-    (state) => state.cartReducer
-  );
 
-  if (error) {
-    Router.push("/404");
-  }
+  const { item } = useAppSelector((state) => state.cartReducer);
 
-  //Check if item is null
-  if (!item) {
-    Router.push("/404");
-  }
+  useEffect(() => {
+    //Check if item is null
+    if (!item) {
+      Router.push("/404");
+    }
+  }, []);
 
   const getTotalPrice = (price: number) => {
     // Return price plus shop tax 10%
@@ -47,7 +63,24 @@ const Pay = () => {
   };
 
   const onSubmit: SubmitHandler<PayFormData> = (data) => {
-    console.log(data);
+    if (item) {
+      dispatch(getStripeSession({ ...data, itemId: item.id }))
+        .unwrap()
+        .then(async (sessionId) => {
+          const stripe = await stripePromise;
+
+          const error = await stripe?.redirectToCheckout({
+            sessionId,
+          });
+
+          if (error) {
+            showErrorToast("Can not create a payment session");
+          }
+        })
+        .catch((err) => {
+          showErrorToast("Can not create a payment session");
+        });
+    }
   };
 
   return (
@@ -82,7 +115,7 @@ const Pay = () => {
                 <input
                   type="text"
                   className="input"
-                  {...register("adressLineFirst", {
+                  {...register("line1", {
                     required: true,
                     maxLength: {
                       value: 50,
@@ -90,9 +123,9 @@ const Pay = () => {
                     },
                   })}
                 />
-                {errors?.adressLineFirst?.message && (
+                {errors?.line1?.message && (
                   <div className="error">
-                    {errors?.adressLineFirst && errors.adressLineFirst.message}
+                    {errors?.line1 && errors.line1.message}
                   </div>
                 )}
               </label>
@@ -101,17 +134,16 @@ const Pay = () => {
                 <input
                   type="text"
                   className="input"
-                  {...register("adressLineSecond", {
+                  {...register("line2", {
                     maxLength: {
                       value: 50,
                       message: "Max 50 symbols",
                     },
                   })}
                 />
-                {errors?.adressLineSecond?.message && (
+                {errors?.line2?.message && (
                   <div className="error">
-                    {errors?.adressLineSecond &&
-                      errors.adressLineSecond.message}
+                    {errors?.line2 && errors.line2.message}
                   </div>
                 )}
               </label>
@@ -158,18 +190,19 @@ const Pay = () => {
                 <input
                   type="text"
                   className="input"
-                  {...register("zip", {
+                  maxLength={6}
+                  {...register("postalCode", {
                     required: true,
                     valueAsNumber: true,
                     maxLength: {
-                      value: 50,
-                      message: "Max 50 symbols",
+                      value: 6,
+                      message: "Max 6 symbols",
                     },
                   })}
                 />
-                {errors?.zip?.message && (
+                {errors?.postalCode?.message && (
                   <div className="error">
-                    {errors?.zip && errors.zip.message}
+                    {errors?.postalCode && errors.postalCode.message}
                   </div>
                 )}
               </label>
@@ -236,7 +269,9 @@ const Pay = () => {
                 />
                 {errors["phone"] && <p className="error">Invalid Phone</p>}
               </label>
-              <button className="button">Continue to payment</button>
+              <button className="button" disabled={status === "loading"}>
+                Continue to payment
+              </button>
             </form>
             <p className="guaranty-icon">
               <Image src={Security} alt="Security" />

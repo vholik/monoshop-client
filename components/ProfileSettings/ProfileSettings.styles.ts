@@ -1,28 +1,8 @@
 import styled from "styled-components";
 
 export const ProfileSettingsStyles = styled.div`
-  .status {
-    grid-column: 1;
-  }
-
   .form {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    grid-column-gap: 2rem;
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-column-gap: 2rem;
-    height: fit-content;
-
-    &:nth-child(2) {
-      grid-column: 2/4;
-      .label {
-        grid-column: 1/3;
-      }
-    }
+    width: 500px;
   }
 
   .submit--buton {
@@ -34,7 +14,6 @@ export const ProfileSettingsStyles = styled.div`
   }
 
   .button {
-    grid-column: 1;
     width: fit-content;
   }
 
@@ -42,8 +21,9 @@ export const ProfileSettingsStyles = styled.div`
     position: relative;
     cursor: pointer;
     margin-top: 0.5rem;
-    width: 100%;
-    aspect-ratio: 1 / 1;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     color: var(--dark);
@@ -52,24 +32,26 @@ export const ProfileSettingsStyles = styled.div`
     &:hover .upload {
       opacity: 1;
     }
+  }
 
-    .upload {
-      opacity: 0;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: absolute;
-      background-color: var(--grey-60);
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      cursor: pointer;
+  .photo-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
 
-      input {
-        display: none;
-      }
+  .photo {
+    border-radius: 50%;
+  }
+
+  .upload-btn {
+    background-color: transparent;
+    color: var(--dark);
+    padding-right: 1em;
+    padding-left: 1em;
+    border: 1px solid var(--grey-30);
+    input {
+      display: none;
     }
   }
 `;

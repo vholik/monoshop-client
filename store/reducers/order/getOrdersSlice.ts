@@ -14,13 +14,13 @@ const initialState: ItemsState = {
   items: [],
 };
 
-export const getUserItems = createAsyncThunk<
+export const getOrders = createAsyncThunk<
   Item[],
   void,
   { rejectValue: RejectError }
->("item/user", async (_, thunkAPI: any) => {
+>("order", async (_, thunkAPI) => {
   try {
-    const response = await instance.get<Item[]>("item/user");
+    const response = await instance.get<Item[]>("order");
     return response.data;
   } catch (err) {
     if (isAxiosError(err) && err.response) {
@@ -30,23 +30,23 @@ export const getUserItems = createAsyncThunk<
   }
 });
 
-export const GetUserItemsSlice = createSlice({
-  name: "item/user",
+export const GetOrdersSlice = createSlice({
+  name: "order",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getUserItems.pending, (state) => {
+      .addCase(getOrders.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(getUserItems.fulfilled, (state, action) => {
+      .addCase(getOrders.fulfilled, (state, action) => {
         state.items = action.payload;
         state.status = "success";
       })
-      .addCase(getUserItems.rejected, (state) => {
+      .addCase(getOrders.rejected, (state) => {
         state.status = "error";
       });
   },
 });
 
-export default GetUserItemsSlice.reducer;
+export default GetOrdersSlice.reducer;

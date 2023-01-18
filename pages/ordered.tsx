@@ -9,40 +9,42 @@ import Image from "next/image";
 import Loading from "@components/Loading/Loading";
 import Footer from "@components/Footer/Footer";
 import { FlexPage } from "@utils/FlexStyle";
-import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
+import { getOrders } from "@store/reducers/order/getOrdersSlice";
 
-const Favorites = () => {
+const Ordered = () => {
   const dispatch = useAppDispatch();
-  const status = useAppSelector((state) => state.getFavoriteReducer.status);
-  const items = useAppSelector((state) => state.getFavoriteReducer.items);
+  const status = useAppSelector((state) => state.getOrdersReducer.status);
+  const items = useAppSelector((state) => state.getOrdersReducer.items);
 
   useEffect(() => {
-    dispatch(getFavorites())
+    dispatch(getOrders())
       .unwrap()
       .then((res) => console.log(res))
-      .catch((err) => showErrorToast("Can not load favorites"));
+      .catch((err) => console.log("rejected", err));
   }, []);
+
+  console.log(items);
 
   return (
     <FlexPage>
-      <FavoritesStyles>
+      <OrderedStyles>
         <Header />
         <Categories />
         <div className="container">
           <div className="settings">
-            <h2 className="profile-title">Favorites</h2>
+            <h2 className="profile-title">Ordered clothing</h2>
             <div className="settings-list">
               <Link href={"/settings"}>
                 <p className="settings-list__item">Settings</p>
               </Link>
               <Link href={"/ordered"}>
-                <p className="settings-list__item">Ordered</p>
+                <p className="settings-list__item active">Ordered</p>
               </Link>
               <Link href={"/selling"}>
                 <p className="settings-list__item">Selling</p>
               </Link>
               <Link href={"/favorites"}>
-                <p className="settings-list__item active">Favorites</p>
+                <p className="settings-list__item">Favorites</p>
               </Link>
             </div>
           </div>
@@ -52,10 +54,8 @@ const Favorites = () => {
         ) : (
           <div className="container">
             <div className="items-inner">
-              {!items.length && (
-                <h2 className="no-items">
-                  You don't have any items added to favorites.{" "}
-                </h2>
+              {/* {!items.length && (
+                <h2 className="no-items">You haven't ordered anything.</h2>
               )}
 
               {items.map((item) => (
@@ -76,19 +76,19 @@ const Favorites = () => {
                     </div>
                   </div>
                 </div>
-              ))}
+              ))} */}
             </div>
           </div>
         )}
-      </FavoritesStyles>
+      </OrderedStyles>
       <Footer />
     </FlexPage>
   );
 };
 
-export default Favorites;
+export default Ordered;
 
-const FavoritesStyles = styled.div`
+const OrderedStyles = styled.div`
   .items-inner {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

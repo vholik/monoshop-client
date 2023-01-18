@@ -1,61 +1,58 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { RejectError } from "@store/types/error";
 import instance from "@utils/axios";
-import { AxiosError } from "axios";
+import { AxiosError, isAxiosError } from "axios";
 
 interface ItemState {
-  isFavoriteLoading: boolean;
-  error: string;
+  status: "init" | "loading" | "error" | "success";
   isFavorite: boolean;
 }
 
 const initialState: ItemState = {
-  isFavoriteLoading: false,
-  error: "",
+  status: "init",
   isFavorite: false,
 };
 
-export const checkIsFavorite = createAsyncThunk<boolean, string>(
-  "isFavorite",
-  async (id: string, thunkAPI: any) => {
-    try {
-      const response = await instance.get<boolean>(`favorite/${id}`);
-      return response.data;
-    } catch (e) {
-      if (e instanceof AxiosError) {
-        return thunkAPI.rejectWithValue(e.response!.data.message);
-      }
-      return e;
+export const checkIsFavorite = createAsyncThunk<
+  boolean,
+  string,
+  { rejectValue: RejectError }
+>("isFavorite", async (id: string, thunkAPI: any) => {
+  try {
+    const response = await instance.get<boolean>(`favorite/${id}`);
+    return response.data;
+  } catch (err) {
+    if (isAxiosError(err) && err.response) {
+      return thunkAPI.rejectWithValue(err.response!.data);
     }
+    return thunkAPI.rejectWithValue({ message: "Can not load the data" });
   }
-);
+});
 
 export const CheckIsFavoriteSlice = createSlice({
   name: "isFavorite",
   initialState,
   reducers: {
-    setIsFavorite: (state, action: PayloadAction<boolean>) => {
-      state.isFavorite = action.payload;
+    setIsFavorite: (state, action: PayloadAction<{ isFavorite: boolean }>) => {
+      state.isFavorite = action.payload.isFavorite;
     },
   },
-  extraReducers: {
-    [checkIsFavorite.fulfilled.type]: (
-      state,
-      action: PayloadAction<boolean>
-    ) => {
-      state.isFavorite = action.payload;
-      state.isFavoriteLoading = false;
-      state.error = "";
-    },
-    [checkIsFavorite.pending.type]: (state) => {
-      state.isFavoriteLoading = true;
-    },
-    [checkIsFavorite.rejected.type]: (state, action: PayloadAction<string>) => {
-      state.isFavoriteLoading = false;
-      state.error = action.payload;
-    },
+  extraReducers: (builder) => {
+    builder
+      .addCase(checkIsFavorite.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(checkIsFavorite.fulfilled, (state, action) => {
+        state.isFavorite = action.payload;
+        state.status = "success";
+      })
+      .addCase(checkIsFavorite.rejected, (state) => {
+        state.status = "error";
+      });
   },
 });
 
-export const { setIsFavorite } = CheckIsFavoriteSlice.actions;
-
-export default CheckIsFavoriteSlice.reducer;
+export const {
+  reducer: checkIsFavoriteReducer,
+  actions: checkIsFavoriteActions,
+} = CheckIsFavoriteSlice;

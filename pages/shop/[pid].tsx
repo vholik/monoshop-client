@@ -1,5 +1,5 @@
 import Categories from "@components/Categories/Categories";
-import Header from "@components/Header";
+import Header from "@components/Header/Header";
 import { getItemById } from "@store/reducers/item/GetItemByIdSlice";
 import styled from "styled-components";
 import Image from "next/image";
@@ -8,14 +8,18 @@ import filledHeart from "@public/images/filled-heart.svg";
 import Footer from "@components/Footer/Footer";
 import Link from "next/link";
 import ArrowRight from "@public/images/arrow-right.svg";
-import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
+import {
+  useActionCreators,
+  useAppDispatch,
+  useAppSelector,
+} from "@store/hooks/redux";
 import { CSSProperties, Fragment, useEffect, useState } from "react";
 import Router, { useRouter } from "next/router";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import {
   checkIsFavorite,
-  setIsFavorite,
+  checkIsFavoriteActions,
 } from "@store/reducers/favorite/CheckIsFavoriteSlice";
 import { toggleFavorite } from "@store/reducers/favorite/ToggleFavoriteSlice";
 import {
@@ -24,11 +28,11 @@ import {
   setGender,
   setSubcategory,
 } from "@store/reducers/filter/FilterSlice";
-import { getCategories } from "@store/reducers/item/GetCategoriesSlice";
-import { getSubcategories } from "@store/reducers/item/GetSubcategoriesSlice";
+import { getCategories } from "@store/reducers/category/GetCategoriesSlice";
+import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
 import { Gender } from "@store/types/gender.enum";
 import { FlexPage } from "@utils/FlexStyle";
-import { addToCart } from "@store/reducers/item/CartSlice";
+import { addToCart } from "@store/reducers/cart/CartSlice";
 
 const arrowStyles: CSSProperties = {
   position: "absolute",
@@ -44,9 +48,15 @@ const ShopItem = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { pid } = router.query;
-  const { isAuth, userId } = useAppSelector((state) => state.loginReducer);
-  const { isFavoriteLoading, isFavorite } = useAppSelector(
-    (state) => state.checkIsFavoriteReducer
+
+  const authStatus = useAppSelector((state) => state.authReducer.status);
+  const userId = useAppSelector((state) => state.authReducer.userId);
+
+  const favoriteStatus = useAppSelector(
+    (state) => state.checkIsFavoriteReducer.status
+  );
+  const isFavorite = useAppSelector(
+    (state) => state.checkIsFavoriteReducer.isFavorite
   );
   const { isFavoriteToggleLoading } = useAppSelector(
     (state) => state.toggleFavoriteReducer
@@ -59,7 +69,6 @@ const ShopItem = () => {
 
   useEffect(() => {
     if (router.isReady) {
-      console.log("get Item");
       dispatch(getItemById(pid as string))
         .unwrap()
         .then((res) => {
@@ -75,7 +84,7 @@ const ShopItem = () => {
           });
           setImages(mappedImages);
           // Check favorite
-          if (isAuth) {
+          if (authStatus !== "authenticated") {
             dispatch(checkIsFavorite(pid as string))
               .unwrap()
               .catch((error: Error) => {
@@ -87,26 +96,26 @@ const ShopItem = () => {
           console.error("rejected", error);
         });
     }
-  }, [router.isReady]);
+  }, [router.query.pid]);
 
   if (error) {
     Router.push("/404");
   }
 
   const favoriteHandler = () => {
-    if (!isAuth) {
+    if (authStatus !== "authenticated") {
       return Router.push("/login");
     }
 
     if (
       typeof pid === "string" &&
       !isFavoriteToggleLoading &&
-      !isFavoriteLoading
+      favoriteStatus !== "loading"
     ) {
       dispatch(toggleFavorite(Number(pid)))
         .unwrap()
         .then((isFavorite) => {
-          dispatch(setIsFavorite(isFavorite)), console.log(isFavorite);
+          dispatch(checkIsFavoriteActions.setIsFavorite({ isFavorite }));
         })
         .catch((error: Error) => {
           console.error("rejected", error);
@@ -153,14 +162,38 @@ const ShopItem = () => {
   };
 
   const buyHandler = () => {
-    if (item) {
-      dispatch(addToCart(item));
-      Router.push("/pay");
+    if (authStatus !== "authenticated") {
+      Router.push({
+        pathname: "/login",
+        query: {
+          redirect: `/shop/${item?.id}`,
+        },
+      });
+    } else {
+      if (item) {
+        dispatch(addToCart(item));
+        Router.push("/pay");
+      }
     }
   };
 
   const sendMessage = () => {
-    Router.push(`/chat/?send=${item?.user.id}&item=${item?.id}`);
+    if (authStatus !== "authenticated") {
+      Router.push({
+        pathname: "/login",
+        query: {
+          redirect: `/shop/${item?.id}`,
+        },
+      });
+    } else {
+      Router.push({
+        pathname: "/chat",
+        query: {
+          send: item?.user.id,
+          item: item?.id,
+        },
+      });
+    }
   };
 
   const handleLinkClink = (pid: number) => {
@@ -174,7 +207,7 @@ const ShopItem = () => {
         <Categories />
 
         <div className="container">
-          {!isLoading && (
+          {!isLoading && item && (
             <div className="url">
               <Link href={"/"}>
                 <p className="url-item">Main page</p>
@@ -207,7 +240,7 @@ const ShopItem = () => {
             </div>
           )}
 
-          {isLoading ? (
+          {isLoading || !item ? (
             <LoadingItemStyles>
               <div className="wrapper">
                 <div className="left">
@@ -350,7 +383,9 @@ const ShopItem = () => {
                 <div className="hero-wrapper">
                   <div className="item-hero">
                     <h2 className="item-name">{item?.name}</h2>
-                    {!isLoading && !isFavoriteLoading && !isFavorite ? (
+                    {!isLoading &&
+                    favoriteStatus !== "loading" &&
+                    !isFavorite ? (
                       <Image
                         src={unfilledHeart}
                         alt="Add to favorites"

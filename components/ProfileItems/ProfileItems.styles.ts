@@ -5,6 +5,7 @@ export const ProfileItemsStyles = styled.div`
   grid-template-columns: repeat(4, 1fr);
   grid-gap: 0.5vw;
   grid-row-gap: 2vw;
+
   .item {
     aspect-ratio: 1/1;
 

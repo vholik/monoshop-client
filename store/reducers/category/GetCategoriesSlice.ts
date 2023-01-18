@@ -3,17 +3,15 @@ import instance from "@utils/axios";
 import { Axios, AxiosError, isAxiosError } from "axios";
 import { ItemEntityWithId } from "@store/types/item-entity";
 import { Gender } from "@store/types/gender.enum";
-import { ReduxError } from "@store/types/error";
+import { RejectError } from "@store/types/error";
 
 interface CategoriesState {
-  isCategoriesLoading: boolean;
-  categoriesError: string;
+  status: "init" | "loading" | "error" | "success";
   categories: ItemEntityWithId[];
 }
 
 const initialState: CategoriesState = {
-  isCategoriesLoading: false,
-  categoriesError: "",
+  status: "init",
   categories: [],
 };
 
@@ -21,7 +19,7 @@ export const getCategories = createAsyncThunk<
   ItemEntityWithId[],
   Gender,
   {
-    rejectValue: ReduxError;
+    rejectValue: RejectError;
   }
 >("category", async (gender, thunkAPI) => {
   try {
@@ -33,9 +31,9 @@ export const getCategories = createAsyncThunk<
     return response.data;
   } catch (err) {
     if (isAxiosError(err) && err.response) {
-      return thunkAPI.rejectWithValue(err.response!.data.message);
+      return thunkAPI.rejectWithValue(err.response.data);
     }
-    return thunkAPI.rejectWithValue({ message: "Can not loading the data" });
+    return thunkAPI.rejectWithValue({ message: "Can not load the data" });
   }
 });
 
@@ -43,22 +41,18 @@ export const GetCategoriesSlice = createSlice({
   name: "category",
   initialState,
   reducers: {},
-  extraReducers: {
-    [getCategories.fulfilled.type]: (
-      state,
-      action: PayloadAction<ItemEntityWithId[]>
-    ) => {
-      state.categories = action.payload;
-      state.isCategoriesLoading = false;
-      state.categoriesError = "";
-    },
-    [getCategories.pending.type]: (state) => {
-      state.isCategoriesLoading = true;
-    },
-    [getCategories.rejected.type]: (state, action: PayloadAction<string>) => {
-      state.isCategoriesLoading = false;
-      state.categoriesError = action.payload;
-    },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getCategories.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getCategories.fulfilled, (state, action) => {
+        state.categories = action.payload;
+        state.status = "success";
+      })
+      .addCase(getCategories.rejected, (state) => {
+        state.status = "error";
+      });
   },
 });
 

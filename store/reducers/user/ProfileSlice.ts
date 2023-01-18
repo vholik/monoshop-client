@@ -1,18 +1,16 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
-import { AxiosError } from "axios";
+import { AxiosError, isAxiosError } from "axios";
 
 import { User } from "@store/types/user";
 
 interface UserState {
-  isLoading: boolean;
-  error: string;
+  status: "init" | "loading" | "error" | "success";
   user: User | null;
 }
 
 const initialState: UserState = {
-  isLoading: false,
-  error: "",
+  status: "init",
   user: null,
 };
 
@@ -23,10 +21,10 @@ export const getProfile = createAsyncThunk<User>(
       const response = await instance.get<User>(`user/profile`);
       return response.data;
     } catch (e) {
-      if (e instanceof AxiosError) {
-        return thunkAPI.rejectWithValue(e.response!.data.message);
+      if (isAxiosError(e) && e.response) {
+        return thunkAPI.rejectWithValue(e.response.data);
       }
-      return e;
+      return thunkAPI.rejectWithValue({ message: "Can not load profile" });
     }
   }
 );
@@ -35,19 +33,18 @@ export const ProfileSlice = createSlice({
   name: "profile",
   initialState,
   reducers: {},
-  extraReducers: {
-    [getProfile.fulfilled.type]: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
-      state.isLoading = false;
-      state.error = "";
-    },
-    [getProfile.pending.type]: (state) => {
-      state.isLoading = true;
-    },
-    [getProfile.rejected.type]: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getProfile.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.status = "success";
+      })
+      .addCase(getProfile.rejected, (state) => {
+        state.status = "error";
+      });
   },
 });
 

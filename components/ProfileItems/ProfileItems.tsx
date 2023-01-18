@@ -41,7 +41,14 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
     if (deleteId) {
       dispatch(deleteItemById(deleteId))
         .unwrap()
-        .then(() => Router.push("/success-update"))
+        .then(() =>
+          Router.push({
+            pathname: "/success",
+            query: {
+              message: "Successfully deleted your item",
+            },
+          })
+        )
         .catch((err) => {
           console.log("rejected", err), Router.push("/404");
         });
@@ -55,6 +62,7 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
   function closeModal() {
     setIsOpen(false);
   }
+
   return (
     <ProfileItemsStyles>
       <Modal

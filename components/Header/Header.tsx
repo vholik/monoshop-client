@@ -6,7 +6,7 @@ import UnfilledHeart from "@public/images/unfilled-heart.svg";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { ChangeEvent, useEffect, useState } from "react";
-import { checkIsAuth } from "@store/reducers/auth/LoginSlice";
+import { checkIsAuth } from "@store/reducers/auth/AuthSlice";
 import ChatIcon from "@public/images/chat.svg";
 import UserIcon from "@public/images/user.svg";
 import Cross from "@public/images/cross.svg";
@@ -18,7 +18,7 @@ import Router from "next/router";
 
 export default function Header() {
   const dispatch = useAppDispatch();
-  const { isAuth } = useAppSelector((state) => state.loginReducer);
+  const status = useAppSelector((state) => state.authReducer.status);
   const filter = useAppSelector((state) => state.filterReducer);
   const { isItemsLoading } = useAppSelector((state) => state.getItemsReducer);
 
@@ -100,7 +100,7 @@ export default function Header() {
           </div>
         )}
       </div>
-      {isAuth ? (
+      {status === "authenticated" ? (
         <div className="right">
           <Link href={"/favorites"}>
             <Image

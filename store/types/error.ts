@@ -1,3 +1,3 @@
-export type ReduxError = {
+export type RejectError = {
   message: string;
 };

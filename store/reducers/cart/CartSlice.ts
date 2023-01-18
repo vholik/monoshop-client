@@ -1,15 +1,11 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Item } from "@store/types/item";
 
-interface ItemsState {
-  isLoading: boolean;
-  error: string;
+interface CartState {
   item: Item | null;
 }
 
-const initialState: ItemsState = {
-  isLoading: false,
-  error: "",
+const initialState: CartState = {
   item: null,
 };
 

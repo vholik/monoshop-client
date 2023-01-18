@@ -1,53 +1,52 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance, { API_URL } from "@utils/axios";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, isAxiosError } from "axios";
 
 import { User } from "@store/types/user";
+import { RejectError } from "@store/types/error";
 
 interface UserState {
-  isLoading: boolean;
-  error: string;
+  status: "init" | "loading" | "error" | "success";
   user: User | null;
 }
 
 const initialState: UserState = {
-  isLoading: false,
-  error: "",
+  status: "init",
   user: null,
 };
 
-export const getUserById = createAsyncThunk<User, string>(
-  "user",
-  async (id: string, thunkAPI: any) => {
-    try {
-      const response = await axios.get<User>(`${API_URL}/user/${id}`);
-      return response.data;
-    } catch (e) {
-      if (e instanceof AxiosError) {
-        return thunkAPI.rejectWithValue(e.response!.data.message);
-      }
-      return e;
+export const getUserById = createAsyncThunk<
+  User,
+  string,
+  { rejectValue: RejectError }
+>("user/id", async (id, thunkAPI) => {
+  try {
+    const response = await axios.get<User>(`${API_URL}/user/${id}`);
+    return response.data;
+  } catch (e) {
+    if (isAxiosError(e) && e.response) {
+      return thunkAPI.rejectWithValue(e.response.data);
     }
+    return thunkAPI.rejectWithValue({ message: "Can not load the user" });
   }
-);
+});
 
 export const GetUserByIdSlice = createSlice({
-  name: "user",
+  name: "user/id",
   initialState,
   reducers: {},
-  extraReducers: {
-    [getUserById.fulfilled.type]: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
-      state.isLoading = false;
-      state.error = "";
-    },
-    [getUserById.pending.type]: (state) => {
-      state.isLoading = true;
-    },
-    [getUserById.rejected.type]: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getUserById.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getUserById.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.status = "success";
+      })
+      .addCase(getUserById.rejected, (state) => {
+        state.status = "error";
+      });
   },
 });
 

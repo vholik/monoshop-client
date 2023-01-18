@@ -1,40 +1,41 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
-import { AxiosError } from "axios";
+import { AxiosError, isAxiosError } from "axios";
 import { Gender } from "@store/types/gender.enum";
 import { Item } from "@store/types/item";
 import { IFileringData, IFilter } from "@store/types/filter";
+import { RejectError } from "@store/types/error";
+import { ParsedUrlQuery } from "querystring";
 
 interface ItemsState {
-  isItemsLoading: boolean;
+  status: "init" | "loading" | "error" | "success";
   total: number;
-  itemsError: string;
   items: Item[];
 }
 
 const initialState: ItemsState = {
-  isItemsLoading: false,
+  status: "init",
   total: 1,
-  itemsError: "",
   items: [],
 };
 
-export const getItems = createAsyncThunk<IFileringData[], IFilter>(
-  "items",
-  async (filter: IFilter, thunkAPI: any) => {
-    try {
-      const response = await instance.get<IFileringData[]>("item", {
-        params: filter,
-      });
-      return response.data;
-    } catch (e) {
-      if (e instanceof AxiosError) {
-        return thunkAPI.rejectWithValue(e.response!.data.message);
-      }
-      return e;
+export const getItems = createAsyncThunk<
+  IFileringData,
+  IFilter,
+  { rejectValue: RejectError }
+>("items", async (filter: IFilter, thunkAPI) => {
+  try {
+    const response = await instance.get<IFileringData>("item", {
+      params: filter,
+    });
+    return response.data;
+  } catch (err) {
+    if (isAxiosError(err) && err.response) {
+      return thunkAPI.rejectWithValue(err.response.data);
     }
+    return thunkAPI.rejectWithValue({ message: "Can not load the data" });
   }
-);
+});
 
 export const GetItemsSlice = createSlice({
   name: "items",
@@ -56,23 +57,19 @@ export const GetItemsSlice = createSlice({
       });
     },
   },
-  extraReducers: {
-    [getItems.fulfilled.type]: (
-      state,
-      action: PayloadAction<IFileringData>
-    ) => {
-      state.items = action.payload.data;
-      state.total = action.payload.meta.total;
-      state.isItemsLoading = false;
-      state.itemsError = "";
-    },
-    [getItems.pending.type]: (state) => {
-      state.isItemsLoading = true;
-    },
-    [getItems.rejected.type]: (state, action: PayloadAction<string>) => {
-      state.isItemsLoading = false;
-      state.itemsError = action.payload;
-    },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getItems.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getItems.fulfilled, (state, action) => {
+        state.items = action.payload.data;
+        state.total = action.payload.meta.total;
+        state.status = "success";
+      })
+      .addCase(getItems.rejected, (state) => {
+        state.status = "error";
+      });
   },
 });
 

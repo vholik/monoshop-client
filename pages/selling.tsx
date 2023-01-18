@@ -2,25 +2,32 @@ import Categories from "@components/Categories/Categories";
 import Header from "@components/Header/Header";
 import { useEffect } from "react";
 import styled from "styled-components";
-import ProfileSettings from "@components/ProfileSettings/ProfileSettings";
-import { getProfile } from "@store/reducers/user/ProfileSlice";
+import ProfileItems from "@components/ProfileItems/ProfileItems";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
-import Loading from "@components/Loading/Loading";
 import Link from "next/link";
+import { getUserItems } from "@store/reducers/item/GetUserItemsSlice";
+import Loading from "@components/Loading/Loading";
 import Footer from "@components/Footer/Footer";
 import { FlexPage } from "@utils/FlexStyle";
+import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
 
 const MyProfile = () => {
   const dispatch = useAppDispatch();
 
-  const status = useAppSelector((state) => state.profileReducer.status);
-  const user = useAppSelector((state) => state.profileReducer.user);
+  const items = useAppSelector((state) => state.getUserItemsReducer.items);
+  const itemsStatus = useAppSelector(
+    (state) => state.getUserItemsReducer.status
+  );
+
+  const deleteStatus = useAppSelector(
+    (state) => state.deleteItemReducer.status
+  );
 
   useEffect(() => {
-    dispatch(getProfile())
+    dispatch(getUserItems())
       .unwrap()
       .catch((error) => {
-        console.error("rejected", error);
+        showErrorToast("Error displaying user items");
       });
   }, []);
 
@@ -31,16 +38,16 @@ const MyProfile = () => {
         <Categories />
         <div className="inner">
           <div className="settings">
-            <h1 className="profile-title">Settings</h1>
+            <h2 className="profile-title">Selling items</h2>
             <div className="settings-list">
               <Link href={"/settings"}>
-                <p className="settings-list__item active">Settings</p>
+                <p className="settings-list__item">Settings</p>
               </Link>
               <Link href={"/ordered"}>
                 <p className="settings-list__item">Ordered</p>
               </Link>
               <Link href={"/selling"}>
-                <p className="settings-list__item">Selling</p>
+                <p className="settings-list__item active">Selling</p>
               </Link>
               <Link href={"/favorites"}>
                 <p className="settings-list__item">Favorites</p>
@@ -48,13 +55,13 @@ const MyProfile = () => {
             </div>
           </div>
           <div className="wrapper">
-            <div className="container">
-              {status === "loading" ? (
-                <Loading />
-              ) : (
-                <ProfileSettings user={user} />
-              )}
-            </div>
+            {itemsStatus === "loading" || deleteStatus === "loading" ? (
+              <Loading />
+            ) : (
+              <div className="container">
+                <ProfileItems items={items} />
+              </div>
+            )}
           </div>
         </div>
       </MyProfileStyles>

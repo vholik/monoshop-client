@@ -1,13 +1,12 @@
-import Header from "@components/Header";
+import Header from "@components/Header/Header";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
-import { fetchLogin } from "@store/reducers/auth/LoginSlice";
 import { ILoginFormData } from "@store/types/auth";
 import Head from "next/head";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
 import styled from "styled-components";
 import { useCookies } from "react-cookie";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import instance, { AuthResponse } from "@utils/axios";
 import {
   CredentialResponse,
@@ -15,10 +14,18 @@ import {
   GoogleOAuthProvider,
 } from "@react-oauth/google";
 import { hasGrantedAllScopesGoogle } from "@react-oauth/google";
+import { useEffect, useState } from "react";
+import { loginUser } from "@store/reducers/auth/AuthSlice";
 
 export default function Login() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
-  const { error } = useAppSelector((state) => state.loginReducer);
+
+  const [googleError, setGoogleError] = useState("");
+
+  const status = useAppSelector((state) => state.authReducer.status);
+  const error = useAppSelector((state) => state.authReducer.error);
+
   const {
     register,
     handleSubmit,
@@ -26,21 +33,27 @@ export default function Login() {
   } = useForm<ILoginFormData>({ mode: "onBlur" });
 
   const onSubmit: SubmitHandler<ILoginFormData> = (data) => {
-    dispatch(fetchLogin(data))
+    dispatch(loginUser(data))
       .unwrap()
       .then((res) => {
         localStorage.setItem("access_token", res.accessToken);
         localStorage.setItem("refresh_token", res.refreshToken);
 
-        Router.push("/");
+        // Return to redirect query value
+        const redirect = router.query.redirect as string;
+        if (redirect) {
+          router.push(redirect);
+        } else {
+          router.push("/");
+        }
       })
       .catch((error) => {
         console.error("rejected", error);
       });
   };
 
+  // Google handler
   const successHandler = async (response: CredentialResponse) => {
-    console.log(response);
     await instance
       .post<AuthResponse>("google-authentication", {
         token: response.credential,
@@ -52,6 +65,10 @@ export default function Login() {
         Router.push("/");
       })
       .catch((err) => Router.push("/404"));
+  };
+
+  const googleErrorHandler = () => {
+    setGoogleError("Error google login");
   };
 
   return (
@@ -102,6 +119,8 @@ export default function Login() {
                 },
               })}
             />
+            {status === "error" && <div className="error">{error}</div>}
+            {googleError && <div className="error">{googleError}</div>}
           </label>
           <p className="account-action">
             Haven't created an account yet?{" "}
@@ -110,7 +129,6 @@ export default function Login() {
             </Link>
           </p>
           <button className="button">Login</button>
-          <div className="error">{error && error}</div>
 
           <GoogleOAuthProvider
             clientId={process.env.NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID!}
@@ -120,9 +138,7 @@ export default function Login() {
                 context="signin"
                 useOneTap
                 onSuccess={successHandler}
-                onError={() => {
-                  console.log("Login Failed");
-                }}
+                onError={googleErrorHandler}
               />
             </div>
           </GoogleOAuthProvider>
