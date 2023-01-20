@@ -18,10 +18,10 @@ li {
 
 :root {
   --font-default: "HelveticaNeueCyr", sans-serif;
-  --font-medium: "HelveticaNeueCyr", sans-serif;
-  --font-wide: "HelveticaNeueCyr", sans-serif;
-  --dark: #131313;
-  --dark-hover: #414141;
+  --font-wide: "Maison Neue", "HelveticaNeueCyr", sans-serif;
+  --dark: #0e0e0f;
+  --dark-hover: #000e0f;
+  --field-highlight: #625bf6;
   --loading: #ebebeb;
   --grey-60: rgba(40, 40, 40, 0.6);
   --grey-30: rgba(40, 40, 40, 0.3);
@@ -39,16 +39,15 @@ li {
   --font-xxxl: 2.8rem;
   --component-margin: 5rem;
   --gap: 2rem;
-  --primary: #7152f3;
+  --stroke: #e8e8e8;
+  --primary: #ff6243;
+  --primary-hover: #ff6243;
 }
 
 .no-items {
-  text-align: center;
   font-size: 1.1rem;
-  margin-top: 2rem;
   font-weight: 400;
-  width: 100%;
-  grid-column: 1/5;
+  width: max-content;
 }
 
 .no-items .bold {
@@ -84,13 +83,13 @@ h3 {
 }
 
 .title-sm {
-  font-family: var(--font-medium);
-  font-size: 1.5rem;
+  font-family: var(--font-wide);
+  font-size: 1.6rem;
   font-weight: 600;
 }
 
 .title-md {
-  font-family: var(--font-medium);
+  font-family: var(--font-wide);
   font-size: var(--font-xxxl);
   font-weight: 600;
 }
@@ -99,15 +98,12 @@ h3 {
   font-size: 1rem;
   font-family: var(--font-default);
   cursor: pointer;
-  text-transform: uppercase;
+  color: var(--field-highlight);
+  font-weight: 500;
 }
 
 .uppercase {
   text-transform: uppercase;
-}
-
-.see-all-button:hover {
-  text-decoration: underline;
 }
 
 .input {
@@ -119,6 +115,7 @@ h3 {
   font-size: 1rem;
   font-family: var(--font-default);
   color: var(--dark);
+  border-radius: 4px;
 }
 
 .input::placeholder {
@@ -134,13 +131,12 @@ h3 {
   cursor: pointer;
   font-family: var(--font-medium);
   color: var(--white);
-  background-color: var(--dark);
-  text-transform: uppercase;
+  background-color: var(--primary);
   font-weight: 500;
   border: none;
   min-width: max-content;
   font-size: 1rem;
-  padding: 0.9em 4em;
+  padding: 0.8em 2em;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -158,7 +154,7 @@ h3 {
 }
 
 .button:hover {
-  background-color: var(--dark-hover);
+  background-color: var(--primary);
 }
 
 a {
@@ -191,7 +187,7 @@ a {
   background-color: #ebebeb;
 }
 
-.loading-background {
+.skeleton-animation {
   animation-duration: 3s;
   animation-fill-mode: forwards;
   animation-iteration-count: infinite;
@@ -203,7 +199,7 @@ a {
   backface-visibility: hidden;
 }
 
-.loading-background img {
+.skeleton-animation img {
   display: none;
 }
 

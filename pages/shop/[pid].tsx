@@ -22,17 +22,13 @@ import {
   checkIsFavoriteActions,
 } from "@store/reducers/favorite/CheckIsFavoriteSlice";
 import { toggleFavorite } from "@store/reducers/favorite/ToggleFavoriteSlice";
-import {
-  resetFilter,
-  setCategory,
-  setGender,
-  setSubcategory,
-} from "@store/reducers/filter/FilterSlice";
 import { getCategories } from "@store/reducers/category/GetCategoriesSlice";
 import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
 import { Gender } from "@store/types/gender.enum";
 import { FlexPage } from "@utils/FlexStyle";
 import { addToCart } from "@store/reducers/cart/CartSlice";
+import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
+import { filterActions } from "@store/reducers/filter/FilterSlice";
 
 const arrowStyles: CSSProperties = {
   position: "absolute",
@@ -51,19 +47,20 @@ const ShopItem = () => {
 
   const authStatus = useAppSelector((state) => state.authReducer.status);
   const userId = useAppSelector((state) => state.authReducer.userId);
-
-  const favoriteStatus = useAppSelector(
+  const isFavoriteStasus = useAppSelector(
     (state) => state.checkIsFavoriteReducer.status
   );
   const isFavorite = useAppSelector(
     (state) => state.checkIsFavoriteReducer.isFavorite
   );
-  const { isFavoriteToggleLoading } = useAppSelector(
-    (state) => state.toggleFavoriteReducer
+  const favoriteTogglerStatus = useAppSelector(
+    (state) => state.toggleFavoriteReducer.status
   );
-  const { item, isLoading, error } = useAppSelector(
-    (state) => state.getItemByIdReducer
-  );
+
+  console.log(isFavorite);
+
+  const item = useAppSelector((state) => state.getItemByIdReducer.item);
+  const itemStatus = useAppSelector((state) => state.getItemByIdReducer.status);
 
   const [images, setImages] = useState<{ image: string }[]>([]);
 
@@ -84,7 +81,7 @@ const ShopItem = () => {
           });
           setImages(mappedImages);
           // Check favorite
-          if (authStatus !== "authenticated") {
+          if (authStatus === "authenticated") {
             dispatch(checkIsFavorite(pid as string))
               .unwrap()
               .catch((error: Error) => {
@@ -93,14 +90,11 @@ const ShopItem = () => {
           }
         })
         .catch((error: Error) => {
+          showErrorToast("Can not load data");
           console.error("rejected", error);
         });
     }
   }, [router.query.pid]);
-
-  if (error) {
-    Router.push("/404");
-  }
 
   const favoriteHandler = () => {
     if (authStatus !== "authenticated") {
@@ -109,8 +103,8 @@ const ShopItem = () => {
 
     if (
       typeof pid === "string" &&
-      !isFavoriteToggleLoading &&
-      favoriteStatus !== "loading"
+      favoriteTogglerStatus !== "loading" &&
+      isFavoriteStasus !== "loading"
     ) {
       dispatch(toggleFavorite(Number(pid)))
         .unwrap()
@@ -124,18 +118,29 @@ const ShopItem = () => {
   };
   const genderRedirect = () => {
     if (item?.gender) {
-      dispatch(resetFilter());
-      dispatch(setGender(item?.gender));
+      dispatch(filterActions.resetFilter());
+      dispatch(
+        filterActions.setGender({ value: item.gender, label: item.gender })
+      );
       dispatch(getCategories(item?.gender)).catch((err) => console.log(err));
     }
 
     Router.push("/shop");
   };
+
   const categoryRedirect = () => {
     if (item?.gender && item.id) {
-      dispatch(resetFilter());
-      dispatch(setGender(item?.gender));
-      dispatch(setCategory(item.category.id));
+      dispatch(filterActions.resetFilter());
+      dispatch(
+        filterActions.setGender({ value: item.gender, label: item.gender })
+      );
+      dispatch(
+        filterActions.setCategory({
+          label: item.category.value,
+          value: item.category.value,
+          id: item.category.id,
+        })
+      );
 
       dispatch(getCategories(item?.gender)).catch((err) => console.log(err));
       dispatch(getSubcategories(item.category.id)).catch((err) =>
@@ -145,12 +150,27 @@ const ShopItem = () => {
 
     Router.push("/shop");
   };
+
   const subcategoryRedirect = () => {
     if (item?.gender && item.id) {
-      dispatch(resetFilter());
-      dispatch(setGender(item?.gender));
-      dispatch(setCategory(item.category.id));
-      dispatch(setSubcategory([item.subcategory.id]));
+      dispatch(filterActions.resetFilter());
+      dispatch(
+        filterActions.setGender({ value: item.gender, label: item.gender })
+      );
+      dispatch(
+        filterActions.setCategory({
+          label: item.category.value,
+          value: item.category.value,
+          id: item.category.id,
+        })
+      );
+      dispatch(
+        filterActions.setCategory({
+          label: item.subcategory.value,
+          value: item.subcategory.value,
+          id: item.subcategory.id,
+        })
+      );
 
       dispatch(getCategories(item?.gender)).catch((err) => console.log(err));
       dispatch(getSubcategories(item.category.id)).catch((err) =>
@@ -207,7 +227,7 @@ const ShopItem = () => {
         <Categories />
 
         <div className="container">
-          {!isLoading && item && (
+          {itemStatus === "success" && (
             <div className="url">
               <Link href={"/"}>
                 <p className="url-item">Main page</p>
@@ -240,11 +260,11 @@ const ShopItem = () => {
             </div>
           )}
 
-          {isLoading || !item ? (
+          {itemStatus === "loading" || itemStatus === "init" ? (
             <LoadingItemStyles>
               <div className="wrapper">
                 <div className="left">
-                  <div className="photo loading-background"></div>
+                  <div className="photo skeleton-animation"></div>
                 </div>
                 <div className="right">
                   {item?.user && (
@@ -383,17 +403,15 @@ const ShopItem = () => {
                 <div className="hero-wrapper">
                   <div className="item-hero">
                     <h2 className="item-name">{item?.name}</h2>
-                    {!isLoading &&
-                    favoriteStatus !== "loading" &&
-                    !isFavorite ? (
+                    {isFavorite ? (
                       <Image
-                        src={unfilledHeart}
+                        src={filledHeart}
                         alt="Add to favorites"
                         onClick={favoriteHandler}
                       />
                     ) : (
                       <Image
-                        src={filledHeart}
+                        src={unfilledHeart}
                         alt="Remove from favorites"
                         onClick={favoriteHandler}
                       />
@@ -494,9 +512,9 @@ const ShopItem = () => {
           {item?.userItems.length && (
             <Fragment>
               <div className="user-items-head">
-                <h2 className="title">Also from this user</h2>
+                <h2 className="title-sm">Also from this user</h2>
                 <Link href={`/user/${item.user.id}`}>
-                  <p className="user-items-link">See all items</p>
+                  <p className="see-all-button">See all items</p>
                 </Link>
               </div>
               <div className="user-items-wrapper">
@@ -722,7 +740,7 @@ const ShopItemStyles = styled.div`
 
       .item-name {
         font-size: 1.5rem;
-        /* text-transform: uppercase; */
+        font-family: var(--font-wide);
         font-weight: 00;
       }
     }
@@ -730,7 +748,7 @@ const ShopItemStyles = styled.div`
     .item--button {
       margin-top: 1rem;
       width: 100%;
-      font-family: var(--font-medium);
+      font-family: var(--font-wide);
       font-size: 1.1rem;
       display: flex;
       justify-content: center;
@@ -739,10 +757,10 @@ const ShopItemStyles = styled.div`
     .message--button {
       color: var(--grey);
       background: transparent;
-      border: 1px solid var(--grey-30);
+      border: 1px solid var(--stroke);
 
       &:hover {
-        background-color: var(--grey-10);
+        background-color: var(--grey-5);
       }
     }
 

@@ -7,6 +7,7 @@ export const ProfileSettingsStyles = styled.div`
 
   .submit--buton {
     margin-top: 1rem;
+    background-color: var(--dark);
   }
 
   .input {
@@ -19,7 +20,6 @@ export const ProfileSettingsStyles = styled.div`
 
   .photo {
     position: relative;
-    cursor: pointer;
     margin-top: 0.5rem;
     width: 150px;
     height: 150px;
@@ -38,6 +38,7 @@ export const ProfileSettingsStyles = styled.div`
     display: flex;
     align-items: center;
     gap: 1rem;
+    width: fit-content;
   }
 
   .photo {
@@ -49,7 +50,7 @@ export const ProfileSettingsStyles = styled.div`
     color: var(--dark);
     padding-right: 1em;
     padding-left: 1em;
-    border: 1px solid var(--grey-30);
+    border: 1px solid var(--stroke);
     input {
       display: none;
     }

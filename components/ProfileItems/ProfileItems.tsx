@@ -9,22 +9,9 @@ import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { deleteItemById } from "@store/reducers/item/DeleteItemSlice";
 import { getUserItems } from "@store/reducers/item/GetUserItemsSlice";
 import Router from "next/router";
+import { modalStyles } from "@components/CustomModal/CustomModal.styles";
 
 Modal.setAppElement("#__next");
-
-const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-  },
-  overlay: {
-    backgroundColor: "var(--grey-30)",
-  },
-};
 
 interface ProfileItemsProps {
   items: Item[];
@@ -68,7 +55,7 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
-        style={customStyles}
+        style={modalStyles}
         contentLabel="Example Modal"
       >
         <div className="modal-inner">

@@ -10,79 +10,31 @@ import Loading from "@components/Loading/Loading";
 import Footer from "@components/Footer/Footer";
 import { FlexPage } from "@utils/FlexStyle";
 import { getOrders } from "@store/reducers/order/getOrdersSlice";
+import Profile from "@components/Profile/Profile";
+import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
+import OrderedItems from "@components/OrderedItems/OrderedItems";
 
 const Ordered = () => {
   const dispatch = useAppDispatch();
   const status = useAppSelector((state) => state.getOrdersReducer.status);
-  const items = useAppSelector((state) => state.getOrdersReducer.items);
+  // const orders = useAppSelector((state) => state.getOrdersReducer.orders);
+  const orders: any = [];
 
   useEffect(() => {
     dispatch(getOrders())
       .unwrap()
       .then((res) => console.log(res))
-      .catch((err) => console.log("rejected", err));
+      .catch((err) => showErrorToast("Can not load your ordered items"));
   }, []);
 
-  console.log(items);
-
   return (
-    <FlexPage>
-      <OrderedStyles>
-        <Header />
-        <Categories />
-        <div className="container">
-          <div className="settings">
-            <h2 className="profile-title">Ordered clothing</h2>
-            <div className="settings-list">
-              <Link href={"/settings"}>
-                <p className="settings-list__item">Settings</p>
-              </Link>
-              <Link href={"/ordered"}>
-                <p className="settings-list__item active">Ordered</p>
-              </Link>
-              <Link href={"/selling"}>
-                <p className="settings-list__item">Selling</p>
-              </Link>
-              <Link href={"/favorites"}>
-                <p className="settings-list__item">Favorites</p>
-              </Link>
-            </div>
-          </div>
-        </div>
-        {status === "loading" ? (
-          <Loading />
-        ) : (
-          <div className="container">
-            <div className="items-inner">
-              {/* {!items.length && (
-                <h2 className="no-items">You haven't ordered anything.</h2>
-              )}
-
-              {items.map((item) => (
-                <div className="item" key={item.id}>
-                  <div className="item-image">
-                    <Link href={`shop/${item.id}`}>
-                      <Image
-                        src={item.images[0]}
-                        alt="Photo"
-                        fill
-                        objectFit="cover"
-                      />
-                    </Link>
-                  </div>
-                  <div className="bar">
-                    <div className="hero">
-                      <div className="item-price">{item.price} PLN</div>
-                    </div>
-                  </div>
-                </div>
-              ))} */}
-            </div>
-          </div>
-        )}
-      </OrderedStyles>
-      <Footer />
-    </FlexPage>
+    <Profile
+      isLoading={status === "loading" || status === "init"}
+      // isError={status === "error"}
+      isError={false}
+    >
+      <OrderedItems items={orders} />
+    </Profile>
   );
 };
 

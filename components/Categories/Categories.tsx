@@ -6,11 +6,7 @@ import { ItemEntityWithId } from "@store/types/item-entity";
 import React, { FC, useEffect, useState } from "react";
 import { CategoriesStyles } from "./Categories.styles";
 import Router from "next/router";
-import {
-  resetFilter,
-  setCategory,
-  setGender,
-} from "@store/reducers/filter/FilterSlice";
+import { filterActions } from "@store/reducers/filter/FilterSlice";
 import instance from "@utils/axios";
 import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
 import Link from "next/link";
@@ -49,9 +45,11 @@ const Categories: FC = () => {
   }, []);
 
   const categoryHandler = (id: number, gender: Gender) => {
-    dispatch(resetFilter());
-    dispatch(setGender(gender));
-    dispatch(setCategory(id));
+    dispatch(filterActions.resetFilter());
+    dispatch(
+      filterActions.setGender({ value: item.gender, label: item.gender })
+    );
+    dispatch(filterActions.setCategory(id));
 
     dispatch(getCategories(gender)).catch((err) => console.log(err));
     dispatch(getSubcategories(id)).catch((err) => console.log(err));

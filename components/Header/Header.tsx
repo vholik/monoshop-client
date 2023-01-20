@@ -10,17 +10,14 @@ import { checkIsAuth } from "@store/reducers/auth/AuthSlice";
 import ChatIcon from "@public/images/chat.svg";
 import UserIcon from "@public/images/user.svg";
 import Cross from "@public/images/cross.svg";
-import {
-  resetFilter,
-  setSearchValue,
-} from "@store/reducers/filter/FilterSlice";
+import { filterActions } from "@store/reducers/filter/FilterSlice";
 import Router from "next/router";
 
 export default function Header() {
   const dispatch = useAppDispatch();
-  const status = useAppSelector((state) => state.authReducer.status);
+  const authStatus = useAppSelector((state) => state.authReducer.status);
   const filter = useAppSelector((state) => state.filterReducer);
-  const { isItemsLoading } = useAppSelector((state) => state.getItemsReducer);
+  const itemStatus = useAppSelector((state) => state.getItemsReducer.status);
 
   const [value, setValue] = useState("");
 
@@ -39,25 +36,24 @@ export default function Header() {
 
   const clearSearch = () => {
     setValue("");
-    dispatch(setSearchValue(""));
+    dispatch(filterActions.setSearchValue(""));
   };
 
   const inputHandler = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
 
     if (!e.target.value) {
-      dispatch(setSearchValue(""));
+      dispatch(filterActions.setSearchValue(""));
     }
   };
 
   const searchSubmit = () => {
     if (value.length > 50) return;
-    if (isItemsLoading) return;
 
     if (value === filter.search) return;
 
-    dispatch(resetFilter());
-    dispatch(setSearchValue(value));
+    dispatch(filterActions.resetFilter());
+    dispatch(filterActions.setSearchValue(value));
 
     Router.push("/shop");
   };
@@ -65,7 +61,13 @@ export default function Header() {
   return (
     <HeaderStyles>
       <Link href={"/"}>
-        <Image src={Logo} height={25} alt="Logo" className="logo" />
+        <Image
+          src={Logo}
+          alt="Logo"
+          className="logo"
+          draggable={false}
+          height={30}
+        />
       </Link>
 
       <div className="input-wrapper">
@@ -100,7 +102,7 @@ export default function Header() {
           </div>
         )}
       </div>
-      {status === "authenticated" ? (
+      {authStatus === "authenticated" ? (
         <div className="right">
           <Link href={"/favorites"}>
             <Image

@@ -5,7 +5,7 @@ export const filterColourStyles = {
   menuList: (styles: any) => ({
     ...styles,
     background: "var(--white)",
-    borderRadius: 0,
+    borderRadius: "4px",
     minWidth: "fit-content",
   }),
   dropdownIndicator: (base: any) => ({
@@ -17,12 +17,13 @@ export const filterColourStyles = {
     background: isFocused ? "#f6f6f6" : isSelected ? "#f6f6f6" : undefined,
     color: isSelected ? "var(--grey-60)" : "var(--dark) !important",
     zIndex: 1,
-    borderRadius: 0,
+    borderRadius: "4px",
+    borderBottom: "1px solid black",
   }),
   menu: (base: any) => ({
     ...base,
     zIndex: 100,
-    borderRadius: 0,
+    borderRadius: "4px",
     border: "1px solid var(--grey-10)",
     boxShadow: "none",
   }),
@@ -32,7 +33,7 @@ export const filterColourStyles = {
     color: "var(--dark)",
     background: "transparent",
     border: "0",
-    borderRadius: 0,
+    borderRadius: "4px",
     cursor: isDisabled ? "not-allowed !important" : "default",
     fontWeight: isSelected ? "700" : "400",
   }),
@@ -62,7 +63,7 @@ export const multiplefilterColourStyles = {
   menuList: (styles: any) => ({
     ...styles,
     background: "var(--white)",
-    borderRadius: 0,
+    borderRadius: "4px",
     minWidth: "fit-content",
   }),
   dropdownIndicator: (base: any) => ({
@@ -74,12 +75,12 @@ export const multiplefilterColourStyles = {
     background: isFocused ? "#f6f6f6" : isSelected ? "#f6f6f6" : undefined,
     color: isSelected ? "var(--grey-60)" : "var(--dark) !important",
     zIndex: 1,
-    borderRadius: 0,
+    borderRadius: "4px",
   }),
   menu: (base: any) => ({
     ...base,
     zIndex: 100,
-    borderRadius: 0,
+    borderRadius: "4px",
     border: "1px solid var(--grey-10)",
     boxShadow: "none",
   }),
@@ -89,7 +90,7 @@ export const multiplefilterColourStyles = {
     color: "var(--dark)",
     background: "transparent",
     border: "0",
-    borderRadius: 0,
+    borderRadius: "4px",
     cursor: isDisabled ? "not-allowed !important" : "default",
   }),
   valueContainer: (provided: any) => ({
@@ -99,6 +100,7 @@ export const multiplefilterColourStyles = {
     margin: "0",
     background: "transparent",
     fontWeight: "700",
+    borderRadius: "4px",
   }),
   indicatorSeparator: () => ({}),
   input: (provided: any, { isSelected }: any) => ({
@@ -106,6 +108,7 @@ export const multiplefilterColourStyles = {
     margin: "0",
     padding: "0",
     fontWeight: isSelected ? "700" : "400",
+    borderRadius: "4px",
   }),
   placeholder: (styles: any, { isDisabled, isSelected }: any) => ({
     ...styles,
@@ -118,7 +121,7 @@ export const sortingColourStyles = {
   menuList: (styles: any) => ({
     ...styles,
     background: "var(--white)",
-    borderRadius: 0,
+    borderRadius: "4px",
     width: "10rem",
   }),
   dropdownIndicator: () => ({
@@ -129,12 +132,12 @@ export const sortingColourStyles = {
     background: isFocused ? "#f6f6f6" : isSelected ? "#f6f6f6" : undefined,
     color: isSelected ? "var(--grey-60)" : "var(--dark) !important",
     zIndex: 1,
-    borderRadius: 0,
+    borderRadius: "4px",
   }),
   menu: (base: any) => ({
     ...base,
     zIndex: 100,
-    borderRadius: 0,
+    borderRadius: "4px",
     border: "1px solid var(--grey-10)",
     boxShadow: "none",
     right: "50px",
@@ -145,7 +148,7 @@ export const sortingColourStyles = {
     color: "var(--dark)",
     background: "transparent",
     border: "0",
-    borderRadius: 0,
+    borderRadius: "4px",
     cursor: isDisabled ? "not-allowed !important" : "default",
   }),
   indicatorSeparator: () => ({
@@ -173,7 +176,7 @@ export const colourStyles = {
   menuList: (styles: any) => ({
     ...styles,
     background: "transparent",
-    borderRadius: 0,
+    borderRadius: "4px",
   }),
 
   option: (styles: any, { isFocused, isSelected }: any) => ({
@@ -181,12 +184,12 @@ export const colourStyles = {
     background: isFocused ? "#f6f6f6" : isSelected ? "#f4f4f4" : undefined,
     color: "var(--dark) !important",
     zIndex: 1,
-    borderRadius: 0,
+    borderRadius: "4px",
   }),
   menu: (base: any) => ({
     ...base,
     zIndex: 100,
-    borderRadius: 0,
+    borderRadius: "4px",
     border: "1px solid var(--grey-10)",
     boxShadow: "none",
   }),
@@ -195,7 +198,7 @@ export const colourStyles = {
     boxShadow: "none",
     color: "var(--dark)",
     border: "1px solid var(--grey-10) !important",
-    borderRadius: 0,
+    borderRadius: "4px",
   }),
   valueContainer: (provided: any) => ({
     ...provided,

@@ -18,15 +18,14 @@ export const HeaderStyles = styled.div`
   }
 
   .input--button {
-    font-size: 0.9rem;
+    font-size: 1rem;
     padding-left: 1em;
     padding-right: 1em;
     border-radius: 2em;
   }
 
   .input-wrapper {
-    border-radius: 2em;
-    /* border: 1px solid var(--dark); */
+    border-radius: 6px;
     display: flex;
     align-items: center;
     padding: 0.5em 1em;
@@ -34,11 +33,8 @@ export const HeaderStyles = styled.div`
     width: fit-content;
     width: 100%;
     margin: 0 5rem;
-    background-color: #f5f5f5;
-  }
-
-  .logo {
-    width: 14rem;
+    background-color: #f6f6f6;
+    border: 1px solid var(--stroke);
   }
 
   .input {

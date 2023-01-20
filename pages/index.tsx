@@ -73,7 +73,7 @@ export default function Home({ brands, items, styles }: HomeProps) {
       <Categories />
       <main className="hero">
         <div className="container">
-          <h1 className="hero-title">Create your style with monoshop</h1>
+          <h1 className="hero-title">Monoshop marketplace</h1>
           <Link href="/shop">
             <button className="hero-button button">Shop</button>
           </Link>
@@ -193,9 +193,9 @@ const HomeStyles = styled.div`
   }
 
   .hero-title {
-    text-transform: uppercase;
-    font-size: 2.5rem;
-    font-family: var(--font-medium);
+    font-size: 3rem;
+    font-weight: 600;
+    font-family: var(--font-wide);
   }
 
   .hero-button {

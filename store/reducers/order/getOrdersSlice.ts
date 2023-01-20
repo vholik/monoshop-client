@@ -1,26 +1,26 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "@utils/axios";
 import { AxiosError, isAxiosError } from "axios";
-import { Item } from "@store/types/item";
 import { RejectError } from "@store/types/error";
+import { Order } from "@stripe/stripe-js";
 
 interface ItemsState {
   status: "init" | "loading" | "error" | "success";
-  items: Item[];
+  orders: Order[];
 }
 
 const initialState: ItemsState = {
   status: "init",
-  items: [],
+  orders: [],
 };
 
 export const getOrders = createAsyncThunk<
-  Item[],
+  Order[],
   void,
   { rejectValue: RejectError }
 >("order", async (_, thunkAPI) => {
   try {
-    const response = await instance.get<Item[]>("order");
+    const response = await instance.get<Order[]>("order");
     return response.data;
   } catch (err) {
     if (isAxiosError(err) && err.response) {
@@ -40,7 +40,7 @@ export const GetOrdersSlice = createSlice({
         state.status = "loading";
       })
       .addCase(getOrders.fulfilled, (state, action) => {
-        state.items = action.payload;
+        state.orders = action.payload;
         state.status = "success";
       })
       .addCase(getOrders.rejected, (state) => {

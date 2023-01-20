@@ -21,7 +21,7 @@ import {
   conditions,
   genders,
   sizes,
-} from "@utils/react-select-utils";
+} from "@utils/react-select/react-select-utils";
 import { getItemById } from "@store/reducers/item/GetItemByIdSlice";
 import { wrapper } from "@store/reducers/store";
 import { Item } from "@store/types/item";
@@ -529,7 +529,7 @@ export default function AddItem({ item }: EditItemProps) {
                   Upload an image
                 </label>
                 {imageStatus === "loading" && (
-                  <div className="item-image loading-background"></div>
+                  <div className="item-image skeleton-animation"></div>
                 )}
                 <Reorder.Group
                   as="ol"

@@ -41,14 +41,25 @@ const UserProfile = ({ user }: UserProfileProps) => {
   const status = useAppSelector((state) => state.getUserByIdReducer.status);
 
   useEffect(() => {
-    if (status) {
+    if (status === "error") {
       Router.push("/404", {
         query: {
-          message: "Error while loading your profile",
+          message: "Error while loading profile",
         },
       });
     }
   }, []);
+
+  const messageUser = () => {
+    if (user) {
+      Router.push({
+        pathname: "/chat",
+        query: {
+          send: router.query.pid,
+        },
+      });
+    }
+  };
 
   return (
     <FlexPage>
@@ -95,7 +106,9 @@ const UserProfile = ({ user }: UserProfileProps) => {
                     </p>
                   )}
                 </div>
-                <button className="button">Message</button>
+                <button className="button" onClick={messageUser}>
+                  Message
+                </button>
               </div>
             </div>
           </div>
@@ -191,6 +204,7 @@ const UserProfileStyles = styled.div`
     }
 
     .user-name {
+      font-family: var(--font-wide);
       font-size: 1.5rem;
     }
 
@@ -214,7 +228,7 @@ const UserProfileStyles = styled.div`
     .button {
       margin-top: 1rem;
       padding: 1rem 2rem;
-      border-radius: 2rem;
+      border-radius: 4px;
     }
   }
 `;

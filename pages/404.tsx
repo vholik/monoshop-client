@@ -6,7 +6,7 @@ import Link from "next/link";
 import Header from "@components/Header/Header";
 import Router from "next/router";
 
-export default function Error() {
+export default function ErrorPage() {
   return (
     <>
       <Header />

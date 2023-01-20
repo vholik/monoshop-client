@@ -26,7 +26,6 @@ export const CategoriesStyles = styled.div`
     font-size: 1rem;
     cursor: pointer;
     font-weight: 500;
-    font-family: var(--font-medium);
   }
 
   .category-dropdown {

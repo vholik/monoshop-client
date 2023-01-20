@@ -17,7 +17,7 @@ import {
   sizes,
   sortingColourStyles,
   sortingValues,
-} from "@utils/react-select-utils";
+} from "@utils/react-select/react-select-utils";
 import {
   useActionCreators,
   useAppDispatch,
@@ -789,7 +789,7 @@ const ShopStyling = styled.div`
     }
 
     .price-handler {
-      top: 220px;
+      top: 3rem;
       z-index: 5;
       position: absolute;
       background-color: white;

@@ -2,11 +2,10 @@ import { IProfileFormData, User } from "@store/types/user";
 import { ProfileSettingsStyles } from "./ProfileSettings.styles";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { uploadImage } from "@store/reducers/image/UploadImageSlice";
 import { editProfile } from "@store/reducers/user/EditProfileSlice";
-import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import {
   showErrorToast,
@@ -59,7 +58,6 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
         .then((result) => {
           const image = result.data.url;
           setProfilePhoto(image);
-          showSuccesToast("Succesfuly updated photo");
         })
         .catch((error) => {
           showErrorToast("Error uploading photo");
@@ -167,23 +165,21 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
           )}
         </label>
         {user?.image && (
-          <label className="label">
+          <div className="label">
             Photo
-            <div
-              className={
-                imageStatus === "loading"
-                  ? "loading-background photo"
-                  : "photo-wrapper"
-              }
-            >
-              <Image
-                src={profilePhoto || user.image}
-                alt="Your photo"
-                width={150}
-                height={150}
-                className="photo"
-              />
-
+            <div className="photo-wrapper">
+              {imageStatus === "loading" ? (
+                <div className="photo skeleton-animation"></div>
+              ) : (
+                <Image
+                  src={profilePhoto || user.image}
+                  alt="Your photo"
+                  width={150}
+                  height={150}
+                  className="photo"
+                  style={{ objectFit: "cover" }}
+                />
+              )}
               <label className="upload-btn button">
                 Upload new
                 <input
@@ -193,12 +189,16 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
                 />
               </label>
             </div>
-          </label>
+          </div>
         )}
         <button
           className="button submit--buton"
           type="submit"
-          disabled={imageStatus === "loading" || profileStatus === "loading"}
+          disabled={
+            imageStatus === "loading" ||
+            profileStatus === "loading" ||
+            profileStatus === "success"
+          }
         >
           Save
         </button>

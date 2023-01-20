@@ -20,7 +20,7 @@ import {
   conditions,
   genders,
   sizes,
-} from "@utils/react-select-utils";
+} from "@utils/react-select/react-select-utils";
 import Select from "react-select";
 import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
 import { Reorder } from "framer-motion";
@@ -29,6 +29,7 @@ import Upload from "@public/images/upload.svg";
 import Drag from "@public/images/drag.svg";
 import Router from "next/router";
 import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
+import { Controller } from "react-hook-form";
 
 export default function AddItem() {
   const dispatch = useAppDispatch();
@@ -455,7 +456,7 @@ export default function AddItem() {
               </label>
 
               {imageStatus === "loading" && (
-                <div className="item-image loading-background"></div>
+                <div className="item-image skeleton-animation"></div>
               )}
               <Reorder.Group
                 as="ol"
@@ -491,17 +492,40 @@ export default function AddItem() {
               {/* Second row */}
               <div className="row">
                 <label className="label">
+                  Title
                   <input
                     onChange={handleNameChange}
                     type="text"
                     className="input"
-                    placeholder="Header name"
                     required
                     minLength={5}
                     maxLength={50}
                   />
                 </label>
                 <label className="label">
+                  Category
+                  <Controller
+                    name="area"
+                    control={control}
+                    rules={{ required: "Area is required" }}
+                    render={({ field }) => (
+                      <Select
+                        instanceId="select"
+                        required={true}
+                        className="select"
+                        name="subcategory"
+                        isLoading={categoriesStatus === "loading"}
+                        isDisabled={!formData.gender}
+                        options={categories}
+                        isClearable={true}
+                        isSearchable={true}
+                        styles={colourStyles}
+                        placeholder=""
+                        onChange={categoryChange}
+                        value={formData.category}
+                      />
+                    )}
+                  />
                   <Select
                     instanceId="select"
                     required={true}
@@ -509,41 +533,43 @@ export default function AddItem() {
                     name="subcategory"
                     isLoading={categoriesStatus === "loading"}
                     isDisabled={!formData.gender}
-                    placeholder="Select a scategory"
                     options={categories}
                     isClearable={true}
                     isSearchable={true}
                     styles={colourStyles}
+                    placeholder=""
                     onChange={categoryChange}
                     value={formData.category}
                   />
                 </label>
 
                 <label className="label">
+                  Style
                   <Select
                     instanceId="select"
                     required={true}
                     className="select"
                     name="style"
                     isLoading={stylesStatus === "loading"}
-                    placeholder="Select a style"
                     options={styles}
                     isClearable={true}
                     isSearchable={true}
+                    placeholder=""
                     styles={colourStyles}
                     onChange={styleChange}
                   />
                 </label>
                 <label className="label">
+                  Colour
                   <Select
                     instanceId="select"
                     required={true}
                     className="select"
                     name="colour"
                     isLoading={coloursStatus === "loading"}
-                    placeholder="Select a colour"
                     options={colours}
                     isClearable={true}
+                    placeholder=""
                     styles={colourStyles}
                     onChange={colourChange}
                     formatOptionLabel={(option) => (
@@ -574,10 +600,10 @@ export default function AddItem() {
                   />
                 </label>
                 <label className="label">
+                  Price
                   <input
                     type="number"
                     className="input"
-                    placeholder="Select a price"
                     onChange={handlePriceChange}
                     step="0.01"
                     min={0}
@@ -585,10 +611,10 @@ export default function AddItem() {
                   />
                 </label>
                 <label className="label">
+                  Hashtags
                   <input
                     type="text"
                     className="input"
-                    placeholder="Hashtags"
                     onChange={handleHashtagsChange}
                   />
                 </label>
@@ -596,12 +622,13 @@ export default function AddItem() {
               {/* Third row */}
               <div className="row">
                 <label className="label">
+                  Gender
                   <Select
+                    placeholder=""
                     instanceId="select"
                     required={true}
                     className="select"
                     name="gender"
-                    placeholder="Select a gender"
                     options={genders}
                     styles={colourStyles}
                     onChange={genderChange}
@@ -609,14 +636,15 @@ export default function AddItem() {
                   />
                 </label>
                 <label className="label">
+                  Subcategory
                   <Select
+                    placeholder=""
                     instanceId="select"
                     required={true}
                     className="select"
                     name="subcategory"
                     isLoading={subcategoriesStatus === "loading"}
                     isDisabled={!formData.category}
-                    placeholder="Select a subcategory"
                     options={subcategories}
                     isClearable={true}
                     isSearchable={true}
@@ -626,12 +654,13 @@ export default function AddItem() {
                   />
                 </label>
                 <label className="label">
+                  Condition
                   <Select
+                    placeholder=""
                     instanceId="select"
                     required={true}
                     className="select"
                     name="condition"
-                    placeholder="Select a condition"
                     options={conditions}
                     isClearable={true}
                     isSearchable={true}
@@ -640,12 +669,13 @@ export default function AddItem() {
                   />
                 </label>
                 <label className="label">
+                  Brand
                   <Select
+                    placeholder=""
                     instanceId="select"
                     required={true}
                     className="select"
                     name="brand"
-                    placeholder="Select a brand"
                     options={brands}
                     isMulti
                     isClearable={true}
@@ -661,14 +691,15 @@ export default function AddItem() {
                   />
                 </label>
                 <label className="label">
+                  Size
                   <Select
                     instanceId="select"
                     required={true}
                     className="select"
                     name="size"
-                    placeholder="Select a size"
                     options={sizes}
                     isClearable={true}
+                    placeholder=""
                     isSearchable={true}
                     styles={colourStyles}
                     onChange={sizeChange}
@@ -676,9 +707,9 @@ export default function AddItem() {
                 </label>
               </div>
               <label className="label description--label">
+                Description
                 <textarea
                   id="description"
-                  placeholder="Describe your item..."
                   minLength={10}
                   maxLength={200}
                   onChange={textareaHandler}
