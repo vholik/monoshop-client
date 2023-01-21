@@ -174,7 +174,8 @@ export default function Sell() {
     const patchedData = {
       ...data,
       images: formImages,
-      hashtags: convertStringToHashtags(data.hashtags)
+      hashtags: convertStringToHashtags(data.hashtags),
+      description: data.description.replace(/\r\n|\r|\n/g, '<br />')
     }
 
     dispatch(addItem(patchedData))

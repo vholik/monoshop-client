@@ -170,7 +170,10 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
     setValue('gender', item.gender)
     setValue('colour', item.colour.value)
     setValue('condition', item.condition)
-    setValue('description', item.description)
+    setValue(
+      'description',
+      item.description ? item.description.replaceAll('<br />', '\n') : ''
+    )
     setValue('hashtags', convertHashtagsToString(item.hashtags))
     setValue('images', item.images)
     setValue('name', item.name)
@@ -227,7 +230,8 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
       ...data,
       images: formImages,
       hashtags: convertStringToHashtags(data.hashtags),
-      id: item.id
+      id: item.id,
+      description: data.description.replace(/\r\n|\r|\n/g, '<br />')
     }
 
     dispatch(editItem(patchedData))
@@ -241,7 +245,7 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
         })
       })
       .catch((err) => {
-        showErrorToast('Error')
+        showErrorToast('Error editing your item. Please try again later')
       })
   }
 
@@ -485,9 +489,6 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                     type="text"
                     className="input"
                     {...register('hashtags', {
-                      onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                        console.log(e.target.value)
-                      },
                       pattern: {
                         value: hashtagsRegex,
                         message: 'Incorrect hashtags (5 hashtags max)'

@@ -30,6 +30,11 @@ import { showErrorToast } from '@utils/ReactTostify/tostifyHandlers'
 import { filterActions } from '@store/reducers/filter/FilterSlice'
 import Layout from '@components/Layout/Layout'
 import ErrorPage from 'pages/404'
+import {
+  redirectCategory,
+  redirectGender,
+  redirectSubcategory
+} from '@utils/redirectionHelper'
 
 const arrowStyles: CSSProperties = {
   position: 'absolute',
@@ -114,69 +119,28 @@ const ShopItem = () => {
         })
     }
   }
-  const genderRedirect = () => {
-    if (item?.gender) {
-      dispatch(filterActions.resetFilter())
-      dispatch(
-        filterActions.setGender({ value: item.gender, label: item.gender })
-      )
-      dispatch(getCategories(item?.gender)).catch((err) => console.log(err))
-    }
 
-    Router.push('/shop')
+  const genderRedirect = () => {
+    if (item) {
+      redirectGender(item.gender, dispatch)
+    }
   }
 
   const categoryRedirect = () => {
-    if (item?.gender && item.id) {
-      dispatch(filterActions.resetFilter())
-      dispatch(
-        filterActions.setGender({ value: item.gender, label: item.gender })
-      )
-      dispatch(
-        filterActions.setCategory({
-          label: item.category.value,
-          value: item.category.value,
-          id: item.category.id
-        })
-      )
-
-      dispatch(getCategories(item?.gender)).catch((err) => console.log(err))
-      dispatch(getSubcategories(item.category.id)).catch((err) =>
-        console.log(err)
-      )
+    if (item) {
+      redirectCategory(item.category, item.gender, dispatch)
     }
-
-    Router.push('/shop')
   }
 
   const subcategoryRedirect = () => {
-    if (item?.gender && item.id) {
-      dispatch(filterActions.resetFilter())
-      dispatch(
-        filterActions.setGender({ value: item.gender, label: item.gender })
-      )
-      dispatch(
-        filterActions.setCategory({
-          label: item.category.value,
-          value: item.category.value,
-          id: item.category.id
-        })
-      )
-      dispatch(
-        filterActions.setCategory({
-          label: item.subcategory.value,
-          value: item.subcategory.value,
-          id: item.subcategory.id
-        })
-      )
-
-      dispatch(getCategories(item?.gender)).catch((err) => console.log(err))
-      dispatch(getSubcategories(item.category.id)).catch((err) =>
-        console.log(err)
+    if (item) {
+      redirectSubcategory(
+        item.subcategory,
+        item.category,
+        item.gender,
+        dispatch
       )
     }
-
-    Router.push('/shop')
   }
 
   const buyHandler = () => {
@@ -215,14 +179,12 @@ const ShopItem = () => {
   }
 
   const handleLinkClink = (pid: number) => {
-    Router.push(`/shop/${pid}`, `/shop/${pid}`)
+    Router.push(`/shop/${pid}`)
   }
 
   if (itemStatus === 'error') {
     return <ErrorPage />
   }
-
-  console.log(item?.description)
 
   return (
     <ShopItemStyles>

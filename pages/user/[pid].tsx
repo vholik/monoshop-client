@@ -1,65 +1,64 @@
-import { wrapper } from "@store/reducers/store";
-import styled from "styled-components";
-import { User } from "@store/types/user";
-import Header from "@components/Header/Header";
-import Categories from "@components/Categories/Categories";
-import { getUserById } from "@store/reducers/user/GetUserById";
-import Image from "next/image";
-import Link from "next/link";
-import Phone from "@public/images/phone.svg";
-import Location from "@public/images/location.svg";
-import Flash from "@public/images/flash.svg";
-import { useAppSelector } from "@store/hooks/redux";
-import { useEffect } from "react";
-import Router, { useRouter } from "next/router";
-import Footer from "@components/Footer/Footer";
-import ArrowRight from "@public/images/arrow-left.svg";
-import Layout from "@components/Layout/Layout";
+import { wrapper } from '@store/reducers/store'
+import styled from 'styled-components'
+import { User } from '@store/types/user'
+import Header from '@components/Header/Header'
+import Categories from '@components/Categories/Categories'
+import { getUserById } from '@store/reducers/user/GetUserById'
+import Image from 'next/image'
+import Link from 'next/link'
+import Phone from '@public/images/phone.svg'
+import Location from '@public/images/location.svg'
+import Flash from '@public/images/flash.svg'
+import { useAppSelector } from '@store/hooks/redux'
+import { useEffect } from 'react'
+import Router, { useRouter } from 'next/router'
+import Footer from '@components/Footer/Footer'
+import ArrowRight from '@public/images/arrow-left.svg'
+import Layout from '@components/Layout/Layout'
+import ErrorPage from 'pages/404'
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) =>
     async ({ query }) => {
-      const pid = query.pid as string;
-      const user = await (await store.dispatch(getUserById(pid))).payload;
+      const pid = query.pid as string
+      const user = await (await store.dispatch(getUserById(pid))).payload
 
       return {
         props: {
           user,
-          error: null,
-        },
-      };
+          error: null
+        }
+      }
     }
-);
+)
 
 interface UserProfileProps {
-  user: User;
+  user: User
 }
 
 const UserProfile = ({ user }: UserProfileProps) => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const status = useAppSelector((state) => state.getUserByIdReducer.status);
+  const pid = Number(router.query.pid)
 
-  useEffect(() => {
-    if (status === "error") {
-      Router.push("/404", {
-        query: {
-          message: "Error while loading profile",
-        },
-      });
-    }
-  }, []);
+  const status = useAppSelector((state) => state.getUserByIdReducer.status)
+
+  const userId = useAppSelector((state) => state.authReducer.userId)
+
+  if (status === 'error') {
+    return <ErrorPage />
+  }
 
   const messageUser = () => {
     if (user) {
       Router.push({
-        pathname: "/chat",
+        pathname: '/chat',
         query: {
-          send: router.query.pid,
-        },
-      });
+          send: router.query.pid
+        }
+      })
     }
-  };
+  }
 
   return (
     <UserProfileStyles>
@@ -75,7 +74,7 @@ const UserProfile = ({ user }: UserProfileProps) => {
               alt="User photo"
               width={100}
               height={100}
-              style={{ objectFit: "cover" }}
+              style={{ objectFit: 'cover' }}
               className="user-photo"
             />
             <div className="right">
@@ -87,7 +86,7 @@ const UserProfile = ({ user }: UserProfileProps) => {
                 </p>
                 {user.phone && (
                   <p className="user-phone">
-                    <Image src={Phone} alt="Phone" height={20} width={20} />{" "}
+                    <Image src={Phone} alt="Phone" height={20} width={20} />{' '}
                     {user.phone}
                   </p>
                 )}
@@ -98,14 +97,16 @@ const UserProfile = ({ user }: UserProfileProps) => {
                       alt="Location"
                       height={20}
                       width={20}
-                    />{" "}
+                    />{' '}
                     {user.location}
                   </p>
                 )}
               </div>
-              <button className="button" onClick={messageUser}>
-                Message
-              </button>
+              {userId !== pid && (
+                <button className="button" onClick={messageUser}>
+                  Message
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -123,7 +124,7 @@ const UserProfile = ({ user }: UserProfileProps) => {
                     <Image
                       src={item.images[0]}
                       alt="Image"
-                      style={{ objectFit: "cover" }}
+                      style={{ objectFit: 'cover' }}
                       fill
                     />
                   </div>
@@ -137,8 +138,8 @@ const UserProfile = ({ user }: UserProfileProps) => {
         </div>
       </div>
     </UserProfileStyles>
-  );
-};
+  )
+}
 
 const UserProfileStyles = styled.div`
   .back {
@@ -226,6 +227,6 @@ const UserProfileStyles = styled.div`
       border-radius: 4px;
     }
   }
-`;
+`
 
-export default UserProfile;
+export default UserProfile
