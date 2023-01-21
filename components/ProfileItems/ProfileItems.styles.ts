@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const ProfileItemsStyles = styled.div`
   display: grid;
@@ -27,6 +27,7 @@ export const ProfileItemsStyles = styled.div`
     .item-name {
       font-weight: 700;
       width: 80%;
+      font-size: 1rem;
     }
   }
 
@@ -36,8 +37,9 @@ export const ProfileItemsStyles = styled.div`
 
     .edit {
       margin-top: 1rem;
+      font-size: 1rem;
       cursor: pointer;
-      text-decoration: underline;
+      color: var(--field-highlight);
     }
   }
-`;
+`
