@@ -1,53 +1,62 @@
-import { Item } from "@store/types/item";
-import { ProfileItemsStyles } from "./ProfileItems.styles";
-import Image from "next/image";
-import TrashCan from "@public/images/trash.svg";
-import Link from "next/link";
-import { useState } from "react";
-import Modal from "react-modal";
-import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
-import { deleteItemById } from "@store/reducers/item/DeleteItemSlice";
-import { getUserItems } from "@store/reducers/item/GetUserItemsSlice";
-import Router from "next/router";
-import { modalStyles } from "@components/CustomModal/CustomModal.styles";
+import { Item } from '@store/types/item'
+import { ProfileItemsStyles } from './ProfileItems.styles'
+import Image from 'next/image'
+import TrashCan from '@public/images/trash.svg'
+import Link from 'next/link'
+import { useState } from 'react'
+import Modal from 'react-modal'
+import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
+import { deleteItemById } from '@store/reducers/item/DeleteItemSlice'
+import { getUserItems } from '@store/reducers/item/GetUserItemsSlice'
+import Router from 'next/router'
+import { modalStyles } from '@components/CustomModal/CustomModal.styles'
+import { showSuccesToast } from '@utils/ReactTostify/tostifyHandlers'
+import ErrorPage from 'pages/404'
 
-Modal.setAppElement("#__next");
+Modal.setAppElement('#__next')
 
 interface ProfileItemsProps {
-  items: Item[];
+  items: Item[]
 }
 
 const ProfileItems = ({ items }: ProfileItemsProps) => {
-  const dispatch = useAppDispatch();
-  const [modalIsOpen, setIsOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<null | number>(null);
+  const dispatch = useAppDispatch()
+  const [modalIsOpen, setIsOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState<null | number>(null)
+
+  const deleteStatus = useAppSelector((state) => state.deleteItemReducer.status)
 
   const deleteHandler = () => {
-    setIsOpen(false);
+    setIsOpen(false)
 
     if (deleteId) {
       dispatch(deleteItemById(deleteId))
         .unwrap()
-        .then(() =>
-          Router.push({
-            pathname: "/success",
-            query: {
-              message: "Successfully deleted your item",
-            },
-          })
-        )
+        .then(() => {
+          showSuccesToast('Succesfully deleted item'),
+            // Refetch
+            dispatch(getUserItems())
+              .unwrap()
+              .catch((err) => {
+                console.log('rejected', err)
+              })
+        })
         .catch((err) => {
-          console.log("rejected", err), Router.push("/404");
-        });
+          console.log('rejected', err)
+        })
     }
-  };
+  }
 
   function openModal() {
-    setIsOpen(true);
+    setIsOpen(true)
   }
 
   function closeModal() {
-    setIsOpen(false);
+    setIsOpen(false)
+  }
+
+  if (deleteStatus === 'error') {
+    return <ErrorPage />
   }
 
   return (
@@ -75,12 +84,13 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
       </Modal>
       {!items.length && (
         <h2 className="no-items">
-          You don't have any items on sell.{" "}
+          You don't have any items on sell.{' '}
           <Link href="/sell">
             <span className="bold">Sell</span>
           </Link>
         </h2>
       )}
+      {}
       {items.map((item) => (
         <div className="item" key={item.id}>
           <div className="item-image">
@@ -97,7 +107,7 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
                 height={20}
                 width={20}
                 onClick={() => {
-                  openModal(), setDeleteId(item.id);
+                  openModal(), setDeleteId(item.id)
                 }}
               />
             </div>
@@ -109,7 +119,7 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
         </div>
       ))}
     </ProfileItemsStyles>
-  );
-};
+  )
+}
 
-export default ProfileItems;
+export default ProfileItems

@@ -13,7 +13,7 @@ import {
   conditions,
   genders,
   sizes
-} from '@utils/react-select/reactSelectUtils'
+} from '@utils/ReactSelect/reactSelectUtils'
 import Select from 'react-select'
 import { getSubcategories } from '@store/reducers/subcategory/GetSubcategoriesSlice'
 import { Reorder } from 'framer-motion'
@@ -23,43 +23,60 @@ import Drag from '@public/images/drag.svg'
 import { showErrorToast } from '@utils/ReactTostify/tostifyHandlers'
 import { Controller, Ref, SubmitHandler, useForm } from 'react-hook-form'
 import { ISellForm } from '@store/types/form'
-import { ItemEntityWithId } from '@store/types/item-entity'
+import { ItemEntity, ItemEntityWithId } from '@store/types/item-entity'
 import { hashtagsRegex } from '@utils/validationRegex'
-import { convertStringToHashtags } from '@utils/hashtagsConverter'
+import {
+  convertHashtagsToString,
+  convertStringToHashtags
+} from '@utils/hashtagsConverter'
 import { addItem } from '@store/reducers/item/AddItemSlice'
 import Router from 'next/router'
 import { SellStyles } from 'styles/shared/SellStyles'
 import { wrapper } from '@store/reducers/store'
 import { getItemById } from '@store/reducers/item/GetItemByIdSlice'
 import { Item } from '@store/types/item'
+import { isAxiosError } from 'axios'
+import ErrorPage from 'pages/404'
+import { editItem } from '@store/reducers/item/EditItemSlice'
 
-export const getServerSideProps = wrapper.getServerSideProps(
+export const getServerSideProps = wrapper.getStaticProps(
   (store) =>
-    async ({ query }) => {
-      const pid = query.pid as string
-      const item = await (await store.dispatch(getItemById(pid))).payload
+    async ({ params }) => {
+      const pid = params!.pid!
 
-      if (!item) {
-        return {
-          props: {
-            item: {}
-          }
+      const item = (await store.dispatch(getItemById(pid as string))).payload
+      const brands = (await store.dispatch(getBrands(''))).payload
+      const styles = (await store.dispatch(getStyles())).payload
+      const colours = (await store.dispatch(getColours())).payload
+
+      if (item) {
+        if ('category' in item) {
+          await store.dispatch(getSubcategories(item.category.id))
+        }
+        if ('subcategory' in item) {
+          await store.dispatch(getCategories(item.gender))
         }
       }
 
       return {
         props: {
-          item
+          item: item,
+          brands: brands,
+          styles: styles,
+          colours: colours
         }
       }
     }
 )
 
-interface EditItemProps {
+interface EditProps {
   item: Item
+  brands: ItemEntityWithId[]
+  styles: ItemEntity[]
+  colours: ItemEntity[]
 }
 
-export default function Edit({ item }: EditItemProps) {
+export default function Edit({ item, brands, colours, styles }: EditProps) {
   const dispatch = useAppDispatch()
 
   const categoryRef = useRef<any>(null)
@@ -77,32 +94,28 @@ export default function Edit({ item }: EditItemProps) {
   })
 
   const imageStatus = useAppSelector((state) => state.uploadImageReducer.status)
+
+  const fetchItemStatus = useAppSelector(
+    (state) => state.getItemByIdReducer.status
+  )
+
+  if (fetchItemStatus === 'error') {
+    return <ErrorPage />
+  }
+
   const categories = useAppSelector(
     (state) => state.getCategoriesReducer.categories
-  )
-  const categoriesStatus = useAppSelector(
-    (state) => state.getCategoriesReducer.status
   )
 
   const subcategories = useAppSelector(
     (state) => state.getSubcategoriesReducer.subcategories
   )
-  const subcategoriesStatus = useAppSelector(
-    (state) => state.getSubcategoriesReducer.status
-  )
 
-  const brandsStatus = useAppSelector((state) => state.getBrandsReducer.status)
-  const brands = useAppSelector((state) => state.getBrandsReducer.brands)
-
-  const styles = useAppSelector((state) => state.getStylesReducer.styles)
-  const stylesStatus = useAppSelector((state) => state.getStylesReducer.status)
-
-  const colours = useAppSelector((state) => state.getColoursReducer.colours)
   const coloursStatus = useAppSelector(
     (state) => state.getColoursReducer.status
   )
 
-  const itemStatus = useAppSelector((state) => state.addItemReducer.status)
+  const itemStatus = useAppSelector((state) => state.editItemReducer.status)
 
   const [formImages, setFormImages] = useState<string[]>([])
 
@@ -147,44 +160,54 @@ export default function Edit({ item }: EditItemProps) {
   }
 
   useEffect(() => {
-    //Brands
-    dispatch(getBrands(''))
-      .unwrap()
-      .catch((error) => {
-        console.error('rejected', error)
-      })
-    //Styles
-    dispatch(getStyles())
-      .unwrap()
-      .catch((error) => {
-        console.error('rejected', error)
-      })
-    //Colours
-    dispatch(getColours())
-      .unwrap()
-      .catch((error) => {
-        console.error('rejected', error)
-      })
-  }, [])
+    setFormImages(item.images)
+    setGender(item.gender)
+    setValue('categoryId', item.category.id)
+    setValue(
+      'brand',
+      item.brand.map((brand) => brand.id)
+    )
+    setValue('gender', item.gender)
+    setValue('colour', item.colour.value)
+    setValue('condition', item.condition)
+    setValue('description', item.description)
+    setValue('hashtags', convertHashtagsToString(item.hashtags))
+    setValue('images', item.images)
+    setValue('name', item.name)
+    setValue('price', item.price)
+    setValue('size', item.size)
+    setValue('style', item.style.value)
+    setValue('subcategoryId', item.subcategory.id)
+  }, [item])
 
   useEffect(() => {
+    setCategoryId(item.category.id)
+  }, [item.category.id])
+
+  const genderChange = (gender: Gender | null) => {
+    setCategoryId(null)
+    setGender(gender)
+
     // Clear values of forward inputs
     resetField('categoryId')
     categoryRef.current.clearValue()
     resetField('subcategoryId')
     subcategoryRef.current.clearValue()
 
-    // Categories
-    dispatch(getCategories(gender as Gender))
-      .unwrap()
-      .catch((error) => {
-        console.error('rejected', error)
-      })
-  }, [gender])
+    if (gender) {
+      // Categories
+      dispatch(getCategories(gender))
+        .unwrap()
+        .catch((error) => {
+          console.error('rejected', error)
+        })
+    }
+  }
 
-  useEffect(() => {
-    resetField('subcategoryId')
+  const categoryChange = (categoryId: number | null) => {
     subcategoryRef.current.clearValue()
+
+    setCategoryId(categoryId)
 
     if (categoryId) {
       // Categories
@@ -192,7 +215,7 @@ export default function Edit({ item }: EditItemProps) {
         .unwrap()
         .catch((error) => {})
     }
-  }, [categoryId])
+  }
 
   const onSubmit: SubmitHandler<ISellForm> = (data) => {
     if (!formImages.length) {
@@ -203,22 +226,27 @@ export default function Edit({ item }: EditItemProps) {
     const patchedData = {
       ...data,
       images: formImages,
-      hashtags: convertStringToHashtags(data.hashtags)
+      hashtags: convertStringToHashtags(data.hashtags),
+      id: item.id
     }
 
-    dispatch(addItem(patchedData))
+    dispatch(editItem(patchedData))
       .unwrap()
       .then(() => {
         Router.push({
           pathname: '/success',
           query: {
-            message: 'Successfully added your item to selling'
+            message: 'Successfully edited your item'
           }
         })
       })
       .catch((err) => {
         showErrorToast('Error')
       })
+  }
+
+  if (itemStatus === 'error') {
+    return <ErrorPage />
   }
 
   return (
@@ -321,7 +349,6 @@ export default function Edit({ item }: EditItemProps) {
                         instanceId="select"
                         className="select"
                         name={name}
-                        isLoading={categoriesStatus === 'loading'}
                         options={categories}
                         isClearable={true}
                         isSearchable={true}
@@ -329,7 +356,7 @@ export default function Edit({ item }: EditItemProps) {
                         styles={colourStyles}
                         placeholder=""
                         onChange={(val) => {
-                          onChange(val?.id), setCategoryId(val ? val.id : val)
+                          onChange(val?.id), categoryChange(val ? val.id : null)
                         }}
                         value={categories.find((c) => c.id === value)}
                         onBlur={onBlur}
@@ -352,7 +379,6 @@ export default function Edit({ item }: EditItemProps) {
                         instanceId="select"
                         className="select"
                         name={name}
-                        isLoading={stylesStatus === 'loading'}
                         options={styles}
                         isClearable={true}
                         isSearchable={true}
@@ -374,8 +400,11 @@ export default function Edit({ item }: EditItemProps) {
                     name="colour"
                     control={control}
                     rules={{ required: 'Please select colour' }}
-                    render={({ field: { value, name, onChange, onBlur } }) => (
+                    render={({
+                      field: { value, name, onChange, onBlur, ref }
+                    }) => (
                       <Select
+                        ref={ref}
                         instanceId="select"
                         className="select"
                         name={name}
@@ -385,6 +414,11 @@ export default function Edit({ item }: EditItemProps) {
                         isSearchable={true}
                         styles={colourStyles}
                         placeholder=""
+                        defaultValue={{
+                          value: item.colour.value,
+                          label: item.colour.value,
+                          hexCode: item.colour.hexCode
+                        }}
                         onChange={(val) => onChange(val?.value)}
                         value={styles.find((c) => c.value === value)}
                         onBlur={onBlur}
@@ -479,14 +513,11 @@ export default function Edit({ item }: EditItemProps) {
                         className="select"
                         name={name}
                         options={genders}
-                        isClearable={true}
-                        isSearchable={true}
                         styles={colourStyles}
                         placeholder=""
                         onChange={(val) => {
                           onChange(val?.value)
-                          setGender(val ? val.value : null)
-                          setCategoryId(null)
+                          genderChange(val ? val.value : null)
                         }}
                         value={genders.find((c) => c.value === value)}
                         onBlur={onBlur}
@@ -514,7 +545,6 @@ export default function Edit({ item }: EditItemProps) {
                         options={subcategories}
                         isClearable={true}
                         isSearchable={true}
-                        isLoading={subcategoriesStatus === 'loading'}
                         styles={colourStyles}
                         placeholder=""
                         isDisabled={!categoryId}
@@ -575,7 +605,6 @@ export default function Edit({ item }: EditItemProps) {
                         name={name}
                         isMulti
                         options={brands}
-                        isLoading={brandsStatus === 'loading'}
                         isClearable={true}
                         isSearchable={true}
                         styles={colourStyles}

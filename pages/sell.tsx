@@ -13,7 +13,7 @@ import {
   conditions,
   genders,
   sizes
-} from '@utils/react-select/reactSelectUtils'
+} from '@utils/ReactSelect/reactSelectUtils'
 import Select from 'react-select'
 import { getSubcategories } from '@store/reducers/subcategory/GetSubcategoriesSlice'
 import { Reorder } from 'framer-motion'

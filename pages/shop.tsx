@@ -1,14 +1,14 @@
-import Categories from "@components/Categories/Categories";
-import Header from "@components/Header/Header";
-import styled from "styled-components";
+import Categories from '@components/Categories/Categories'
+import Header from '@components/Header/Header'
+import styled from 'styled-components'
 import Select, {
   components,
   GroupBase,
   MultiValue,
   SelectInstance,
   SingleValue,
-  ValueContainerProps,
-} from "react-select";
+  ValueContainerProps
+} from 'react-select'
 import {
   conditions,
   filterColourStyles,
@@ -16,85 +16,85 @@ import {
   multiplefilterColourStyles,
   sizes,
   sortingColourStyles,
-  sortingValues,
-} from "@utils/react-select/reactSelectUtils";
+  sortingValues
+} from '@utils/ReactSelect/reactSelectUtils'
 import {
   useActionCreators,
   useAppDispatch,
-  useAppSelector,
-} from "@store/hooks/redux";
-import { getItems, setFavorite } from "@store/reducers/item/GetItemsSlice";
-import Image from "next/image";
-import { getTrackBackground, Range } from "react-range";
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { getBrands } from "@store/reducers/brand/GetBrandsSlice";
-import { getStyles } from "@store/reducers/style/GetStylesSlice";
-import { getColours } from "@store/reducers/colour/GetColoursSlice";
-import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
-import { getCategories } from "@store/reducers/category/GetCategoriesSlice";
-import { Gender } from "@store/types/gender.enum";
-import { IFilter } from "@store/types/filter";
-import { SortBy } from "@store/types/filter-by.enum";
-import Link from "next/link";
-import Pagination from "rc-pagination";
-import "rc-pagination/assets/index.css";
-import UnfilledWhiteHeart from "@public/images/unfilled-white-heart.svg";
-import FilledHeart from "@public/images/filled-heart.svg";
-import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
-import SortingIcon from "@public/images/filter.svg";
-import { toggleFavorite } from "@store/reducers/favorite/ToggleFavoriteSlice";
-import Footer from "@components/Footer/Footer";
-import useDebounce from "@utils/useDebounce";
-import StateManagedSelect from "react-select";
-import ReactSelect from "react-select";
-import { filterActions } from "@store/reducers/filter/FilterSlice";
-import Layout from "@components/Layout/Layout";
+  useAppSelector
+} from '@store/hooks/redux'
+import { getItems, setFavorite } from '@store/reducers/item/GetItemsSlice'
+import Image from 'next/image'
+import { getTrackBackground, Range } from 'react-range'
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { getBrands } from '@store/reducers/brand/GetBrandsSlice'
+import { getStyles } from '@store/reducers/style/GetStylesSlice'
+import { getColours } from '@store/reducers/colour/GetColoursSlice'
+import { ItemEntity, ItemEntityWithId } from '@store/types/item-entity'
+import { getCategories } from '@store/reducers/category/GetCategoriesSlice'
+import { Gender } from '@store/types/gender.enum'
+import { IFilter } from '@store/types/filter'
+import { SortBy } from '@store/types/filter-by.enum'
+import Link from 'next/link'
+import Pagination from 'rc-pagination'
+import 'rc-pagination/assets/index.css'
+import UnfilledWhiteHeart from '@public/images/unfilled-white-heart.svg'
+import FilledHeart from '@public/images/filled-heart.svg'
+import { getSubcategories } from '@store/reducers/subcategory/GetSubcategoriesSlice'
+import SortingIcon from '@public/images/filter.svg'
+import { toggleFavorite } from '@store/reducers/favorite/ToggleFavoriteSlice'
+import Footer from '@components/Footer/Footer'
+import useDebounce from '@utils/useDebounce'
+import StateManagedSelect from 'react-select'
+import ReactSelect from 'react-select'
+import { filterActions } from '@store/reducers/filter/FilterSlice'
+import Layout from '@components/Layout/Layout'
 
-const STEP = 1;
-const MIN = 0;
-const MAX = 10000;
+const STEP = 1
+const MIN = 0
+const MAX = 10000
 
 const Shop = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
-  const filter = useAppSelector((state) => state.filterReducer);
+  const filter = useAppSelector((state) => state.filterReducer)
 
-  const items = useAppSelector((state) => state.getItemsReducer.items);
-  const itemsStatus = useAppSelector((state) => state.getItemsReducer.status);
-  const itemsTotal = useAppSelector((state) => state.getItemsReducer.total);
+  const items = useAppSelector((state) => state.getItemsReducer.items)
+  const itemsStatus = useAppSelector((state) => state.getItemsReducer.status)
+  const itemsTotal = useAppSelector((state) => state.getItemsReducer.total)
 
   const favoriteToggleStatus = useAppSelector(
     (state) => state.toggleFavoriteReducer.status
-  );
+  )
 
-  const brandStatus = useAppSelector((state) => state.getBrandsReducer.status);
-  const brands = useAppSelector((state) => state.getBrandsReducer.brands);
+  const brandStatus = useAppSelector((state) => state.getBrandsReducer.status)
+  const brands = useAppSelector((state) => state.getBrandsReducer.brands)
 
-  const colours = useAppSelector((state) => state.getColoursReducer.colours);
+  const colours = useAppSelector((state) => state.getColoursReducer.colours)
   const coloursStatus = useAppSelector(
     (state) => state.getColoursReducer.status
-  );
+  )
 
-  const stylesStatus = useAppSelector((state) => state.getStylesReducer.status);
-  const styles = useAppSelector((state) => state.getStylesReducer.styles);
+  const stylesStatus = useAppSelector((state) => state.getStylesReducer.status)
+  const styles = useAppSelector((state) => state.getStylesReducer.styles)
 
   const subcategories = useAppSelector(
     (state) => state.getSubcategoriesReducer.subcategories
-  );
+  )
   const subcategoriesStatus = useAppSelector(
     (state) => state.getSubcategoriesReducer.status
-  );
+  )
 
   const categoriesStatus = useAppSelector(
     (state) => state.getCategoriesReducer.status
-  );
+  )
   const categories = useAppSelector(
     (state) => state.getCategoriesReducer.categories
-  );
+  )
 
-  const [values, setValues] = useState([0, 10000]);
-  const [isPriceOpen, setIsPriceOpen] = useState(false);
-  const debouncedValue = useDebounce<IFilter>(filter, 1000);
+  const [values, setValues] = useState([0, 10000])
+  const [isPriceOpen, setIsPriceOpen] = useState(false)
+  const debouncedValue = useDebounce<IFilter>(filter, 1000)
 
   const convertFilterToQuery = useMemo(
     () => (): IFilter => {
@@ -120,13 +120,13 @@ const Shop = () => {
           : undefined,
         subcategory: filter.subcategory
           ? filter.subcategory.map((category) => category.id)
-          : undefined,
-      };
+          : undefined
+      }
 
-      return JSON.parse(JSON.stringify(obj));
+      return JSON.parse(JSON.stringify(obj))
     },
     [filter]
-  );
+  )
 
   const dispatchItems = () => {
     dispatch(getItems(convertFilterToQuery()))
@@ -135,159 +135,159 @@ const Shop = () => {
         window.scrollTo({
           top: 0,
           left: 0,
-          behavior: "smooth",
-        });
+          behavior: 'smooth'
+        })
       })
       .catch((error: Error) => {
-        console.error("rejected", error);
-      });
-  };
+        console.error('rejected', error)
+      })
+  }
 
   useEffect(() => {
-    if (items && itemsStatus !== "loading") {
-      dispatchItems();
+    if (items && itemsStatus !== 'loading') {
+      dispatchItems()
     }
-  }, [debouncedValue]);
+  }, [debouncedValue])
 
   useEffect(() => {
     dispatch(getBrands(undefined))
       .unwrap()
       .catch((error: Error) => {
-        console.error("rejected", error);
-      });
+        console.error('rejected', error)
+      })
     dispatch(getStyles())
       .unwrap()
       .catch((error: Error) => {
-        console.error("rejected", error);
-      });
+        console.error('rejected', error)
+      })
     dispatch(getColours())
       .unwrap()
       .catch((error: Error) => {
-        console.error("rejected", error);
-      });
-  }, []);
+        console.error('rejected', error)
+      })
+  }, [])
 
   const priceValuesHandler = (values: number[]) => {
-    setValues(values);
-  };
+    setValues(values)
+  }
 
   const priceHandler = () => {
     if (filter.price) {
       const isPreviousPrice =
         Math.round(values[0]) === filter.price[0] &&
-        Math.round(values[1]) === filter.price[1];
+        Math.round(values[1]) === filter.price[1]
 
       if (!isPreviousPrice) {
         const roundedPrice = [
           Math.round(values[0]),
-          Math.round(values[1]),
-        ] as const;
+          Math.round(values[1])
+        ] as const
 
-        dispatch(filterActions.setPrice([roundedPrice[0], roundedPrice[1]]));
+        dispatch(filterActions.setPrice([roundedPrice[0], roundedPrice[1]]))
 
         //Change page to first
-        dispatch(filterActions.changePage(1));
+        dispatch(filterActions.changePage(1))
       }
     }
-  };
+  }
 
   const categoryHandler = (e: SingleValue<ItemEntity>) => {
     if (e) {
       // Fetch subcategories with this id
-      if (typeof e.id === "number") {
+      if (typeof e.id === 'number') {
         dispatch(getSubcategories(e.id))
           .unwrap()
-          .catch((err) => console.log("rejected", err));
+          .catch((err) => console.log('rejected', err))
       }
     }
 
-    dispatch(filterActions.setCategory(e));
+    dispatch(filterActions.setCategory(e))
     // Clear subcategory value
-    dispatch(filterActions.setSubcategory([]));
-  };
+    dispatch(filterActions.setSubcategory([]))
+  }
 
   const subcategoriesHandler = (e: MultiValue<ItemEntityWithId>) => {
     const mapped = e.map((subcategory) => {
-      return subcategory.id;
-    });
+      return subcategory.id
+    })
 
-    dispatch(filterActions.setSubcategory(e));
-  };
+    dispatch(filterActions.setSubcategory(e))
+  }
 
   const brandHandler = (e: MultiValue<ItemEntity>) => {
     if (e) {
       const mapped = e.map((item) => {
-        return item.value;
-      });
+        return item.value
+      })
 
-      dispatch(filterActions.setBrand(e));
+      dispatch(filterActions.setBrand(e))
     }
-  };
+  }
 
   const filterHandler = (
     e: MultiValue<ItemEntity>,
     filterName: keyof IFilter
   ) => {
     if (e) {
-      if (filterName === "condition") {
-        dispatch(filterActions.setCondition(e));
-      } else if (filterName === "style") {
-        dispatch(filterActions.setStyle(e));
-      } else if (filterName === "colour") {
-        dispatch(filterActions.setColour(e));
-      } else if (filterName === "size") {
-        dispatch(filterActions.setSize(e));
+      if (filterName === 'condition') {
+        dispatch(filterActions.setCondition(e))
+      } else if (filterName === 'style') {
+        dispatch(filterActions.setStyle(e))
+      } else if (filterName === 'colour') {
+        dispatch(filterActions.setColour(e))
+      } else if (filterName === 'size') {
+        dispatch(filterActions.setSize(e))
       }
     }
-  };
+  }
 
   const sortingHandler = (e: SingleValue<ItemEntity>) => {
     if (e) {
-      dispatch(filterActions.setSortBy(e));
+      dispatch(filterActions.setSortBy(e))
     }
-  };
+  }
 
   const nextPage = (page: number) => {
-    dispatch(filterActions.changePage(page));
-  };
+    dispatch(filterActions.changePage(page))
+  }
 
   const favoriteHandler = (id: number) => {
-    if (favoriteToggleStatus !== "loading") {
+    if (favoriteToggleStatus !== 'loading') {
       dispatch(toggleFavorite(id))
         .unwrap()
         .then((isFavorite) => {
-          dispatch(setFavorite({ id, isFavorite }));
+          dispatch(setFavorite({ id, isFavorite }))
         })
         .catch((error: Error) => {
-          console.error("rejected", error);
-        });
+          console.error('rejected', error)
+        })
     }
-  };
+  }
 
   const onInputBrandChange = (e: string) => {
     dispatch(getBrands(e))
       .unwrap()
       .catch((error: Error) => {
-        console.error("rejected", error);
-      });
-  };
+        console.error('rejected', error)
+      })
+  }
 
   const genderHandler = (
     e: SingleValue<{
-      value: string;
-      label: string;
+      value: string
+      label: string
     }>
   ) => {
     if (e) {
-      dispatch(filterActions.setGender(e));
-      dispatch(filterActions.setCategory(null));
-      dispatch(filterActions.setSubcategory([]));
+      dispatch(filterActions.setGender(e))
+      dispatch(filterActions.setCategory(null))
+      dispatch(filterActions.setSubcategory([]))
 
       dispatch(getCategories(e.value as Gender))
         .unwrap()
-        .catch((err) => console.log("rejected", err));
+        .catch((err) => console.log('rejected', err))
     }
-  };
+  }
 
   return (
     <ShopStyling onClick={() => setIsPriceOpen(false)}>
@@ -297,7 +297,7 @@ const Shop = () => {
             <div
               className="price"
               onClick={(e) => {
-                e.stopPropagation(), setIsPriceOpen(!isPriceOpen);
+                e.stopPropagation(), setIsPriceOpen(!isPriceOpen)
               }}
             >
               <p className="price-tag">Price</p>
@@ -315,7 +315,7 @@ const Shop = () => {
               <div
                 onClick={(e) => e.stopPropagation()}
                 className="price-handler"
-                style={isPriceOpen ? undefined : { display: "none" }}
+                style={isPriceOpen ? undefined : { display: 'none' }}
               >
                 <div className="price-range">
                   <Range
@@ -330,28 +330,28 @@ const Shop = () => {
                         onTouchStart={props.onTouchStart}
                         style={{
                           ...props.style,
-                          height: "36px",
-                          display: "flex",
-                          width: "100%",
+                          height: '36px',
+                          display: 'flex',
+                          width: '100%'
                         }}
                       >
                         <div
                           ref={props.ref}
                           style={{
-                            height: "5px",
-                            width: "100%",
-                            borderRadius: "4px",
+                            height: '5px',
+                            width: '100%',
+                            borderRadius: '4px',
                             background: getTrackBackground({
                               values,
                               colors: [
-                                "var(--grey-30)",
-                                "var(--dark)",
-                                "var(--grey-30)",
+                                'var(--grey-30)',
+                                'var(--dark)',
+                                'var(--grey-30)'
                               ],
                               min: MIN,
-                              max: MAX,
+                              max: MAX
                             }),
-                            alignSelf: "center",
+                            alignSelf: 'center'
                           }}
                         >
                           {children}
@@ -363,39 +363,39 @@ const Shop = () => {
                         {...props}
                         style={{
                           ...props.style,
-                          height: "25px",
-                          width: "25px",
-                          borderRadius: "4px",
-                          backgroundColor: "#FFF",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          border: "1px solid var(--grey-30)",
-                          outline: "none",
+                          height: '25px',
+                          width: '25px',
+                          borderRadius: '4px',
+                          backgroundColor: '#FFF',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          border: '1px solid var(--grey-30)',
+                          outline: 'none'
                         }}
                       >
                         <div
                           style={{
-                            position: "absolute",
-                            top: "-28px",
-                            color: "#fff",
-                            fontWeight: "400",
-                            fontSize: "14px",
-                            fontFamily: "var(--font-default)",
-                            padding: "4px",
-                            borderRadius: "4px",
-                            backgroundColor: "var(--dark)",
+                            position: 'absolute',
+                            top: '-28px',
+                            color: '#fff',
+                            fontWeight: '400',
+                            fontSize: '14px',
+                            fontFamily: 'var(--font-default)',
+                            padding: '4px',
+                            borderRadius: '4px',
+                            backgroundColor: 'var(--dark)'
                           }}
                         >
                           {values[index].toFixed(1)}
                         </div>
                         <div
                           style={{
-                            height: "16px",
-                            width: "5px",
+                            height: '16px',
+                            width: '5px',
                             backgroundColor: isDragged
-                              ? "var(--grey-30)"
-                              : "var(--grey-30)",
+                              ? 'var(--grey-30)'
+                              : 'var(--grey-30)'
                           }}
                         />
                       </div>
@@ -403,7 +403,7 @@ const Shop = () => {
                   />
                 </div>
                 <button
-                  disabled={itemsStatus === "loading"}
+                  disabled={itemsStatus === 'loading'}
                   className="button price--buton"
                   onClick={priceHandler}
                 >
@@ -412,7 +412,7 @@ const Shop = () => {
               </div>
             </div>
             <Select
-              placeholder={"Gender"}
+              placeholder={'Gender'}
               styles={multiplefilterColourStyles}
               onChange={genderHandler}
               options={genders}
@@ -422,27 +422,27 @@ const Shop = () => {
               isLoading={false}
               isSearchable={true}
               isClearable={false}
-              name={"gender"}
+              name={'gender'}
               instanceId="gender-select"
               value={filter.gender}
             />
             <Select
-              placeholder={"Categories"}
+              placeholder={'Categories'}
               styles={multiplefilterColourStyles}
               onChange={categoryHandler}
               options={categories}
               className="select"
               required={true}
               isDisabled={!filter.gender}
-              isLoading={categoriesStatus === "loading"}
+              isLoading={categoriesStatus === 'loading'}
               isSearchable={true}
-              name={"category"}
+              name={'category'}
               instanceId="category-select"
               isClearable={true}
               value={filter.category}
             />
             <Select
-              placeholder={"Subcategories"}
+              placeholder={'Subcategories'}
               styles={multiplefilterColourStyles}
               onChange={subcategoriesHandler}
               options={subcategories}
@@ -450,22 +450,22 @@ const Shop = () => {
               className="select"
               required={true}
               isDisabled={!filter.category}
-              isLoading={subcategoriesStatus === "loading"}
+              isLoading={subcategoriesStatus === 'loading'}
               isSearchable={true}
-              name={"subcategory"}
+              name={'subcategory'}
               instanceId="category-select"
               isClearable={true}
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
               value={filter.subcategory}
               components={{
-                ValueContainer,
+                ValueContainer
               }}
             />
             <Select
-              placeholder={"Size"}
+              placeholder={'Size'}
               styles={multiplefilterColourStyles}
-              onChange={(e) => filterHandler(e, "size" as keyof IFilter)}
+              onChange={(e) => filterHandler(e, 'size' as keyof IFilter)}
               options={sizes}
               isMulti
               className="select"
@@ -473,39 +473,39 @@ const Shop = () => {
               isDisabled={false}
               isLoading={false}
               isSearchable={true}
-              name={"size"}
+              name={'size'}
               instanceId="size-select"
               isClearable={true}
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
               value={filter.size}
               components={{
-                ValueContainer,
+                ValueContainer
               }}
             />
             <Select
-              placeholder={"Condition"}
+              placeholder={'Condition'}
               styles={multiplefilterColourStyles}
               isMulti
               options={conditions}
               className="select"
               required={true}
               isDisabled={false}
-              onChange={(e) => filterHandler(e, "condition" as keyof IFilter)}
+              onChange={(e) => filterHandler(e, 'condition' as keyof IFilter)}
               isLoading={false}
               isSearchable={true}
-              name={"condition"}
+              name={'condition'}
               isClearable={true}
               instanceId="condition-select"
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
               value={filter.condition}
               components={{
-                ValueContainer,
+                ValueContainer
               }}
             />
             <Select
-              placeholder={"Brand"}
+              placeholder={'Brand'}
               styles={multiplefilterColourStyles}
               isMulti
               options={brands}
@@ -513,9 +513,9 @@ const Shop = () => {
               onChange={brandHandler}
               required={true}
               isDisabled={false}
-              isLoading={brandStatus === "loading"}
+              isLoading={brandStatus === 'loading'}
               isSearchable={true}
-              name={"brand"}
+              name={'brand'}
               isClearable={true}
               instanceId="brand-select"
               closeMenuOnSelect={false}
@@ -523,66 +523,66 @@ const Shop = () => {
               onInputChange={onInputBrandChange}
               value={filter.brand}
               components={{
-                ValueContainer,
+                ValueContainer
               }}
             />
             <Select
-              placeholder={"Style"}
+              placeholder={'Style'}
               styles={multiplefilterColourStyles}
               isMulti
               options={styles}
               className="select"
-              onChange={(e) => filterHandler(e, "style" as keyof IFilter)}
+              onChange={(e) => filterHandler(e, 'style' as keyof IFilter)}
               required={true}
               isDisabled={false}
-              isLoading={stylesStatus === "loading"}
+              isLoading={stylesStatus === 'loading'}
               isSearchable={true}
-              name={"style"}
+              name={'style'}
               isClearable={true}
               instanceId="style-select"
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
               value={filter.style}
               components={{
-                ValueContainer,
+                ValueContainer
               }}
             />
             <Select
-              placeholder={"Colour"}
+              placeholder={'Colour'}
               styles={multiplefilterColourStyles}
               isMulti
               options={colours}
               className="select"
               required={true}
               isDisabled={false}
-              isLoading={coloursStatus === "loading"}
+              isLoading={coloursStatus === 'loading'}
               isSearchable={true}
-              name={"colour"}
-              onChange={(e) => filterHandler(e, "colour" as keyof IFilter)}
+              name={'colour'}
+              onChange={(e) => filterHandler(e, 'colour' as keyof IFilter)}
               isClearable={true}
               instanceId="colour-select"
               closeMenuOnSelect={false}
               hideSelectedOptions={false}
               value={filter.colour}
               components={{
-                ValueContainer,
+                ValueContainer
               }}
               formatOptionLabel={(option) => (
                 <div>
                   {option.hexCode ? (
                     <div
                       style={{
-                        display: "flex",
-                        gap: "10px",
-                        alignItems: "center",
+                        display: 'flex',
+                        gap: '10px',
+                        alignItems: 'center'
                       }}
                     >
                       <div
                         style={{
-                          minHeight: "30px",
-                          minWidth: "30px",
-                          borderRadius: "50%",
-                          backgroundColor: `#${option.hexCode}`,
+                          minHeight: '30px',
+                          minWidth: '30px',
+                          borderRadius: '50%',
+                          backgroundColor: `#${option.hexCode}`
                         }}
                       ></div>
                       <span>{option.label}</span>
@@ -606,7 +606,7 @@ const Shop = () => {
             <Image src={SortingIcon} alt="Sort by" />
           </div>
         </div>
-        {itemsStatus === "loading" ? (
+        {itemsStatus === 'loading' ? (
           <LoadindShopStyling>
             <div className="items-wrapper">
               <div className="item">
@@ -655,7 +655,7 @@ const Shop = () => {
                     <Image
                       src={item.images[0]}
                       alt="Image"
-                      style={{ objectFit: "cover" }}
+                      style={{ objectFit: 'cover' }}
                       fill
                     />
                   </div>
@@ -667,7 +667,7 @@ const Shop = () => {
           </div>
         )}
         <Pagination
-          disabled={itemsStatus === "loading"}
+          disabled={itemsStatus === 'loading'}
           simple
           current={filter.page || 1}
           onChange={(page) => nextPage(page)}
@@ -677,14 +677,14 @@ const Shop = () => {
         />
       </div>
     </ShopStyling>
-  );
-};
+  )
+}
 
 const ValueContainer = ({ children, ...props }: ValueContainerProps<any>) => {
-  let [values, input] = children as ReactNode[];
+  let [values, input] = children as ReactNode[]
 
   if (Array.isArray(values)) {
-    values = `${values.length} selected`;
+    values = `${values.length} selected`
   }
 
   return (
@@ -692,10 +692,10 @@ const ValueContainer = ({ children, ...props }: ValueContainerProps<any>) => {
       {values}
       {input}
     </components.ValueContainer>
-  );
-};
+  )
+}
 
-export default Shop;
+export default Shop
 
 const LoadindShopStyling = styled.div`
   .item {
@@ -715,7 +715,7 @@ const LoadindShopStyling = styled.div`
       background-color: var(--grey-10);
     }
   }
-`;
+`
 
 const ShopStyling = styled.div`
   //Pagination styling
@@ -827,7 +827,7 @@ const ShopStyling = styled.div`
         aspect-ratio: 1 / 1.2;
         position: relative;
         &::after {
-          content: "";
+          content: '';
           position: absolute;
           top: 0;
           bottom: 0;
@@ -855,4 +855,4 @@ const ShopStyling = styled.div`
       }
     }
   }
-`;
+`

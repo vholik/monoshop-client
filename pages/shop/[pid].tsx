@@ -1,68 +1,67 @@
-import Categories from "@components/Categories/Categories";
-import Header from "@components/Header/Header";
-import { getItemById } from "@store/reducers/item/GetItemByIdSlice";
-import styled from "styled-components";
-import Image from "next/image";
-import unfilledHeart from "@public/images/unfilled-heart.svg";
-import filledHeart from "@public/images/filled-heart.svg";
-import Footer from "@components/Footer/Footer";
-import Link from "next/link";
-import ArrowRight from "@public/images/arrow-right.svg";
+import Categories from '@components/Categories/Categories'
+import Header from '@components/Header/Header'
+import { getItemById } from '@store/reducers/item/GetItemByIdSlice'
+import styled from 'styled-components'
+import Image from 'next/image'
+import unfilledHeart from '@public/images/unfilled-heart.svg'
+import filledHeart from '@public/images/filled-heart.svg'
+import Footer from '@components/Footer/Footer'
+import Link from 'next/link'
+import ArrowRight from '@public/images/arrow-right.svg'
 import {
   useActionCreators,
   useAppDispatch,
-  useAppSelector,
-} from "@store/hooks/redux";
-import { CSSProperties, Fragment, useEffect, useState } from "react";
-import Router, { useRouter } from "next/router";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { Carousel } from "react-responsive-carousel";
+  useAppSelector
+} from '@store/hooks/redux'
+import { CSSProperties, Fragment, useEffect, useState } from 'react'
+import Router, { useRouter } from 'next/router'
+import 'react-responsive-carousel/lib/styles/carousel.min.css'
+import { Carousel } from 'react-responsive-carousel'
 import {
   checkIsFavorite,
-  checkIsFavoriteActions,
-} from "@store/reducers/favorite/CheckIsFavoriteSlice";
-import { toggleFavorite } from "@store/reducers/favorite/ToggleFavoriteSlice";
-import { getCategories } from "@store/reducers/category/GetCategoriesSlice";
-import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
-import { Gender } from "@store/types/gender.enum";
-import { addToCart } from "@store/reducers/cart/CartSlice";
-import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
-import { filterActions } from "@store/reducers/filter/FilterSlice";
-import Layout from "@components/Layout/Layout";
+  checkIsFavoriteActions
+} from '@store/reducers/favorite/CheckIsFavoriteSlice'
+import { toggleFavorite } from '@store/reducers/favorite/ToggleFavoriteSlice'
+import { getCategories } from '@store/reducers/category/GetCategoriesSlice'
+import { getSubcategories } from '@store/reducers/subcategory/GetSubcategoriesSlice'
+import { Gender } from '@store/types/gender.enum'
+import { addToCart } from '@store/reducers/cart/CartSlice'
+import { showErrorToast } from '@utils/ReactTostify/tostifyHandlers'
+import { filterActions } from '@store/reducers/filter/FilterSlice'
+import Layout from '@components/Layout/Layout'
+import ErrorPage from 'pages/404'
 
 const arrowStyles: CSSProperties = {
-  position: "absolute",
-  top: "50%",
-  transform: "translateY(-50%)",
-  bottom: "auto",
-  padding: "1em",
+  position: 'absolute',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  bottom: 'auto',
+  padding: '1em',
   zIndex: 2,
-  backgroundColor: "rgba(255,255,255,0.3)",
-};
+  backgroundColor: 'rgba(255,255,255,0.3)'
+}
 
 const ShopItem = () => {
-  const dispatch = useAppDispatch();
-  const router = useRouter();
-  const { pid } = router.query;
+  const dispatch = useAppDispatch()
+  const router = useRouter()
+  const { pid } = router.query
 
-  const authStatus = useAppSelector((state) => state.authReducer.status);
-  const userId = useAppSelector((state) => state.authReducer.userId);
+  const authStatus = useAppSelector((state) => state.authReducer.status)
+  const userId = useAppSelector((state) => state.authReducer.userId)
   const isFavoriteStasus = useAppSelector(
     (state) => state.checkIsFavoriteReducer.status
-  );
+  )
   const isFavorite = useAppSelector(
     (state) => state.checkIsFavoriteReducer.isFavorite
-  );
+  )
   const favoriteTogglerStatus = useAppSelector(
     (state) => state.toggleFavoriteReducer.status
-  );
+  )
 
-  console.log(isFavorite);
+  const item = useAppSelector((state) => state.getItemByIdReducer.item)
+  const itemStatus = useAppSelector((state) => state.getItemByIdReducer.status)
 
-  const item = useAppSelector((state) => state.getItemByIdReducer.item);
-  const itemStatus = useAppSelector((state) => state.getItemByIdReducer.status);
-
-  const [images, setImages] = useState<{ image: string }[]>([]);
+  const [images, setImages] = useState<{ image: string }[]>([])
 
   useEffect(() => {
     if (router.isReady) {
@@ -72,167 +71,172 @@ const ShopItem = () => {
           window.scrollTo({
             top: 0,
             left: 0,
-            behavior: "smooth",
-          });
+            behavior: 'smooth'
+          })
           const mappedImages = res.images.map((image) => {
             return {
-              image,
-            };
-          });
-          setImages(mappedImages);
+              image
+            }
+          })
+          setImages(mappedImages)
           // Check favorite
-          if (authStatus === "authenticated") {
+          if (authStatus === 'authenticated') {
             dispatch(checkIsFavorite(pid as string))
               .unwrap()
               .catch((error: Error) => {
-                console.error("rejected", error);
-              });
+                console.error('rejected', error)
+              })
           }
         })
         .catch((error: Error) => {
-          showErrorToast("Can not load data");
-          console.error("rejected", error);
-        });
+          console.error('rejected', error)
+        })
     }
-  }, [router.query.pid]);
+  }, [router.query.pid])
 
   const favoriteHandler = () => {
-    if (authStatus !== "authenticated") {
-      return Router.push("/login");
+    if (authStatus !== 'authenticated') {
+      return Router.push('/login')
     }
 
     if (
-      typeof pid === "string" &&
-      favoriteTogglerStatus !== "loading" &&
-      isFavoriteStasus !== "loading"
+      typeof pid === 'string' &&
+      favoriteTogglerStatus !== 'loading' &&
+      isFavoriteStasus !== 'loading'
     ) {
       dispatch(toggleFavorite(Number(pid)))
         .unwrap()
         .then((isFavorite) => {
-          dispatch(checkIsFavoriteActions.setIsFavorite({ isFavorite }));
+          dispatch(checkIsFavoriteActions.setIsFavorite({ isFavorite }))
         })
         .catch((error: Error) => {
-          console.error("rejected", error);
-        });
+          console.error('rejected', error)
+        })
     }
-  };
+  }
   const genderRedirect = () => {
     if (item?.gender) {
-      dispatch(filterActions.resetFilter());
+      dispatch(filterActions.resetFilter())
       dispatch(
         filterActions.setGender({ value: item.gender, label: item.gender })
-      );
-      dispatch(getCategories(item?.gender)).catch((err) => console.log(err));
+      )
+      dispatch(getCategories(item?.gender)).catch((err) => console.log(err))
     }
 
-    Router.push("/shop");
-  };
+    Router.push('/shop')
+  }
 
   const categoryRedirect = () => {
     if (item?.gender && item.id) {
-      dispatch(filterActions.resetFilter());
+      dispatch(filterActions.resetFilter())
       dispatch(
         filterActions.setGender({ value: item.gender, label: item.gender })
-      );
+      )
       dispatch(
         filterActions.setCategory({
           label: item.category.value,
           value: item.category.value,
-          id: item.category.id,
+          id: item.category.id
         })
-      );
+      )
 
-      dispatch(getCategories(item?.gender)).catch((err) => console.log(err));
+      dispatch(getCategories(item?.gender)).catch((err) => console.log(err))
       dispatch(getSubcategories(item.category.id)).catch((err) =>
         console.log(err)
-      );
+      )
     }
 
-    Router.push("/shop");
-  };
+    Router.push('/shop')
+  }
 
   const subcategoryRedirect = () => {
     if (item?.gender && item.id) {
-      dispatch(filterActions.resetFilter());
+      dispatch(filterActions.resetFilter())
       dispatch(
         filterActions.setGender({ value: item.gender, label: item.gender })
-      );
+      )
       dispatch(
         filterActions.setCategory({
           label: item.category.value,
           value: item.category.value,
-          id: item.category.id,
+          id: item.category.id
         })
-      );
+      )
       dispatch(
         filterActions.setCategory({
           label: item.subcategory.value,
           value: item.subcategory.value,
-          id: item.subcategory.id,
+          id: item.subcategory.id
         })
-      );
+      )
 
-      dispatch(getCategories(item?.gender)).catch((err) => console.log(err));
+      dispatch(getCategories(item?.gender)).catch((err) => console.log(err))
       dispatch(getSubcategories(item.category.id)).catch((err) =>
         console.log(err)
-      );
+      )
     }
 
-    Router.push("/shop");
-  };
+    Router.push('/shop')
+  }
 
   const buyHandler = () => {
-    if (authStatus !== "authenticated") {
+    if (authStatus !== 'authenticated') {
       Router.push({
-        pathname: "/login",
+        pathname: '/login',
         query: {
-          redirect: `/shop/${item?.id}`,
-        },
-      });
+          redirect: `/shop/${item?.id}`
+        }
+      })
     } else {
       if (item) {
-        dispatch(addToCart(item));
-        Router.push("/pay");
+        dispatch(addToCart(item))
+        Router.push('/pay')
       }
     }
-  };
+  }
 
   const sendMessage = () => {
-    if (authStatus !== "authenticated") {
+    if (authStatus !== 'authenticated') {
       Router.push({
-        pathname: "/login",
+        pathname: '/login',
         query: {
-          redirect: `/shop/${item?.id}`,
-        },
-      });
+          redirect: `/shop/${item?.id}`
+        }
+      })
     } else {
       Router.push({
-        pathname: "/chat",
+        pathname: '/chat',
         query: {
           send: item?.user.id,
-          item: item?.id,
-        },
-      });
+          item: item?.id
+        }
+      })
     }
-  };
+  }
 
   const handleLinkClink = (pid: number) => {
-    Router.push(`/shop/${pid}`, `/shop/${pid}`);
-  };
+    Router.push(`/shop/${pid}`, `/shop/${pid}`)
+  }
+
+  if (itemStatus === 'error') {
+    return <ErrorPage />
+  }
+
+  console.log(item?.description)
 
   return (
     <ShopItemStyles>
       <div className="container">
-        {itemStatus === "success" && (
+        {itemStatus === 'success' && (
           <div className="url">
-            <Link href={"/"}>
+            <Link href={'/'}>
               <p className="url-item">Main page</p>
             </Link>
             <Image src={ArrowRight} alt="url" width={10} height={10} />
             {item?.gender && (
               <div>
                 <p className="url-item" onClick={genderRedirect}>
-                  {item?.gender === Gender.MEN ? "Menswear" : "Womenswear"}
+                  {item?.gender === Gender.MEN ? 'Menswear' : 'Womenswear'}
                 </p>
               </div>
             )}
@@ -254,7 +258,7 @@ const ShopItem = () => {
           </div>
         )}
 
-        {itemStatus === "loading" || itemStatus === "init" ? (
+        {itemStatus === 'loading' || itemStatus === 'init' ? (
           <LoadingItemStyles>
             <div className="wrapper">
               <div className="left">
@@ -328,13 +332,13 @@ const ShopItem = () => {
                       title={label}
                       style={{
                         ...arrowStyles,
-                        left: "0",
-                        border: "none",
+                        left: '0',
+                        border: 'none'
                       }}
                     >
                       <Image
                         src={ArrowRight}
-                        style={{ transform: "rotate(180deg)" }}
+                        style={{ transform: 'rotate(180deg)' }}
                         alt="url"
                         width={15}
                         height={15}
@@ -350,8 +354,8 @@ const ShopItem = () => {
                       title={label}
                       style={{
                         ...arrowStyles,
-                        right: "0",
-                        border: "none",
+                        right: '0',
+                        border: 'none'
                       }}
                     >
                       <Image
@@ -382,7 +386,7 @@ const ShopItem = () => {
                       className="user-photo"
                       width={50}
                       height={50}
-                      style={{ objectFit: "cover" }}
+                      style={{ objectFit: 'cover' }}
                     />
                   </Link>
                   <Link href={`/user/${item?.user.id}`}>
@@ -452,11 +456,9 @@ const ShopItem = () => {
                   <h2 className="item-info__value">
                     {item?.brand.map((brand, key) => {
                       if (key === item.brand.length - 1)
-                        return <Fragment key={key}>{brand.value}</Fragment>;
+                        return <Fragment key={key}>{brand.value}</Fragment>
 
-                      return (
-                        <Fragment key={key}>{`${brand.value}, `}</Fragment>
-                      );
+                      return <Fragment key={key}>{`${brand.value}, `}</Fragment>
                     })}
                   </h2>
                 </div>
@@ -527,8 +529,8 @@ const ShopItem = () => {
         )}
       </div>
     </ShopItemStyles>
-  );
-};
+  )
+}
 
 const LoadingItemStyles = styled.div`
   .user {
@@ -582,7 +584,7 @@ const LoadingItemStyles = styled.div`
       background-color: var(--grey-10);
     }
   }
-`;
+`
 
 const ShopItemStyles = styled.div`
   .user-items-head {
@@ -785,6 +787,6 @@ const ShopItemStyles = styled.div`
       aspect-ratio: 1 / 1.2;
     }
   }
-`;
+`
 
-export default ShopItem;
+export default ShopItem
