@@ -3,6 +3,7 @@ import instance, { AuthResponse } from "@utils/axios";
 import { ILoginFormData } from "@store/types/auth";
 import { AxiosError, isAxiosError } from "axios";
 import { RejectError } from "@store/types/error";
+import { HYDRATE } from "next-redux-wrapper";
 
 interface InitState {
   userId: number | null;

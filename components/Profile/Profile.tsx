@@ -1,9 +1,9 @@
 import Categories from "@components/Categories/Categories";
 import Footer from "@components/Footer/Footer";
 import Header from "@components/Header/Header";
+import Layout from "@components/Layout/Layout";
 import Loading from "@components/Loading/Loading";
 import ProfileSidebar from "@components/ProfileSidebar/ProfileSidebar";
-import { FlexPage } from "@utils/FlexStyle";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import ErrorPage from "pages/404";
@@ -24,9 +24,7 @@ function Profile({ children, isLoading, isError }: ProfileProps) {
   }
 
   return (
-    <FlexPage>
-      <Header />
-      <Categories />
+    <>
       <ProfileStyles>
         <ProfileSidebar path={asPath} />
         {isLoading ? (
@@ -37,8 +35,7 @@ function Profile({ children, isLoading, isError }: ProfileProps) {
           <>{children}</>
         )}
       </ProfileStyles>
-      <Footer />
-    </FlexPage>
+    </>
   );
 }
 

@@ -15,6 +15,7 @@ import { useAppDispatch } from "@store/hooks/redux";
 import Router from "next/router";
 import { SortBy } from "@store/types/filter-by.enum";
 import { filterActions } from "@store/reducers/filter/FilterSlice";
+import Layout from "@components/Layout/Layout";
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) => async () => {
@@ -69,8 +70,6 @@ export default function Home({ brands, items, styles }: HomeProps) {
         <title>Monoshop - create your style</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <Header />
-      <Categories />
       <main className="hero">
         <div className="container">
           <h1 className="hero-title">Monoshop marketplace</h1>
@@ -176,17 +175,20 @@ export default function Home({ brands, items, styles }: HomeProps) {
           </div>
         </div>
       </div>
-      <Footer />
     </HomeStyles>
   );
 }
 
 const HomeStyles = styled.div`
   .hero {
+    border-radius: 2em;
+    margin-top: 2rem;
     padding: 10rem 0;
     font-family: var(--font-default);
     color: white;
     background-image: url(${HeroBg.src});
+    right: -100%;
+    left: -100%;
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;

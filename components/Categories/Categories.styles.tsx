@@ -4,14 +4,22 @@ export const CategoriesStyles = styled.div`
   font-family: var(--font-default);
   margin-top: 2rem;
   padding: 1rem 0;
-  border-top: 1px solid var(--grey-10);
-  border-bottom: 1px solid var(--grey-10);
   display: flex;
   align-items: center;
   gap: 2rem;
-  padding-left: 50px;
-  padding-right: 50px;
-  background-color: #fbfaf9;
+  position: relative;
+
+  &::before {
+    content: "";
+    background-color: #fbfaf9;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -100%;
+    right: -100%;
+    border-top: 1px solid var(--grey-10);
+    border-bottom: 1px solid var(--grey-10);
+  }
 
   .category {
     position: relative;

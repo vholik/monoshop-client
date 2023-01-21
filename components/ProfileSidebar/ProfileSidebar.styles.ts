@@ -1,7 +1,6 @@
 import styled from "styled-components";
 
 export const ProfileSidebarStyles = styled.div`
-  margin-left: 50px;
   width: fit-content;
 
   .title-sm {

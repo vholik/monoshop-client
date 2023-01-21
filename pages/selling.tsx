@@ -8,9 +8,9 @@ import Link from "next/link";
 import { getUserItems } from "@store/reducers/item/GetUserItemsSlice";
 import Loading from "@components/Loading/Loading";
 import Footer from "@components/Footer/Footer";
-import { FlexPage } from "@utils/FlexStyle";
 import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
 import Profile from "@components/Profile/Profile";
+import Layout from "@components/Layout/Layout";
 
 const MyProfile = () => {
   const dispatch = useAppDispatch();
@@ -27,7 +27,7 @@ const MyProfile = () => {
   }, []);
 
   return (
-    <Profile isLoading={status === "loading"}>
+    <Profile isLoading={status === "loading"} isError={status === "error"}>
       <ProfileItems items={items} />
     </Profile>
   );

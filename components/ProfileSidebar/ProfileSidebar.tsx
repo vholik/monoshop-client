@@ -12,7 +12,7 @@ function ProfileSidebar({ path }: ProfileSidebarProps) {
     <ProfileSidebarStyles>
       <h1 className="title-sm">Profile</h1>
       {profileRoutes.map((route) => (
-        <Link href={route.path}>
+        <Link href={route.path} key={route.path}>
           <div
             className={
               path === route.path

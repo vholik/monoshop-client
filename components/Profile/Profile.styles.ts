@@ -4,7 +4,6 @@ export const ProfileStyles = styled.div`
   margin-top: 2rem;
   display: flex;
   gap: 5rem;
-  margin-right: 50px;
 
   .loading-wrapper {
     position: absolute;

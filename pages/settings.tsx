@@ -8,10 +8,10 @@ import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import Loading from "@components/Loading/Loading";
 import Link from "next/link";
 import Footer from "@components/Footer/Footer";
-import { FlexPage } from "@utils/FlexStyle";
 import Profile from "@components/Profile/Profile";
 import ProfileItems from "@components/ProfileItems/ProfileItems";
 import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
+import Layout from "@components/Layout/Layout";
 
 const MyProfile = () => {
   const dispatch = useAppDispatch();
@@ -23,12 +23,12 @@ const MyProfile = () => {
     dispatch(getProfile())
       .unwrap()
       .catch((error) => {
-        showErrorToast("Can not load your profile");
+        console.log(error);
       });
   }, []);
 
   return (
-    <Profile isLoading={status === "loading"}>
+    <Profile isLoading={status === "loading"} isError={status === "error"}>
       <ProfileSettings user={user} />
     </Profile>
   );

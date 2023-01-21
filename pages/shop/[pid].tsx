@@ -25,10 +25,10 @@ import { toggleFavorite } from "@store/reducers/favorite/ToggleFavoriteSlice";
 import { getCategories } from "@store/reducers/category/GetCategoriesSlice";
 import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
 import { Gender } from "@store/types/gender.enum";
-import { FlexPage } from "@utils/FlexStyle";
 import { addToCart } from "@store/reducers/cart/CartSlice";
 import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
 import { filterActions } from "@store/reducers/filter/FilterSlice";
+import Layout from "@components/Layout/Layout";
 
 const arrowStyles: CSSProperties = {
   position: "absolute",
@@ -221,320 +221,312 @@ const ShopItem = () => {
   };
 
   return (
-    <FlexPage>
-      <ShopItemStyles>
-        <Header />
-        <Categories />
-
-        <div className="container">
-          {itemStatus === "success" && (
-            <div className="url">
-              <Link href={"/"}>
-                <p className="url-item">Main page</p>
-              </Link>
-              <Image src={ArrowRight} alt="url" width={10} height={10} />
-              {item?.gender && (
-                <div>
-                  <p className="url-item" onClick={genderRedirect}>
-                    {item?.gender === Gender.MEN ? "Menswear" : "Womenswear"}
-                  </p>
-                </div>
-              )}
-              <Image src={ArrowRight} alt="url" width={10} height={10} />
-              {item?.category && (
-                <p className="url-item" onClick={categoryRedirect}>
-                  {item?.category.value}
+    <ShopItemStyles>
+      <div className="container">
+        {itemStatus === "success" && (
+          <div className="url">
+            <Link href={"/"}>
+              <p className="url-item">Main page</p>
+            </Link>
+            <Image src={ArrowRight} alt="url" width={10} height={10} />
+            {item?.gender && (
+              <div>
+                <p className="url-item" onClick={genderRedirect}>
+                  {item?.gender === Gender.MEN ? "Menswear" : "Womenswear"}
                 </p>
-              )}
-              <Image src={ArrowRight} alt="url" width={10} height={10} />
-              {item?.subcategory && (
-                <p className="url-item" onClick={subcategoryRedirect}>
-                  {item?.subcategory.value}
-                </p>
-              )}
-
-              <Image src={ArrowRight} alt="url" width={10} height={10} />
-              {item?.name && (
-                <p className="url-item current-url">{item?.name}</p>
-              )}
-            </div>
-          )}
-
-          {itemStatus === "loading" || itemStatus === "init" ? (
-            <LoadingItemStyles>
-              <div className="wrapper">
-                <div className="left">
-                  <div className="photo skeleton-animation"></div>
-                </div>
-                <div className="right">
-                  {item?.user && (
-                    <div className="user">
-                      <div className="user-photo"></div>
-
-                      <div className="user-info">
-                        <h3 className="user-name"></h3>
-                        <p className="user-mail"></p>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="hero-wrapper">
-                    <div className="item-hero">
-                      <h2 className="item-name"></h2>
-                    </div>
-                    <h2 className="item-price"></h2>
-                    <button className="button item--button"></button>
-                  </div>
-
-                  <div className="item-info">
-                    <div className="item-info__item">
-                      <h2 className="item-info__tag"></h2>
-                      <h2 className="item-info__value gender--value"></h2>
-                    </div>
-                    <div className="item-info__item">
-                      <h2 className="item-info__tag"></h2>
-                      <h2 className="item-info__value gender--value"></h2>
-                    </div>
-                    <div className="item-info__item">
-                      <h2 className="item-info__tag"></h2>
-                      <h2 className="item-info__value"></h2>
-                    </div>
-                    <div className="item-info__item">
-                      <h2 className="item-info__tag"></h2>
-                      <h2 className="item-info__value"></h2>
-                    </div>
-                    <div className="item-info__item">
-                      <h2 className="item-info__tag"></h2>
-                      <h2 className="item-info__value"></h2>
-                    </div>
-                    <div className="item-info__item">
-                      <h2 className="item-info__tag"></h2>
-                      <h2 className="item-info__value"></h2>
-                    </div>
-                    <div className="item-info__item">
-                      <h2 className="item-info__tag"></h2>
-                      <h2 className="item-info__value colour--value"></h2>
-                    </div>
-                  </div>
-                </div>
               </div>
-            </LoadingItemStyles>
-          ) : (
+            )}
+            <Image src={ArrowRight} alt="url" width={10} height={10} />
+            {item?.category && (
+              <p className="url-item" onClick={categoryRedirect}>
+                {item?.category.value}
+              </p>
+            )}
+            <Image src={ArrowRight} alt="url" width={10} height={10} />
+            {item?.subcategory && (
+              <p className="url-item" onClick={subcategoryRedirect}>
+                {item?.subcategory.value}
+              </p>
+            )}
+
+            <Image src={ArrowRight} alt="url" width={10} height={10} />
+            {item?.name && <p className="url-item current-url">{item?.name}</p>}
+          </div>
+        )}
+
+        {itemStatus === "loading" || itemStatus === "init" ? (
+          <LoadingItemStyles>
             <div className="wrapper">
               <div className="left">
-                <Carousel
-                  showArrows={true}
-                  showStatus={false}
-                  showIndicators={false}
-                  renderArrowPrev={(onClickHandler, hasPrev, label) =>
-                    hasPrev && (
-                      <button
-                        type="button"
-                        onClick={onClickHandler}
-                        title={label}
-                        style={{
-                          ...arrowStyles,
-                          left: "0",
-                          border: "none",
-                        }}
-                      >
-                        <Image
-                          src={ArrowRight}
-                          style={{ transform: "rotate(180deg)" }}
-                          alt="url"
-                          width={15}
-                          height={15}
-                        />
-                      </button>
-                    )
-                  }
-                  renderArrowNext={(onClickHandler, hasPrev, label) =>
-                    hasPrev && (
-                      <button
-                        type="button"
-                        onClick={onClickHandler}
-                        title={label}
-                        style={{
-                          ...arrowStyles,
-                          right: "0",
-                          border: "none",
-                        }}
-                      >
-                        <Image
-                          src={ArrowRight}
-                          alt="url"
-                          width={15}
-                          height={15}
-                        />
-                      </button>
-                    )
-                  }
-                >
-                  {images.map((image, key) => (
-                    <div className="image-slide" key={key}>
-                      <img src={image.image} />
-                    </div>
-                  ))}
-                </Carousel>
+                <div className="photo skeleton-animation"></div>
               </div>
-              {/* Right */}
               <div className="right">
                 {item?.user && (
                   <div className="user">
-                    <Link href={`/user/${item?.user.id}`}>
-                      <Image
-                        src={item!.user.image}
-                        alt="User photo"
-                        className="user-photo"
-                        width={50}
-                        height={50}
-                        style={{ objectFit: "cover" }}
-                      />
-                    </Link>
-                    <Link href={`/user/${item?.user.id}`}>
-                      <div className="user-info">
-                        <h3 className="user-name">{item?.user.fullName}</h3>
-                        <p className="user-mail">{item?.user.email}</p>
-                      </div>
-                    </Link>
+                    <div className="user-photo"></div>
+
+                    <div className="user-info">
+                      <h3 className="user-name"></h3>
+                      <p className="user-mail"></p>
+                    </div>
                   </div>
                 )}
 
                 <div className="hero-wrapper">
                   <div className="item-hero">
-                    <h2 className="item-name">{item?.name}</h2>
-                    {isFavorite ? (
-                      <Image
-                        src={filledHeart}
-                        alt="Add to favorites"
-                        onClick={favoriteHandler}
-                      />
-                    ) : (
-                      <Image
-                        src={unfilledHeart}
-                        alt="Remove from favorites"
-                        onClick={favoriteHandler}
-                      />
-                    )}
+                    <h2 className="item-name"></h2>
                   </div>
-                  <h2 className="item-price">{item?.price} PLN</h2>
-                  {userId === item?.user?.id ? (
-                    <Link href={`/edit/${item.id}`}>
-                      <button className="button item--button">Edit</button>
-                    </Link>
-                  ) : (
-                    <Fragment>
-                      <button
-                        className="button item--button"
-                        onClick={buyHandler}
-                      >
-                        Buy now
-                      </button>
-
-                      <button
-                        className="button item--button message--button"
-                        onClick={sendMessage}
-                      >
-                        Message
-                      </button>
-                    </Fragment>
-                  )}
+                  <h2 className="item-price"></h2>
+                  <button className="button item--button"></button>
                 </div>
+
                 <div className="item-info">
                   <div className="item-info__item">
-                    <h2 className="item-info__tag">Category</h2>
-                    <h2 className="item-info__value gender--value">
-                      {item?.category.value}
-                    </h2>
+                    <h2 className="item-info__tag"></h2>
+                    <h2 className="item-info__value gender--value"></h2>
                   </div>
                   <div className="item-info__item">
-                    <h2 className="item-info__tag">Gender</h2>
-                    <h2 className="item-info__value gender--value">
-                      {item?.gender}
-                    </h2>
+                    <h2 className="item-info__tag"></h2>
+                    <h2 className="item-info__value gender--value"></h2>
                   </div>
                   <div className="item-info__item">
-                    <h2 className="item-info__tag">Brand</h2>
-                    <h2 className="item-info__value">
-                      {item?.brand.map((brand, key) => {
-                        if (key === item.brand.length - 1)
-                          return <Fragment key={key}>{brand.value}</Fragment>;
-
-                        return (
-                          <Fragment key={key}>{`${brand.value}, `}</Fragment>
-                        );
-                      })}
-                    </h2>
+                    <h2 className="item-info__tag"></h2>
+                    <h2 className="item-info__value"></h2>
                   </div>
                   <div className="item-info__item">
-                    <h2 className="item-info__tag">Size</h2>
-                    <h2 className="item-info__value">{item?.size}</h2>
+                    <h2 className="item-info__tag"></h2>
+                    <h2 className="item-info__value"></h2>
                   </div>
                   <div className="item-info__item">
-                    <h2 className="item-info__tag">Style</h2>
-                    <h2 className="item-info__value">{item?.style?.value}</h2>
+                    <h2 className="item-info__tag"></h2>
+                    <h2 className="item-info__value"></h2>
                   </div>
                   <div className="item-info__item">
-                    <h2 className="item-info__tag">Condition</h2>
-                    <h2 className="item-info__value">{item?.condition}/10</h2>
+                    <h2 className="item-info__tag"></h2>
+                    <h2 className="item-info__value"></h2>
                   </div>
                   <div className="item-info__item">
-                    <h2 className="item-info__tag">Colour</h2>
-                    <h2 className="item-info__value colour--value">
-                      <div
-                        className="colour-circle"
-                        style={{ backgroundColor: `#${item?.colour?.hexCode}` }}
-                      ></div>
-                      {item?.colour?.value}
-                    </h2>
+                    <h2 className="item-info__tag"></h2>
+                    <h2 className="item-info__value colour--value"></h2>
                   </div>
                 </div>
-                {item?.description && (
-                  <div className="item-description">
-                    <p
-                      className="item-description__text"
-                      dangerouslySetInnerHTML={{ __html: item!.description }}
-                    ></p>
-                  </div>
-                )}
-                {item?.hashtags.length !== 0 && item?.hashtags && (
-                  <div className="hashtags-wrapper">
-                    {item?.hashtags.map((hashtag, key) => (
-                      <div className="hashtag" key={key}>
-                        #{hashtag}
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
-          )}
-          {item?.userItems.length && (
-            <Fragment>
-              <div className="user-items-head">
-                <h2 className="title-sm">Also from this user</h2>
-                <Link href={`/user/${item.user.id}`}>
-                  <p className="see-all-button">See all items</p>
-                </Link>
-              </div>
-              <div className="user-items-wrapper">
-                {item?.userItems.map((wear) => (
-                  <div className="user-item" key={wear.id}>
-                    <div
-                      onClick={() => handleLinkClink(wear.id)}
-                      className="user-item__photo"
-                      style={{ backgroundImage: `url(${wear.images[0]})` }}
-                    ></div>
-                    <div className="user-item__price">{wear.price} PLN</div>
+          </LoadingItemStyles>
+        ) : (
+          <div className="wrapper">
+            <div className="left">
+              <Carousel
+                showArrows={true}
+                showStatus={false}
+                showIndicators={false}
+                renderArrowPrev={(onClickHandler, hasPrev, label) =>
+                  hasPrev && (
+                    <button
+                      type="button"
+                      onClick={onClickHandler}
+                      title={label}
+                      style={{
+                        ...arrowStyles,
+                        left: "0",
+                        border: "none",
+                      }}
+                    >
+                      <Image
+                        src={ArrowRight}
+                        style={{ transform: "rotate(180deg)" }}
+                        alt="url"
+                        width={15}
+                        height={15}
+                      />
+                    </button>
+                  )
+                }
+                renderArrowNext={(onClickHandler, hasPrev, label) =>
+                  hasPrev && (
+                    <button
+                      type="button"
+                      onClick={onClickHandler}
+                      title={label}
+                      style={{
+                        ...arrowStyles,
+                        right: "0",
+                        border: "none",
+                      }}
+                    >
+                      <Image
+                        src={ArrowRight}
+                        alt="url"
+                        width={15}
+                        height={15}
+                      />
+                    </button>
+                  )
+                }
+              >
+                {images.map((image, key) => (
+                  <div className="image-slide" key={key}>
+                    <img src={image.image} />
                   </div>
                 ))}
+              </Carousel>
+            </div>
+            {/* Right */}
+            <div className="right">
+              {item?.user && (
+                <div className="user">
+                  <Link href={`/user/${item?.user.id}`}>
+                    <Image
+                      src={item!.user.image}
+                      alt="User photo"
+                      className="user-photo"
+                      width={50}
+                      height={50}
+                      style={{ objectFit: "cover" }}
+                    />
+                  </Link>
+                  <Link href={`/user/${item?.user.id}`}>
+                    <div className="user-info">
+                      <h3 className="user-name">{item?.user.fullName}</h3>
+                      <p className="user-mail">{item?.user.email}</p>
+                    </div>
+                  </Link>
+                </div>
+              )}
+
+              <div className="hero-wrapper">
+                <div className="item-hero">
+                  <h2 className="item-name">{item?.name}</h2>
+                  {isFavorite ? (
+                    <Image
+                      src={filledHeart}
+                      alt="Add to favorites"
+                      onClick={favoriteHandler}
+                    />
+                  ) : (
+                    <Image
+                      src={unfilledHeart}
+                      alt="Remove from favorites"
+                      onClick={favoriteHandler}
+                    />
+                  )}
+                </div>
+                <h2 className="item-price">{item?.price} PLN</h2>
+                {userId === item?.user?.id ? (
+                  <Link href={`/edit/${item.id}`}>
+                    <button className="button item--button">Edit</button>
+                  </Link>
+                ) : (
+                  <Fragment>
+                    <button
+                      className="button item--button"
+                      onClick={buyHandler}
+                    >
+                      Buy now
+                    </button>
+
+                    <button
+                      className="button item--button message--button"
+                      onClick={sendMessage}
+                    >
+                      Message
+                    </button>
+                  </Fragment>
+                )}
               </div>
-            </Fragment>
-          )}
-        </div>
-      </ShopItemStyles>
-      <Footer />
-    </FlexPage>
+              <div className="item-info">
+                <div className="item-info__item">
+                  <h2 className="item-info__tag">Category</h2>
+                  <h2 className="item-info__value gender--value">
+                    {item?.category.value}
+                  </h2>
+                </div>
+                <div className="item-info__item">
+                  <h2 className="item-info__tag">Gender</h2>
+                  <h2 className="item-info__value gender--value">
+                    {item?.gender}
+                  </h2>
+                </div>
+                <div className="item-info__item">
+                  <h2 className="item-info__tag">Brand</h2>
+                  <h2 className="item-info__value">
+                    {item?.brand.map((brand, key) => {
+                      if (key === item.brand.length - 1)
+                        return <Fragment key={key}>{brand.value}</Fragment>;
+
+                      return (
+                        <Fragment key={key}>{`${brand.value}, `}</Fragment>
+                      );
+                    })}
+                  </h2>
+                </div>
+                <div className="item-info__item">
+                  <h2 className="item-info__tag">Size</h2>
+                  <h2 className="item-info__value">{item?.size}</h2>
+                </div>
+                <div className="item-info__item">
+                  <h2 className="item-info__tag">Style</h2>
+                  <h2 className="item-info__value">{item?.style?.value}</h2>
+                </div>
+                <div className="item-info__item">
+                  <h2 className="item-info__tag">Condition</h2>
+                  <h2 className="item-info__value">{item?.condition}/10</h2>
+                </div>
+                <div className="item-info__item">
+                  <h2 className="item-info__tag">Colour</h2>
+                  <h2 className="item-info__value colour--value">
+                    <div
+                      className="colour-circle"
+                      style={{ backgroundColor: `#${item?.colour?.hexCode}` }}
+                    ></div>
+                    {item?.colour?.value}
+                  </h2>
+                </div>
+              </div>
+              {item?.description && (
+                <div className="item-description">
+                  <p
+                    className="item-description__text"
+                    dangerouslySetInnerHTML={{ __html: item!.description }}
+                  ></p>
+                </div>
+              )}
+              {item?.hashtags.length !== 0 && item?.hashtags && (
+                <div className="hashtags-wrapper">
+                  {item?.hashtags.map((hashtag, key) => (
+                    <div className="hashtag" key={key}>
+                      #{hashtag}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {item?.userItems.length && (
+          <Fragment>
+            <div className="user-items-head">
+              <h2 className="title-sm">Also from this user</h2>
+              <Link href={`/user/${item.user.id}`}>
+                <p className="see-all-button">See all items</p>
+              </Link>
+            </div>
+            <div className="user-items-wrapper">
+              {item?.userItems.map((wear) => (
+                <div className="user-item" key={wear.id}>
+                  <div
+                    onClick={() => handleLinkClink(wear.id)}
+                    className="user-item__photo"
+                    style={{ backgroundImage: `url(${wear.images[0]})` }}
+                  ></div>
+                  <div className="user-item__price">{wear.price} PLN</div>
+                </div>
+              ))}
+            </div>
+          </Fragment>
+        )}
+      </div>
+    </ShopItemStyles>
   );
 };
 

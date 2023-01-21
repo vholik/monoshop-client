@@ -1,38 +1,59 @@
-import Categories from "@components/Categories/Categories";
-import Header from "@components/Header/Header";
 import styled from "styled-components";
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
-import StateManagedSelect, { MultiValue, SingleValue } from "react-select";
-import Footer from "@components/Footer/Footer";
+import {
+  ChangeEvent,
+  FormEvent,
+  RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import StateManagedSelect, { GroupBase } from "react-select";
 import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
 import { uploadImage } from "@store/reducers/image/UploadImageSlice";
 import Image from "next/image";
 import { getCategories } from "@store/reducers/category/GetCategoriesSlice";
-import { ItemEntity, ItemEntityWithId } from "@store/types/item-entity";
 import { getBrands } from "@store/reducers/brand/GetBrandsSlice";
 import { getStyles } from "@store/reducers/style/GetStylesSlice";
 import { getColours } from "@store/reducers/colour/GetColoursSlice";
 import { Gender } from "@store/types/gender.enum";
-import { addItem } from "@store/reducers/item/AddItemSlice";
-import Loading from "@components/Loading/Loading";
+
 import {
   colourStyles,
   conditions,
   genders,
   sizes,
-} from "@utils/react-select/react-select-utils";
+} from "@utils/react-select/reactSelectUtils";
 import Select from "react-select";
 import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
 import { Reorder } from "framer-motion";
 import Trash from "@public/images/trash.svg";
 import Upload from "@public/images/upload.svg";
 import Drag from "@public/images/drag.svg";
-import Router from "next/router";
 import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
-import { Controller } from "react-hook-form";
+import { Controller, Ref, SubmitHandler, useForm } from "react-hook-form";
+import { ISellForm } from "@store/types/form";
+import { ItemEntityWithId } from "@store/types/item-entity";
+import { hashtagsRegex } from "@utils/validationRegex";
+import { convertStringToHashtags } from "@utils/hashtagsConverter";
+import { addItem } from "@store/reducers/item/AddItemSlice";
+import Router from "next/router";
 
 export default function AddItem() {
   const dispatch = useAppDispatch();
+
+  const categoryRef = useRef<any>(null);
+  const subcategoryRef = useRef<any>(null);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    resetField,
+    formState: { errors: formErrors },
+  } = useForm<ISellForm>({
+    mode: "onBlur",
+  });
 
   const imageStatus = useAppSelector(
     (state) => state.uploadImageReducer.status
@@ -51,7 +72,7 @@ export default function AddItem() {
     (state) => state.getSubcategoriesReducer.status
   );
 
-  const brandsStatus = useAppSelector((state) => state.getBrandsReducer);
+  const brandsStatus = useAppSelector((state) => state.getBrandsReducer.status);
   const brands = useAppSelector((state) => state.getBrandsReducer.brands);
 
   const styles = useAppSelector((state) => state.getStylesReducer.styles);
@@ -65,49 +86,9 @@ export default function AddItem() {
   const itemStatus = useAppSelector((state) => state.addItemReducer.status);
 
   const [formImages, setFormImages] = useState<string[]>([]);
-  const [formData, setFormData] = useState<{
-    category: ItemEntityWithId | null;
-    condition: ItemEntity | null;
-    style: ItemEntity | null;
-    brand: MultiValue<ItemEntityWithId> | null;
-    colour: ItemEntity | null;
-    size: ItemEntity | null;
-    price: number;
-    gender: ItemEntity | null;
-    description: string;
-    hashtags: string[];
-    name: string;
-    subcategory: ItemEntityWithId | null;
-  }>({
-    category: null,
-    condition: null,
-    style: null,
-    brand: null,
-    colour: null,
-    size: null,
-    price: 0,
-    gender: null,
-    description: "",
-    hashtags: [],
-    name: "",
-    subcategory: null,
-  });
 
-  const [errors, setErrors] = useState({
-    category: "",
-    subcategory: "",
-    condition: "",
-    style: "",
-    brand: "",
-    colour: "",
-    size: "",
-    price: "",
-    gender: "",
-    images: "",
-    description: "",
-    hashtags: "",
-    name: "",
-  });
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [gender, setGender] = useState<Gender | null>(null);
 
   const handleImageSubmit = (e: ChangeEvent<HTMLInputElement>) => {
     if (formImages.length >= 5) {
@@ -115,8 +96,6 @@ export default function AddItem() {
 
       return;
     }
-
-    setErrors({ ...errors, images: "" });
 
     const image = e.target.files![0];
 
@@ -133,14 +112,13 @@ export default function AddItem() {
           const find = formImages.find((url) => url === image);
 
           if (find) {
-            setErrors({ ...errors, images: "Images can't be the same" });
+            showErrorToast("Images can not be the same");
           } else {
             setFormImages([image, ...formImages]);
           }
         })
         .catch((error) => {
-          setErrors({ ...errors, images: error.message });
-          console.error("rejected", error);
+          +console.error("rejected", error);
         });
     }
   };
@@ -171,179 +149,42 @@ export default function AddItem() {
   }, []);
 
   useEffect(() => {
-    if (!formData.gender) {
-      return;
-    }
+    // Clear values of forward inputs
+    resetField("categoryId");
+    categoryRef.current.clearValue();
+    resetField("subcategoryId");
+    subcategoryRef.current.clearValue();
 
     // Categories
-    dispatch(getCategories(formData.gender.value as Gender))
+    dispatch(getCategories(gender as Gender))
       .unwrap()
       .catch((error) => {
         console.error("rejected", error);
       });
-  }, [formData.gender]);
+  }, [gender]);
 
   useEffect(() => {
-    if (!formData.category) {
-      return;
+    resetField("subcategoryId");
+    subcategoryRef.current.clearValue();
+
+    if (categoryId) {
+      // Categories
+      dispatch(getSubcategories(categoryId))
+        .unwrap()
+        .catch((error) => {});
     }
+  }, [categoryId]);
 
-    // Categories
-    dispatch(getSubcategories(formData.category?.id))
-      .unwrap()
-      .catch((error) => {
-        showErrorToast("Error getting a subcategories");
-      });
-  }, [formData.category]);
-
-  const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    if (value) {
-      setFormData({
-        ...formData,
-        price: Number(value),
-      });
-    }
-  };
-
-  const handleHashtagsChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value;
-
-    const hashtags = text
-      .split(",")
-      .map((hashtag) => hashtag.replace("#", "").trim())
-      .filter((hashtag) => hashtag !== "");
-
-    hashtags.map((hashtag) => {
-      if (hashtag.split(" ").length !== 1) {
-        showErrorToast("Hashtags can not have white space");
-        return;
-      }
-    });
-
-    setFormData({
-      ...formData,
-      hashtags,
-    });
-  };
-
-  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    setErrors({ ...errors, name: "" });
-
-    if (value) {
-      setFormData({
-        ...formData,
-        name: value,
-      });
-    }
-  };
-
-  const textareaHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      description: e.target.value.replace(/\r\n|\r|\n/g, "<br />"),
-    });
-    setErrors({ ...errors, description: "" });
-  };
-
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (errors.hashtags) {
-      showErrorToast("Please fix hashtags");
-      return;
-    }
-
-    if (formData.name.length > 50) {
-      showErrorToast("Item header are too big");
-      return;
-    }
-
-    if (formData.name.length < 5) {
-      showErrorToast("Item header are too small");
-      return;
-    }
-
-    if (!formData.gender) {
-      showErrorToast("Choose a gender");
-      return;
-    }
-
-    if (!formData.category) {
-      showErrorToast("Please choose category");
-      return;
-    }
-
-    if (!formData.subcategory) {
-      showErrorToast("Please choose subcategory");
-      return;
-    }
-
-    if (!formData.style) {
-      showErrorToast("Please choose style");
-      return;
-    }
-
-    if (!formData.condition) {
-      showErrorToast("Pick condition of your item");
-      return;
-    }
-
-    if (!formData.colour) {
-      showErrorToast("Choose a colour");
-      return;
-    }
-
-    if (!formData.brand) {
-      showErrorToast("Choose a brand");
-      return;
-    }
-
-    if (!formData.price) {
-      showErrorToast("Enter the price");
-      return;
-    }
-
-    if (!formData.size) {
-      showErrorToast("Please choose size");
-      return;
-    }
-
-    if (formData.hashtags.length > 5) {
-      showErrorToast("Can not be more than 5 hashtags");
-      return;
-    }
-    if (formData.hashtags.length > 200) {
-      showErrorToast("Description are too big");
-      return;
-    }
-
+  const onSubmit: SubmitHandler<ISellForm> = (data) => {
     if (!formImages.length) {
-      showErrorToast("Please upload at least 1 photo");
-      return;
-    }
-    if (formImages.length > 5) {
-      showErrorToast("Too much images");
+      showErrorToast("Please upload at least 1 image");
       return;
     }
 
     const patchedData = {
-      categoryId: formData.category.id,
-      subcategoryId: formData.subcategory.id,
-      condition: Number(formData.condition.value),
-      style: formData.style.value,
-      brand: formData.brand.map((brand) => brand.id),
+      ...data,
       images: formImages,
-      colour: formData.colour.value,
-      size: formData.size.value,
-      price: formData.price,
-      gender: formData.gender.value,
-      name: formData.name,
-      hashtags: formData.hashtags,
-      description: formData.description,
+      hashtags: convertStringToHashtags(data.hashtags),
     };
 
     dispatch(addItem(patchedData))
@@ -361,80 +202,13 @@ export default function AddItem() {
       });
   };
 
-  const handleBrandChange = (e: MultiValue<ItemEntityWithId>) => {
-    setFormData({
-      ...formData,
-      brand: e,
-    });
-  };
-
-  const onInputBrandChange = (e: string) => {
-    dispatch(getBrands(e))
-      .unwrap()
-      .catch((error: Error) => {
-        showErrorToast("Error loading brands");
-      });
-  };
-
-  const categoryChange = (e: SingleValue<ItemEntityWithId>) => {
-    setFormData({
-      ...formData,
-      category: e,
-      subcategory: null,
-    });
-  };
-
-  const genderChange = (e: SingleValue<ItemEntity>) => {
-    setFormData({
-      ...formData,
-      gender: e,
-      category: null,
-      subcategory: null,
-    });
-  };
-
-  const subcategoryChange = (e: SingleValue<ItemEntityWithId>) => {
-    setFormData({
-      ...formData,
-      subcategory: e,
-    });
-  };
-
-  const colourChange = (e: SingleValue<ItemEntity>) => {
-    setFormData({
-      ...formData,
-      colour: e,
-    });
-  };
-  const styleChange = (e: SingleValue<ItemEntity>) => {
-    setFormData({
-      ...formData,
-      style: e,
-    });
-  };
-  const conditionChange = (e: SingleValue<ItemEntity>) => {
-    setFormData({
-      ...formData,
-      condition: e,
-    });
-  };
-  const sizeChange = (e: SingleValue<ItemEntity>) => {
-    setFormData({
-      ...formData,
-      size: e,
-    });
-  };
-
   return (
     <AddItemStyles>
-      <Header />
-      <Categories />
-
       <div className="container">
         <div className="wrapper">
           <h1 className="title-md">Sell new item</h1>
 
-          <form className="inner" onSubmit={onSubmit}>
+          <form className="inner" onSubmit={handleSubmit(onSubmit)}>
             {/* First row */}
             <div className="row">
               <label className="image-upload">
@@ -494,226 +268,349 @@ export default function AddItem() {
                 <label className="label">
                   Title
                   <input
-                    onChange={handleNameChange}
                     type="text"
                     className="input"
-                    required
                     minLength={5}
                     maxLength={50}
+                    {...register("name", {
+                      required: "Title is required",
+                      minLength: {
+                        value: 5,
+                        message: "Name should have at least 5 symbols",
+                      },
+                      maxLength: {
+                        value: 50,
+                        message: "Name can not have more than 50 symbols",
+                      },
+                    })}
                   />
+                  {formErrors.name && (
+                    <p className="error">{formErrors.name.message}</p>
+                  )}
                 </label>
                 <label className="label">
                   Category
                   <Controller
-                    name="area"
+                    name="categoryId"
                     control={control}
-                    rules={{ required: "Area is required" }}
-                    render={({ field }) => (
+                    rules={{ required: "Please select category" }}
+                    render={({
+                      field: { value, name, onChange, onBlur, ref },
+                    }) => (
                       <Select
+                        ref={categoryRef}
                         instanceId="select"
-                        required={true}
                         className="select"
-                        name="subcategory"
+                        name={name}
                         isLoading={categoriesStatus === "loading"}
-                        isDisabled={!formData.gender}
                         options={categories}
                         isClearable={true}
                         isSearchable={true}
+                        isDisabled={!gender}
                         styles={colourStyles}
                         placeholder=""
-                        onChange={categoryChange}
-                        value={formData.category}
+                        onChange={(val) => {
+                          onChange(val?.id), setCategoryId(val ? val.id : val);
+                        }}
+                        value={categories.find((c) => c.id === value)}
+                        onBlur={onBlur}
                       />
                     )}
                   />
-                  <Select
-                    instanceId="select"
-                    required={true}
-                    className="select"
-                    name="subcategory"
-                    isLoading={categoriesStatus === "loading"}
-                    isDisabled={!formData.gender}
-                    options={categories}
-                    isClearable={true}
-                    isSearchable={true}
-                    styles={colourStyles}
-                    placeholder=""
-                    onChange={categoryChange}
-                    value={formData.category}
-                  />
+                  {formErrors.categoryId && (
+                    <p className="error">{formErrors.categoryId.message}</p>
+                  )}
                 </label>
 
                 <label className="label">
                   Style
-                  <Select
-                    instanceId="select"
-                    required={true}
-                    className="select"
+                  <Controller
                     name="style"
-                    isLoading={stylesStatus === "loading"}
-                    options={styles}
-                    isClearable={true}
-                    isSearchable={true}
-                    placeholder=""
-                    styles={colourStyles}
-                    onChange={styleChange}
+                    control={control}
+                    rules={{ required: "Please select style" }}
+                    render={({ field: { value, name, onChange, onBlur } }) => (
+                      <Select
+                        instanceId="select"
+                        className="select"
+                        name={name}
+                        isLoading={stylesStatus === "loading"}
+                        options={styles}
+                        isClearable={true}
+                        isSearchable={true}
+                        styles={colourStyles}
+                        placeholder=""
+                        onChange={(val) => onChange(val?.value)}
+                        value={styles.find((c) => c.value === value)}
+                        onBlur={onBlur}
+                      />
+                    )}
                   />
+                  {formErrors.style && (
+                    <p className="error">{formErrors.style.message}</p>
+                  )}
                 </label>
                 <label className="label">
                   Colour
-                  <Select
-                    instanceId="select"
-                    required={true}
-                    className="select"
+                  <Controller
                     name="colour"
-                    isLoading={coloursStatus === "loading"}
-                    options={colours}
-                    isClearable={true}
-                    placeholder=""
-                    styles={colourStyles}
-                    onChange={colourChange}
-                    formatOptionLabel={(option) => (
-                      <div>
-                        {option.hexCode ? (
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "10px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <div
-                              style={{
-                                height: "30px",
-                                width: "30px",
-                                borderRadius: "50%",
-                                backgroundColor: `#${option.hexCode}`,
-                              }}
-                            ></div>
-                            <span>{option.label}</span>
+                    control={control}
+                    rules={{ required: "Please select colour" }}
+                    render={({ field: { value, name, onChange, onBlur } }) => (
+                      <Select
+                        instanceId="select"
+                        className="select"
+                        name={name}
+                        isLoading={coloursStatus === "loading"}
+                        options={colours}
+                        isClearable={true}
+                        isSearchable={true}
+                        styles={colourStyles}
+                        placeholder=""
+                        onChange={(val) => onChange(val?.value)}
+                        value={styles.find((c) => c.value === value)}
+                        onBlur={onBlur}
+                        formatOptionLabel={(option) => (
+                          <div>
+                            {option.hexCode ? (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  gap: "10px",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    borderRadius: "50%",
+                                    backgroundColor: `#${option.hexCode}`,
+                                  }}
+                                ></div>
+                                <span>{option.label}</span>
+                              </div>
+                            ) : (
+                              <span>{option.label}</span>
+                            )}
                           </div>
-                        ) : (
-                          <span>{option.label}</span>
                         )}
-                      </div>
+                      />
                     )}
                   />
+                  {formErrors.colour && (
+                    <p className="error">{formErrors.colour.message}</p>
+                  )}
                 </label>
                 <label className="label">
                   Price
                   <input
                     type="number"
                     className="input"
-                    onChange={handlePriceChange}
                     step="0.01"
                     min={0}
                     max={100000}
+                    {...register("price", {
+                      required: "Price is required",
+                      valueAsNumber: true,
+                      min: {
+                        value: 0,
+                        message: "Please pick a price",
+                      },
+                      max: {
+                        value: 10000,
+                        message: "Price can not be greater than 10 000",
+                      },
+                    })}
                   />
+                  {formErrors.price && (
+                    <p className="error">{formErrors.price.message}</p>
+                  )}
                 </label>
                 <label className="label">
                   Hashtags
                   <input
                     type="text"
                     className="input"
-                    onChange={handleHashtagsChange}
+                    {...register("hashtags", {
+                      onChange: (e: ChangeEvent<HTMLInputElement>) => {
+                        console.log(e.target.value);
+                      },
+                      pattern: {
+                        value: hashtagsRegex,
+                        message: "Incorrect hashtags (5 hashtags max)",
+                      },
+                    })}
                   />
+                  {formErrors.hashtags && (
+                    <p className="error">{formErrors.hashtags.message}</p>
+                  )}
                 </label>
               </div>
               {/* Third row */}
               <div className="row">
                 <label className="label">
                   Gender
-                  <Select
-                    placeholder=""
-                    instanceId="select"
-                    required={true}
-                    className="select"
+                  <Controller
                     name="gender"
-                    options={genders}
-                    styles={colourStyles}
-                    onChange={genderChange}
-                    value={formData.gender}
+                    control={control}
+                    rules={{ required: "Please select gender" }}
+                    render={({ field: { value, name, onChange, onBlur } }) => (
+                      <Select
+                        instanceId="select"
+                        className="select"
+                        name={name}
+                        options={genders}
+                        isClearable={true}
+                        isSearchable={true}
+                        styles={colourStyles}
+                        placeholder=""
+                        onChange={(val) => {
+                          onChange(val?.value);
+                          setGender(val ? val.value : null);
+                          setCategoryId(null);
+                        }}
+                        value={genders.find((c) => c.value === value)}
+                        onBlur={onBlur}
+                      />
+                    )}
                   />
+                  {formErrors.gender && (
+                    <p className="error">{formErrors.gender.message}</p>
+                  )}
                 </label>
                 <label className="label">
                   Subcategory
-                  <Select
-                    placeholder=""
-                    instanceId="select"
-                    required={true}
-                    className="select"
-                    name="subcategory"
-                    isLoading={subcategoriesStatus === "loading"}
-                    isDisabled={!formData.category}
-                    options={subcategories}
-                    isClearable={true}
-                    isSearchable={true}
-                    styles={colourStyles}
-                    onChange={subcategoryChange}
-                    value={formData.subcategory}
+                  <Controller
+                    name="subcategoryId"
+                    control={control}
+                    rules={{ required: "Please select subcategory" }}
+                    render={({
+                      field: { value, name, onChange, onBlur, ref },
+                    }) => (
+                      <Select
+                        ref={subcategoryRef}
+                        instanceId="select"
+                        className="select"
+                        name={name}
+                        options={subcategories}
+                        isClearable={true}
+                        isSearchable={true}
+                        isLoading={subcategoriesStatus === "loading"}
+                        styles={colourStyles}
+                        placeholder=""
+                        isDisabled={!categoryId}
+                        onChange={(val) => {
+                          onChange(val ? val.id : val);
+                        }}
+                        value={subcategories.find((c) => c.id === value)}
+                        onBlur={onBlur}
+                      />
+                    )}
                   />
+                  {formErrors.subcategoryId && (
+                    <p className="error">{formErrors.subcategoryId.message}</p>
+                  )}
                 </label>
                 <label className="label">
                   Condition
-                  <Select
-                    placeholder=""
-                    instanceId="select"
-                    required={true}
-                    className="select"
+                  <Controller
                     name="condition"
-                    options={conditions}
-                    isClearable={true}
-                    isSearchable={true}
-                    styles={colourStyles}
-                    onChange={conditionChange}
+                    control={control}
+                    rules={{ required: "Please select condition" }}
+                    render={({ field: { value, name, onChange, onBlur } }) => (
+                      <Select
+                        instanceId="select"
+                        className="select"
+                        name={name}
+                        options={conditions}
+                        isClearable={true}
+                        isSearchable={true}
+                        styles={colourStyles}
+                        placeholder=""
+                        onChange={(val) => onChange(val?.value)}
+                        value={conditions.find((c) => c.value === value)}
+                        onBlur={onBlur}
+                      />
+                    )}
                   />
+                  {formErrors.condition && (
+                    <p className="error">{formErrors.condition.message}</p>
+                  )}
                 </label>
                 <label className="label">
-                  Brand
-                  <Select
-                    placeholder=""
-                    instanceId="select"
-                    required={true}
-                    className="select"
+                  Brands
+                  <Controller
                     name="brand"
-                    options={brands}
-                    isMulti
-                    isClearable={true}
-                    isSearchable={true}
-                    styles={colourStyles}
-                    onChange={handleBrandChange}
-                    onInputChange={onInputBrandChange}
-                    isOptionDisabled={() => {
-                      if (formData.brand) return formData.brand.length >= 5;
-
-                      return false;
+                    control={control}
+                    rules={{
+                      required: "Please select brands",
+                      maxLength: {
+                        value: 5,
+                        message: "Max 5 brands",
+                      },
                     }}
+                    render={({ field: { value, name, onChange, onBlur } }) => (
+                      <Select
+                        instanceId="select"
+                        className="select"
+                        name={name}
+                        isMulti
+                        options={brands}
+                        isLoading={brandsStatus === "loading"}
+                        isClearable={true}
+                        isSearchable={true}
+                        styles={colourStyles}
+                        placeholder=""
+                        value={brands.filter(
+                          (brand) => value && value.includes(brand.id)
+                        )}
+                        onChange={(val) => onChange(val.map((c) => c.id))}
+                      />
+                    )}
                   />
+                  {formErrors.brand && (
+                    <p className="error">{formErrors.brand.message}</p>
+                  )}
                 </label>
                 <label className="label">
                   Size
-                  <Select
-                    instanceId="select"
-                    required={true}
-                    className="select"
+                  <Controller
                     name="size"
-                    options={sizes}
-                    isClearable={true}
-                    placeholder=""
-                    isSearchable={true}
-                    styles={colourStyles}
-                    onChange={sizeChange}
+                    control={control}
+                    rules={{ required: "Please select size" }}
+                    render={({ field: { value, name, onChange, onBlur } }) => (
+                      <Select
+                        instanceId="select"
+                        className="select"
+                        name={name}
+                        options={sizes}
+                        isClearable={true}
+                        isSearchable={true}
+                        styles={colourStyles}
+                        placeholder=""
+                        onChange={(val) => onChange(val?.value)}
+                        value={sizes.find((c) => c.value === value)}
+                        onBlur={onBlur}
+                      />
+                    )}
                   />
+                  {formErrors.size && (
+                    <p className="error">{formErrors.size.message}</p>
+                  )}
                 </label>
               </div>
               <label className="label description--label">
                 Description
                 <textarea
                   id="description"
-                  minLength={10}
                   maxLength={200}
-                  onChange={textareaHandler}
+                  {...register("description", {
+                    maxLength: 200,
+                  })}
                 ></textarea>
+                {formErrors.description && (
+                  <p className="error">{formErrors.description.message}</p>
+                )}
               </label>
               <button
                 className="button submit--buton"
@@ -725,8 +622,6 @@ export default function AddItem() {
           </form>
         </div>
       </div>
-
-      <Footer />
     </AddItemStyles>
   );
 }

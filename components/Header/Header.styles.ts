@@ -5,8 +5,6 @@ export const HeaderStyles = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-left: 50px;
-  padding-right: 50px;
 
   .cross-icon {
     cursor: pointer;
@@ -28,7 +26,7 @@ export const HeaderStyles = styled.div`
     border-radius: 6px;
     display: flex;
     align-items: center;
-    padding: 0.5em 1em;
+    padding: 0.4em 1em;
     background-color: white;
     width: fit-content;
     width: 100%;

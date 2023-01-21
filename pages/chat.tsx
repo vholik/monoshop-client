@@ -1,6 +1,5 @@
 import Footer from "@components/Footer/Footer";
 import Header from "@components/Header/Header";
-import { FlexPage } from "@utils/FlexStyle";
 import styled from "styled-components";
 import io, { Socket } from "socket.io-client";
 import { ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
@@ -16,6 +15,7 @@ import moment from "moment";
 import Flash from "@public/images/flash.svg";
 import Link from "next/link";
 import { Item } from "@store/types/item";
+import Layout from "@components/Layout/Layout";
 
 type Timestamp = {
   time: string;
@@ -194,125 +194,121 @@ const Chat = () => {
   }, [messages]);
 
   return (
-    <FlexPage>
-      <Header />
-      <ChatStyles>
-        <div className="container">
-          <div className="title-md">Messages</div>
-          <div className="chat-wrapper">
-            <div className="rooms-wrapper">
-              {rooms?.map((room, key) => (
-                <div
-                  className={
-                    room.users.id === currentUser?.id
-                      ? "room selected-room"
-                      : "room"
-                  }
-                  key={key}
-                  onClick={() => changeRoom(room)}
-                >
-                  <div className="left">
-                    <div
-                      // Set as selected to grey if chat is selected
-                      className="user-photo"
-                      style={{ backgroundImage: `url(${room.users.image})` }}
-                    ></div>
-                    <h3 className="user-name">{room.users.fullName}</h3>
-                  </div>
-                  <div className="user-activity">
-                    {room.message.markedSeen === false && (
-                      <div className="not-read-circle"></div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="chat">
-              {currentUser && (
-                <div className="chat-header">
+    <ChatStyles>
+      <div className="container">
+        <div className="title-md">Messages</div>
+        <div className="chat-wrapper">
+          <div className="rooms-wrapper">
+            {rooms?.map((room, key) => (
+              <div
+                className={
+                  room.users.id === currentUser?.id
+                    ? "room selected-room"
+                    : "room"
+                }
+                key={key}
+                onClick={() => changeRoom(room)}
+              >
+                <div className="left">
                   <div
+                    // Set as selected to grey if chat is selected
                     className="user-photo"
-                    style={{ backgroundImage: `url(${currentUser.image})` }}
+                    style={{ backgroundImage: `url(${room.users.image})` }}
                   ></div>
-                  <div className="right">
-                    <Link href={`/user/${currentUser.id}`}>
-                      <h2 className="user-name">{currentUser.fullName}</h2>
-                    </Link>
-                    <p className="user-activity">
-                      <Image src={Flash} alt="Activity" />
-                      Last activity{" "}
-                      {getActivity(
-                        currentUser?.lastActivity
-                      )?.toLocaleLowerCase()}
+                  <h3 className="user-name">{room.users.fullName}</h3>
+                </div>
+                <div className="user-activity">
+                  {room.message.markedSeen === false && (
+                    <div className="not-read-circle"></div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="chat">
+            {currentUser && (
+              <div className="chat-header">
+                <div
+                  className="user-photo"
+                  style={{ backgroundImage: `url(${currentUser.image})` }}
+                ></div>
+                <div className="right">
+                  <Link href={`/user/${currentUser.id}`}>
+                    <h2 className="user-name">{currentUser.fullName}</h2>
+                  </Link>
+                  <p className="user-activity">
+                    <Image src={Flash} alt="Activity" />
+                    Last activity{" "}
+                    {getActivity(
+                      currentUser?.lastActivity
+                    )?.toLocaleLowerCase()}
+                  </p>
+                </div>
+              </div>
+            )}
+            {roomItem && (
+              <div className="chat-item">
+                <div className="chat-item__photo"></div>
+                <Link href={`/shop/${roomItem.id}`}>
+                  <Image
+                    src={roomItem.images[0]}
+                    alt="Item photo"
+                    width={50}
+                    height={50}
+                  />
+                </Link>
+                <div className="right">
+                  <Link href={`/shop/${roomItem.id}`}>
+                    <h2 className="chat-item__name">{roomItem.name}</h2>
+                  </Link>
+                  <p className="chat-item__price">{roomItem.price} PLN</p>
+                </div>
+              </div>
+            )}
+            <div className="chat-inner" ref={chatRef}>
+              {messages.map((message, key) => (
+                <Fragment key={key}>
+                  {timeStamps[key] && (
+                    <p className="timestamp">{timeStamps[key].time}</p>
+                  )}
+                  <div
+                    key={key}
+                    className={
+                      message.userId === userId
+                        ? "message my--message"
+                        : "message"
+                    }
+                  >
+                    <div className="message-inner">{message.text}</div>
+                    <p className="message-time">
+                      {new Date(message.date).toLocaleString("en-US", {
+                        hour: "numeric",
+                        minute: "numeric",
+                        hour12: true,
+                      })}
                     </p>
                   </div>
-                </div>
-              )}
-              {roomItem && (
-                <div className="chat-item">
-                  <div className="chat-item__photo"></div>
-                  <Link href={`/shop/${roomItem.id}`}>
-                    <Image
-                      src={roomItem.images[0]}
-                      alt="Item photo"
-                      width={50}
-                      height={50}
-                    />
-                  </Link>
-                  <div className="right">
-                    <Link href={`/shop/${roomItem.id}`}>
-                      <h2 className="chat-item__name">{roomItem.name}</h2>
-                    </Link>
-                    <p className="chat-item__price">{roomItem.price} PLN</p>
-                  </div>
-                </div>
-              )}
-              <div className="chat-inner" ref={chatRef}>
-                {messages.map((message, key) => (
-                  <Fragment key={key}>
-                    {timeStamps[key] && (
-                      <p className="timestamp">{timeStamps[key].time}</p>
-                    )}
-                    <div
-                      key={key}
-                      className={
-                        message.userId === userId
-                          ? "message my--message"
-                          : "message"
-                      }
-                    >
-                      <div className="message-inner">{message.text}</div>
-                      <p className="message-time">
-                        {new Date(message.date).toLocaleString("en-US", {
-                          hour: "numeric",
-                          minute: "numeric",
-                          hour12: true,
-                        })}
-                      </p>
-                    </div>
-                  </Fragment>
-                ))}
-              </div>
-              {currentUser && (
-                <div className="chat-bottom">
-                  <input
-                    type="text"
-                    className="chat-input"
-                    placeholder="Type something..."
-                    onChange={inputHandler}
-                    value={value}
-                  />
-                  <button className="button" onClick={send}>
-                    Send
-                  </button>
-                </div>
-              )}
+                </Fragment>
+              ))}
             </div>
+            {currentUser && (
+              <div className="chat-bottom">
+                <input
+                  type="text"
+                  className="chat-input"
+                  placeholder="Type something..."
+                  onChange={inputHandler}
+                  value={value}
+                />
+                <button className="button" onClick={send}>
+                  Send
+                </button>
+              </div>
+            )}
           </div>
         </div>
-      </ChatStyles>
-      <Footer />
-    </FlexPage>
+      </div>
+    </ChatStyles>
   );
 };
 

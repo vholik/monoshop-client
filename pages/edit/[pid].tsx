@@ -21,7 +21,7 @@ import {
   conditions,
   genders,
   sizes,
-} from "@utils/react-select/react-select-utils";
+} from "@utils/react-select/reactSelectUtils";
 import { getItemById } from "@store/reducers/item/GetItemByIdSlice";
 import { wrapper } from "@store/reducers/store";
 import { Item } from "@store/types/item";
@@ -500,8 +500,6 @@ export default function AddItem({ item }: EditItemProps) {
 
   return (
     <EditItemStyles>
-      <Header />
-      <Categories />
       <div className="container">
         <div className="wrapper">
           <h1 className="title-md">Sell new item</h1>
@@ -781,7 +779,6 @@ export default function AddItem({ item }: EditItemProps) {
           )}
         </div>
       </div>
-      <Footer />
     </EditItemStyles>
   );
 }

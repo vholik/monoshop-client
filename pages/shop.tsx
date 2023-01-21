@@ -17,7 +17,7 @@ import {
   sizes,
   sortingColourStyles,
   sortingValues,
-} from "@utils/react-select/react-select-utils";
+} from "@utils/react-select/reactSelectUtils";
 import {
   useActionCreators,
   useAppDispatch,
@@ -43,12 +43,12 @@ import FilledHeart from "@public/images/filled-heart.svg";
 import { getSubcategories } from "@store/reducers/subcategory/GetSubcategoriesSlice";
 import SortingIcon from "@public/images/filter.svg";
 import { toggleFavorite } from "@store/reducers/favorite/ToggleFavoriteSlice";
-import { FlexPage } from "@utils/FlexStyle";
 import Footer from "@components/Footer/Footer";
 import useDebounce from "@utils/useDebounce";
 import StateManagedSelect from "react-select";
 import ReactSelect from "react-select";
 import { filterActions } from "@store/reducers/filter/FilterSlice";
+import Layout from "@components/Layout/Layout";
 
 const STEP = 1;
 const MIN = 0;
@@ -290,400 +290,393 @@ const Shop = () => {
   };
 
   return (
-    <FlexPage>
-      <ShopStyling onClick={() => setIsPriceOpen(false)}>
-        <Header />
-        <Categories />
-        <div className="wrapper">
-          <div className="filter">
-            <div className="filter-inner">
-              <div
-                className="price"
-                onClick={(e) => {
-                  e.stopPropagation(), setIsPriceOpen(!isPriceOpen);
-                }}
-              >
-                <p className="price-tag">Price</p>
-                <div className="price-arrow">
-                  <svg
-                    height="20"
-                    width="20"
-                    viewBox="0 0 20 20"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path>
-                  </svg>
-                </div>
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  className="price-handler"
-                  style={isPriceOpen ? undefined : { display: "none" }}
+    <ShopStyling onClick={() => setIsPriceOpen(false)}>
+      <div className="wrapper">
+        <div className="filter">
+          <div className="filter-inner">
+            <div
+              className="price"
+              onClick={(e) => {
+                e.stopPropagation(), setIsPriceOpen(!isPriceOpen);
+              }}
+            >
+              <p className="price-tag">Price</p>
+              <div className="price-arrow">
+                <svg
+                  height="20"
+                  width="20"
+                  viewBox="0 0 20 20"
+                  aria-hidden="true"
+                  focusable="false"
                 >
-                  <div className="price-range">
-                    <Range
-                      values={values}
-                      step={STEP}
-                      min={MIN}
-                      max={MAX}
-                      onChange={(values) => priceValuesHandler(values)}
-                      renderTrack={({ props, children }) => (
-                        <div
-                          onMouseDown={props.onMouseDown}
-                          onTouchStart={props.onTouchStart}
-                          style={{
-                            ...props.style,
-                            height: "36px",
-                            display: "flex",
-                            width: "100%",
-                          }}
-                        >
-                          <div
-                            ref={props.ref}
-                            style={{
-                              height: "5px",
-                              width: "100%",
-                              borderRadius: "4px",
-                              background: getTrackBackground({
-                                values,
-                                colors: [
-                                  "var(--grey-30)",
-                                  "var(--dark)",
-                                  "var(--grey-30)",
-                                ],
-                                min: MIN,
-                                max: MAX,
-                              }),
-                              alignSelf: "center",
-                            }}
-                          >
-                            {children}
-                          </div>
-                        </div>
-                      )}
-                      renderThumb={({ index, props, isDragged }) => (
-                        <div
-                          {...props}
-                          style={{
-                            ...props.style,
-                            height: "25px",
-                            width: "25px",
-                            borderRadius: "4px",
-                            backgroundColor: "#FFF",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            border: "1px solid var(--grey-30)",
-                            outline: "none",
-                          }}
-                        >
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "-28px",
-                              color: "#fff",
-                              fontWeight: "400",
-                              fontSize: "14px",
-                              fontFamily: "var(--font-default)",
-                              padding: "4px",
-                              borderRadius: "4px",
-                              backgroundColor: "var(--dark)",
-                            }}
-                          >
-                            {values[index].toFixed(1)}
-                          </div>
-                          <div
-                            style={{
-                              height: "16px",
-                              width: "5px",
-                              backgroundColor: isDragged
-                                ? "var(--grey-30)"
-                                : "var(--grey-30)",
-                            }}
-                          />
-                        </div>
-                      )}
-                    />
-                  </div>
-                  <button
-                    disabled={itemsStatus === "loading"}
-                    className="button price--buton"
-                    onClick={priceHandler}
-                  >
-                    Apply
-                  </button>
-                </div>
+                  <path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path>
+                </svg>
               </div>
-              <Select
-                placeholder={"Gender"}
-                styles={multiplefilterColourStyles}
-                onChange={genderHandler}
-                options={genders}
-                className="select"
-                required={true}
-                isDisabled={false}
-                isLoading={false}
-                isSearchable={true}
-                isClearable={false}
-                name={"gender"}
-                instanceId="gender-select"
-                value={filter.gender}
-              />
-              <Select
-                placeholder={"Categories"}
-                styles={multiplefilterColourStyles}
-                onChange={categoryHandler}
-                options={categories}
-                className="select"
-                required={true}
-                isDisabled={!filter.gender}
-                isLoading={categoriesStatus === "loading"}
-                isSearchable={true}
-                name={"category"}
-                instanceId="category-select"
-                isClearable={true}
-                value={filter.category}
-              />
-              <Select
-                placeholder={"Subcategories"}
-                styles={multiplefilterColourStyles}
-                onChange={subcategoriesHandler}
-                options={subcategories}
-                isMulti
-                className="select"
-                required={true}
-                isDisabled={!filter.category}
-                isLoading={subcategoriesStatus === "loading"}
-                isSearchable={true}
-                name={"subcategory"}
-                instanceId="category-select"
-                isClearable={true}
-                closeMenuOnSelect={false}
-                hideSelectedOptions={false}
-                value={filter.subcategory}
-                components={{
-                  ValueContainer,
-                }}
-              />
-              <Select
-                placeholder={"Size"}
-                styles={multiplefilterColourStyles}
-                onChange={(e) => filterHandler(e, "size" as keyof IFilter)}
-                options={sizes}
-                isMulti
-                className="select"
-                required={true}
-                isDisabled={false}
-                isLoading={false}
-                isSearchable={true}
-                name={"size"}
-                instanceId="size-select"
-                isClearable={true}
-                closeMenuOnSelect={false}
-                hideSelectedOptions={false}
-                value={filter.size}
-                components={{
-                  ValueContainer,
-                }}
-              />
-              <Select
-                placeholder={"Condition"}
-                styles={multiplefilterColourStyles}
-                isMulti
-                options={conditions}
-                className="select"
-                required={true}
-                isDisabled={false}
-                onChange={(e) => filterHandler(e, "condition" as keyof IFilter)}
-                isLoading={false}
-                isSearchable={true}
-                name={"condition"}
-                isClearable={true}
-                instanceId="condition-select"
-                closeMenuOnSelect={false}
-                hideSelectedOptions={false}
-                value={filter.condition}
-                components={{
-                  ValueContainer,
-                }}
-              />
-              <Select
-                placeholder={"Brand"}
-                styles={multiplefilterColourStyles}
-                isMulti
-                options={brands}
-                className="select"
-                onChange={brandHandler}
-                required={true}
-                isDisabled={false}
-                isLoading={brandStatus === "loading"}
-                isSearchable={true}
-                name={"brand"}
-                isClearable={true}
-                instanceId="brand-select"
-                closeMenuOnSelect={false}
-                hideSelectedOptions={false}
-                onInputChange={onInputBrandChange}
-                value={filter.brand}
-                components={{
-                  ValueContainer,
-                }}
-              />
-              <Select
-                placeholder={"Style"}
-                styles={multiplefilterColourStyles}
-                isMulti
-                options={styles}
-                className="select"
-                onChange={(e) => filterHandler(e, "style" as keyof IFilter)}
-                required={true}
-                isDisabled={false}
-                isLoading={stylesStatus === "loading"}
-                isSearchable={true}
-                name={"style"}
-                isClearable={true}
-                instanceId="style-select"
-                closeMenuOnSelect={false}
-                hideSelectedOptions={false}
-                value={filter.style}
-                components={{
-                  ValueContainer,
-                }}
-              />
-              <Select
-                placeholder={"Colour"}
-                styles={multiplefilterColourStyles}
-                isMulti
-                options={colours}
-                className="select"
-                required={true}
-                isDisabled={false}
-                isLoading={coloursStatus === "loading"}
-                isSearchable={true}
-                name={"colour"}
-                onChange={(e) => filterHandler(e, "colour" as keyof IFilter)}
-                isClearable={true}
-                instanceId="colour-select"
-                closeMenuOnSelect={false}
-                hideSelectedOptions={false}
-                value={filter.colour}
-                components={{
-                  ValueContainer,
-                }}
-                formatOptionLabel={(option) => (
-                  <div>
-                    {option.hexCode ? (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="price-handler"
+                style={isPriceOpen ? undefined : { display: "none" }}
+              >
+                <div className="price-range">
+                  <Range
+                    values={values}
+                    step={STEP}
+                    min={MIN}
+                    max={MAX}
+                    onChange={(values) => priceValuesHandler(values)}
+                    renderTrack={({ props, children }) => (
                       <div
+                        onMouseDown={props.onMouseDown}
+                        onTouchStart={props.onTouchStart}
                         style={{
+                          ...props.style,
+                          height: "36px",
                           display: "flex",
-                          gap: "10px",
+                          width: "100%",
+                        }}
+                      >
+                        <div
+                          ref={props.ref}
+                          style={{
+                            height: "5px",
+                            width: "100%",
+                            borderRadius: "4px",
+                            background: getTrackBackground({
+                              values,
+                              colors: [
+                                "var(--grey-30)",
+                                "var(--dark)",
+                                "var(--grey-30)",
+                              ],
+                              min: MIN,
+                              max: MAX,
+                            }),
+                            alignSelf: "center",
+                          }}
+                        >
+                          {children}
+                        </div>
+                      </div>
+                    )}
+                    renderThumb={({ index, props, isDragged }) => (
+                      <div
+                        {...props}
+                        style={{
+                          ...props.style,
+                          height: "25px",
+                          width: "25px",
+                          borderRadius: "4px",
+                          backgroundColor: "#FFF",
+                          display: "flex",
+                          justifyContent: "center",
                           alignItems: "center",
+                          border: "1px solid var(--grey-30)",
+                          outline: "none",
                         }}
                       >
                         <div
                           style={{
-                            minHeight: "30px",
-                            minWidth: "30px",
-                            borderRadius: "50%",
-                            backgroundColor: `#${option.hexCode}`,
+                            position: "absolute",
+                            top: "-28px",
+                            color: "#fff",
+                            fontWeight: "400",
+                            fontSize: "14px",
+                            fontFamily: "var(--font-default)",
+                            padding: "4px",
+                            borderRadius: "4px",
+                            backgroundColor: "var(--dark)",
                           }}
-                        ></div>
-                        <span>{option.label}</span>
-                      </div>
-                    ) : (
-                      <span>{option.label}</span>
-                    )}
-                  </div>
-                )}
-              />
-            </div>
-            <div className="sorting">
-              <Select
-                placeholder="Sorting"
-                onChange={sortingHandler}
-                options={sortingValues}
-                styles={sortingColourStyles}
-                instanceId="select"
-                value={filter.sortBy}
-              />
-              <Image src={SortingIcon} alt="Sort by" />
-            </div>
-          </div>
-          <div className="item-container">
-            {itemsStatus === "loading" ? (
-              <LoadindShopStyling>
-                <div className="items-wrapper">
-                  <div className="item">
-                    <div className="item-image "></div>
-                    <h2 className="item-price "></h2>
-                    <p className="item-size "></p>
-                  </div>
-                  <div className="item">
-                    <div className="item-image "></div>
-                    <h2 className="item-price "></h2>
-                    <p className="item-size "></p>
-                  </div>
-                  <div className="item">
-                    <div className="item-image "></div>
-                    <h2 className="item-price "></h2>
-                    <p className="item-size "></p>
-                  </div>
-                  <div className="item">
-                    <div className="item-image "></div>
-                    <h2 className="item-price "></h2>
-                    <p className="item-size "></p>
-                  </div>
-                </div>
-              </LoadindShopStyling>
-            ) : (
-              <div className="items-wrapper">
-                {items.map((item) => (
-                  <div className="item" key={item.id}>
-                    {item.isFavorite ? (
-                      <Image
-                        src={FilledHeart}
-                        alt="Remove favorites"
-                        className="unfilled-heart"
-                        onClick={() => favoriteHandler(item.id)}
-                      />
-                    ) : (
-                      <Image
-                        src={UnfilledWhiteHeart}
-                        alt="Add to favorites"
-                        className="unfilled-heart"
-                        onClick={() => favoriteHandler(item.id)}
-                      />
-                    )}
-                    <Link href={`/shop/${item.id}`}>
-                      <div className="item-image">
-                        <Image
-                          src={item.images[0]}
-                          alt="Image"
-                          style={{ objectFit: "cover" }}
-                          fill
+                        >
+                          {values[index].toFixed(1)}
+                        </div>
+                        <div
+                          style={{
+                            height: "16px",
+                            width: "5px",
+                            backgroundColor: isDragged
+                              ? "var(--grey-30)"
+                              : "var(--grey-30)",
+                          }}
                         />
                       </div>
-                    </Link>
-                    <h2 className="item-price">{item.price} PLN</h2>
-                    <p className="item-size">{item.size}</p>
-                  </div>
-                ))}
+                    )}
+                  />
+                </div>
+                <button
+                  disabled={itemsStatus === "loading"}
+                  className="button price--buton"
+                  onClick={priceHandler}
+                >
+                  Apply
+                </button>
               </div>
-            )}
-            <Pagination
-              disabled={itemsStatus === "loading"}
-              simple
-              current={filter.page || 1}
-              onChange={(page) => nextPage(page)}
-              defaultCurrent={filter.page}
-              total={items.length === 0 ? 1 : itemsTotal}
-              pageSize={12}
+            </div>
+            <Select
+              placeholder={"Gender"}
+              styles={multiplefilterColourStyles}
+              onChange={genderHandler}
+              options={genders}
+              className="select"
+              required={true}
+              isDisabled={false}
+              isLoading={false}
+              isSearchable={true}
+              isClearable={false}
+              name={"gender"}
+              instanceId="gender-select"
+              value={filter.gender}
+            />
+            <Select
+              placeholder={"Categories"}
+              styles={multiplefilterColourStyles}
+              onChange={categoryHandler}
+              options={categories}
+              className="select"
+              required={true}
+              isDisabled={!filter.gender}
+              isLoading={categoriesStatus === "loading"}
+              isSearchable={true}
+              name={"category"}
+              instanceId="category-select"
+              isClearable={true}
+              value={filter.category}
+            />
+            <Select
+              placeholder={"Subcategories"}
+              styles={multiplefilterColourStyles}
+              onChange={subcategoriesHandler}
+              options={subcategories}
+              isMulti
+              className="select"
+              required={true}
+              isDisabled={!filter.category}
+              isLoading={subcategoriesStatus === "loading"}
+              isSearchable={true}
+              name={"subcategory"}
+              instanceId="category-select"
+              isClearable={true}
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              value={filter.subcategory}
+              components={{
+                ValueContainer,
+              }}
+            />
+            <Select
+              placeholder={"Size"}
+              styles={multiplefilterColourStyles}
+              onChange={(e) => filterHandler(e, "size" as keyof IFilter)}
+              options={sizes}
+              isMulti
+              className="select"
+              required={true}
+              isDisabled={false}
+              isLoading={false}
+              isSearchable={true}
+              name={"size"}
+              instanceId="size-select"
+              isClearable={true}
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              value={filter.size}
+              components={{
+                ValueContainer,
+              }}
+            />
+            <Select
+              placeholder={"Condition"}
+              styles={multiplefilterColourStyles}
+              isMulti
+              options={conditions}
+              className="select"
+              required={true}
+              isDisabled={false}
+              onChange={(e) => filterHandler(e, "condition" as keyof IFilter)}
+              isLoading={false}
+              isSearchable={true}
+              name={"condition"}
+              isClearable={true}
+              instanceId="condition-select"
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              value={filter.condition}
+              components={{
+                ValueContainer,
+              }}
+            />
+            <Select
+              placeholder={"Brand"}
+              styles={multiplefilterColourStyles}
+              isMulti
+              options={brands}
+              className="select"
+              onChange={brandHandler}
+              required={true}
+              isDisabled={false}
+              isLoading={brandStatus === "loading"}
+              isSearchable={true}
+              name={"brand"}
+              isClearable={true}
+              instanceId="brand-select"
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              onInputChange={onInputBrandChange}
+              value={filter.brand}
+              components={{
+                ValueContainer,
+              }}
+            />
+            <Select
+              placeholder={"Style"}
+              styles={multiplefilterColourStyles}
+              isMulti
+              options={styles}
+              className="select"
+              onChange={(e) => filterHandler(e, "style" as keyof IFilter)}
+              required={true}
+              isDisabled={false}
+              isLoading={stylesStatus === "loading"}
+              isSearchable={true}
+              name={"style"}
+              isClearable={true}
+              instanceId="style-select"
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              value={filter.style}
+              components={{
+                ValueContainer,
+              }}
+            />
+            <Select
+              placeholder={"Colour"}
+              styles={multiplefilterColourStyles}
+              isMulti
+              options={colours}
+              className="select"
+              required={true}
+              isDisabled={false}
+              isLoading={coloursStatus === "loading"}
+              isSearchable={true}
+              name={"colour"}
+              onChange={(e) => filterHandler(e, "colour" as keyof IFilter)}
+              isClearable={true}
+              instanceId="colour-select"
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              value={filter.colour}
+              components={{
+                ValueContainer,
+              }}
+              formatOptionLabel={(option) => (
+                <div>
+                  {option.hexCode ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div
+                        style={{
+                          minHeight: "30px",
+                          minWidth: "30px",
+                          borderRadius: "50%",
+                          backgroundColor: `#${option.hexCode}`,
+                        }}
+                      ></div>
+                      <span>{option.label}</span>
+                    </div>
+                  ) : (
+                    <span>{option.label}</span>
+                  )}
+                </div>
+              )}
             />
           </div>
+          <div className="sorting">
+            <Select
+              placeholder="Sorting"
+              onChange={sortingHandler}
+              options={sortingValues}
+              styles={sortingColourStyles}
+              instanceId="select"
+              value={filter.sortBy}
+            />
+            <Image src={SortingIcon} alt="Sort by" />
+          </div>
         </div>
-      </ShopStyling>
-      <Footer />
-    </FlexPage>
+        {itemsStatus === "loading" ? (
+          <LoadindShopStyling>
+            <div className="items-wrapper">
+              <div className="item">
+                <div className="item-image "></div>
+                <h2 className="item-price "></h2>
+                <p className="item-size "></p>
+              </div>
+              <div className="item">
+                <div className="item-image "></div>
+                <h2 className="item-price "></h2>
+                <p className="item-size "></p>
+              </div>
+              <div className="item">
+                <div className="item-image "></div>
+                <h2 className="item-price "></h2>
+                <p className="item-size "></p>
+              </div>
+              <div className="item">
+                <div className="item-image "></div>
+                <h2 className="item-price "></h2>
+                <p className="item-size "></p>
+              </div>
+            </div>
+          </LoadindShopStyling>
+        ) : (
+          <div className="items-wrapper">
+            {items.map((item) => (
+              <div className="item" key={item.id}>
+                {item.isFavorite ? (
+                  <Image
+                    src={FilledHeart}
+                    alt="Remove favorites"
+                    className="unfilled-heart"
+                    onClick={() => favoriteHandler(item.id)}
+                  />
+                ) : (
+                  <Image
+                    src={UnfilledWhiteHeart}
+                    alt="Add to favorites"
+                    className="unfilled-heart"
+                    onClick={() => favoriteHandler(item.id)}
+                  />
+                )}
+                <Link href={`/shop/${item.id}`}>
+                  <div className="item-image">
+                    <Image
+                      src={item.images[0]}
+                      alt="Image"
+                      style={{ objectFit: "cover" }}
+                      fill
+                    />
+                  </div>
+                </Link>
+                <h2 className="item-price">{item.price} PLN</h2>
+                <p className="item-size">{item.size}</p>
+              </div>
+            ))}
+          </div>
+        )}
+        <Pagination
+          disabled={itemsStatus === "loading"}
+          simple
+          current={filter.page || 1}
+          onChange={(page) => nextPage(page)}
+          defaultCurrent={filter.page}
+          total={items.length === 0 ? 1 : itemsTotal}
+          pageSize={12}
+        />
+      </div>
+    </ShopStyling>
   );
 };
 
@@ -753,8 +746,6 @@ const ShopStyling = styled.div`
 
   .filter {
     margin-top: 1rem;
-    margin-left: 50px;
-    margin-right: 50px;
     display: flex;
     justify-content: space-between;
   }
@@ -813,10 +804,6 @@ const ShopStyling = styled.div`
     justify-content: center;
     display: flex;
     width: 100%;
-  }
-
-  .item-container {
-    margin: 0 50px;
   }
 
   .items-wrapper {

@@ -9,8 +9,8 @@ import { getBrands } from "@store/reducers/brand/GetBrandsSlice";
 import Loading from "@components/Loading/Loading";
 import Router from "next/router";
 import Footer from "@components/Footer/Footer";
-import { FlexPage } from "@utils/FlexStyle";
 import { filterActions } from "@store/reducers/filter/FilterSlice";
+import Layout from "@components/Layout/Layout";
 
 const Brands = () => {
   const dispatch = useAppDispatch();
@@ -37,40 +37,35 @@ const Brands = () => {
   };
 
   return (
-    <FlexPage>
-      <Header />
-      <Categories />
-      <BrandsStyles>
-        <div className="container">
-          <h1 className="title">Search for brands</h1>
-          <div className="search-wrapper">
-            <Image src={SearchIcon} alt="Search" />
-            <input
-              type="text"
-              className="input"
-              placeholder="Search for brands"
-              onChange={inputChange}
-            />
-          </div>
-          {status === "loading" ? (
-            <Loading />
-          ) : (
-            <div className="brands">
-              {brands.map((brand) => (
-                <div
-                  key={brand.id}
-                  className="brand"
-                  onClick={() => filterBrand(brand.value)}
-                >
-                  {brand.value}
-                </div>
-              ))}
-            </div>
-          )}
+    <BrandsStyles>
+      <div className="container">
+        <h1 className="title">Search for brands</h1>
+        <div className="search-wrapper">
+          <Image src={SearchIcon} alt="Search" />
+          <input
+            type="text"
+            className="input"
+            placeholder="Search for brands"
+            onChange={inputChange}
+          />
         </div>
-      </BrandsStyles>
-      <Footer />
-    </FlexPage>
+        {status === "loading" ? (
+          <Loading />
+        ) : (
+          <div className="brands">
+            {brands.map((brand) => (
+              <div
+                key={brand.id}
+                className="brand"
+                onClick={() => filterBrand(brand.value)}
+              >
+                {brand.value}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </BrandsStyles>
   );
 };
 

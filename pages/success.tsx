@@ -5,45 +5,42 @@ import Image from "next/image";
 import Link from "next/link";
 import Header from "@components/Header/Header";
 import Router, { useRouter } from "next/router";
+import Layout from "@components/Layout/Layout";
 
 export default function Success() {
   const router = useRouter();
   const { pid } = router.query;
 
   return (
-    <>
-      <Header />
-      <SuccessStyling>
-        <div className="image">
-          <Image
-            src={SuccessIllustration}
-            alt="Success"
-            style={{ position: "absolute", objectFit: "contain" }}
-            fill
-          />
-        </div>
-        {router.query.message && (
-          <h1 className="text">{router.query.message}</h1>
-        )}
+    <SuccessStyling>
+      <div className="image">
+        <Image
+          src={SuccessIllustration}
+          alt="Success"
+          style={{ position: "absolute", objectFit: "contain" }}
+          fill
+        />
+      </div>
+      {router.query.message && <h1 className="text">{router.query.message}</h1>}
 
-        <Link href={"/"}>
-          <div className="return">
-            <Image src={ArrowLeft} alt="Arrow" />
-            Return to home page
-          </div>
-        </Link>
-      </SuccessStyling>
-    </>
+      <Link href={"/"}>
+        <div className="return">
+          <Image src={ArrowLeft} alt="Arrow" />
+          Return to home page
+        </div>
+      </Link>
+    </SuccessStyling>
   );
 }
 
 export const SuccessStyling = styled.div`
   width: 100%;
   display: flex;
-  margin-top: 8rem;
+  margin-top: 4rem;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+
   .image {
     width: 350px;
     height: 350px;

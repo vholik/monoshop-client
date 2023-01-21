@@ -8,11 +8,11 @@ import styled from "styled-components";
 import Image from "next/image";
 import Loading from "@components/Loading/Loading";
 import Footer from "@components/Footer/Footer";
-import { FlexPage } from "@utils/FlexStyle";
 import { getOrders } from "@store/reducers/order/getOrdersSlice";
 import Profile from "@components/Profile/Profile";
 import { showErrorToast } from "@utils/ReactTostify/tostifyHandlers";
 import OrderedItems from "@components/OrderedItems/OrderedItems";
+import Layout from "@components/Layout/Layout";
 
 const Ordered = () => {
   const dispatch = useAppDispatch();

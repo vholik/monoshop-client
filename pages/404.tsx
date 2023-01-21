@@ -9,7 +9,6 @@ import Router from "next/router";
 export default function ErrorPage() {
   return (
     <>
-      <Header />
       <ErrorStyling>
         <div className="image">
           <Image

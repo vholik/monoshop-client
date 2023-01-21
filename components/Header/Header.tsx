@@ -17,18 +17,11 @@ export default function Header() {
   const dispatch = useAppDispatch();
   const authStatus = useAppSelector((state) => state.authReducer.status);
   const filter = useAppSelector((state) => state.filterReducer);
-  const itemStatus = useAppSelector((state) => state.getItemsReducer.status);
 
   const [value, setValue] = useState("");
 
   useEffect(() => {
-    dispatch(checkIsAuth())
-      .unwrap()
-      .catch((error) => {
-        console.error("rejected", error);
-      });
-
-    // Set filter search value
+    // Set store search value to input
     if (filter.search) {
       setValue(filter.search);
     }
