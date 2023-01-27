@@ -9,13 +9,17 @@ import Link from 'next/link'
 import Phone from '@public/images/phone.svg'
 import Location from '@public/images/location.svg'
 import Flash from '@public/images/flash.svg'
-import { useAppSelector } from '@store/hooks/redux'
-import { useEffect } from 'react'
+import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
+import { useEffect, useState } from 'react'
 import Router, { useRouter } from 'next/router'
 import Footer from '@components/Footer/Footer'
 import ArrowRight from '@public/images/arrow-left.svg'
 import Layout from '@components/Layout/Layout'
 import ErrorPage from 'pages/404'
+import { checkIsAuth } from '@store/reducers/auth/AuthSlice'
+import { UserRating } from '@components/UserRating/UserRating'
+import { RatingModal } from '@components/RatingModal/RatingModal'
+import { ReviewModalStyles } from '@components/ReviewModal/ReviewModal.styles'
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) =>
@@ -37,13 +41,22 @@ interface UserProfileProps {
 }
 
 const UserProfile = ({ user }: UserProfileProps) => {
+  const dispatch = useAppDispatch()
   const router = useRouter()
+
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
 
   const pid = Number(router.query.pid)
 
   const status = useAppSelector((state) => state.getUserByIdReducer.status)
 
   const userId = useAppSelector((state) => state.authReducer.userId)
+
+  useEffect(() => {
+    dispatch(checkIsAuth())
+      .unwrap()
+      .catch((err) => console.log(err))
+  }, [])
 
   if (status === 'error') {
     return <ErrorPage />
@@ -60,8 +73,19 @@ const UserProfile = ({ user }: UserProfileProps) => {
     }
   }
 
+  const openModal = () => {
+    setIsReviewModalOpen(true)
+  }
+
   return (
     <UserProfileStyles>
+      {user && (
+        <RatingModal
+          isOpen={isReviewModalOpen}
+          setIsOpen={setIsReviewModalOpen}
+          userId={user.id}
+        />
+      )}
       <div className="container">
         <div className="back" onClick={() => router.back()}>
           <Image src={ArrowRight} alt="url" width={10} height={10} />
@@ -79,6 +103,12 @@ const UserProfile = ({ user }: UserProfileProps) => {
             />
             <div className="right">
               <h2 className="user-name">{user.fullName}</h2>
+              <span onClick={openModal}>
+                <UserRating
+                  count={user.reviewCount!}
+                  rating={user.reviewRating!}
+                />
+              </span>
               <div className="bottom">
                 <p className="user-activity">
                   <Image src={Flash} alt="Flash" height={20} width={20} /> Last
@@ -102,6 +132,7 @@ const UserProfile = ({ user }: UserProfileProps) => {
                   </p>
                 )}
               </div>
+
               {userId !== pid && (
                 <button className="button" onClick={messageUser}>
                   Message
@@ -113,9 +144,6 @@ const UserProfile = ({ user }: UserProfileProps) => {
       </div>
       <div className="items-wrapper">
         <div className="container">
-          {!user.items?.length && (
-            <p className="no-items">There is not items posted</p>
-          )}
           <div className="items-wrapper__inner">
             {user.items?.map((item) => (
               <div className="item" key={item.id}>
@@ -190,7 +218,7 @@ const UserProfileStyles = styled.div`
     display: flex;
     gap: 1rem;
     .bottom {
-      margin-top: 0.5rem;
+      margin-top: 1rem;
       display: flex;
       gap: 1rem;
     }

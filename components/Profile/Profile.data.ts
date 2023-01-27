@@ -1,18 +1,22 @@
 export const profileRoutes = [
   {
-    path: "/settings",
-    name: "Settings",
+    path: '/settings',
+    name: 'Settings'
   },
   {
-    path: "/ordered",
-    name: "Orders",
+    path: '/ordered',
+    name: 'Orders'
   },
   {
-    path: "/selling",
-    name: "Selling",
+    path: '/selling',
+    name: 'Selling'
   },
   {
-    path: "/favorites",
-    name: "Favorites",
+    path: '/sold',
+    name: 'Sold'
   },
-];
+  {
+    path: '/favorites',
+    name: 'Favorites'
+  }
+]

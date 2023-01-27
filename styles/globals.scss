@@ -16,8 +16,8 @@ li {
 }
 
 :root {
-  --font-default: "HelveticaNeueCyr", sans-serif;
-  --font-wide: "Maison Neue", "HelveticaNeueCyr", sans-serif;
+  --font-default: 'HelveticaNeueCyr', sans-serif;
+  --font-wide: 'Maison Neue', 'HelveticaNeueCyr', sans-serif;
   --dark: #0e0e0f;
   --dark-hover: #000e0f;
   --field-highlight: #625bf6;
@@ -40,7 +40,7 @@ li {
   --gap: 2rem;
   --stroke: #e8e8e8;
   --primary: #ff6243;
-  --primary-hover: #ff6243;
+  --primary-hover: #e65a3e;
 }
 
 .no-items {
@@ -115,15 +115,10 @@ h3 {
   font-family: var(--font-default);
   color: var(--dark);
   border-radius: 4px;
-}
 
-.input::placeholder {
-  color: hsl(0, 0%, 50%) !important;
-  opacity: 1;
-}
-
-.input::placeholder {
-  color: var(--grey-30);
+  &::placeholder {
+    color: var(--grey-30);
+  }
 }
 
 .button {
@@ -141,19 +136,19 @@ h3 {
   gap: 0.5rem;
   border-radius: 4px;
   transition: background var(--transition);
-}
 
-.button:disabled {
-  cursor: not-allowed;
-  background-color: var(--grey-30);
-}
+  &:disabled {
+    cursor: not-allowed;
+    background-color: var(--grey-30);
+  }
 
-.button:disabled:hover {
-  background-color: var(--grey-30);
-}
+  &:disabled:hover {
+    background-color: var(--grey-30);
+  }
 
-.button:hover {
-  background-color: var(--primary);
+  &:hover {
+    background-color: var(--primary);
+  }
 }
 
 a {
@@ -205,10 +200,14 @@ a {
 /* Modal */
 .modal-inner__title {
   font-size: 1.8rem;
-  font-family: var(--font-medium);
+  font-family: var(--font-wide);
+}
+.modal-inner {
+  max-width: 100%;
 }
 
 .modal-inner__text {
+  line-height: 150%;
   margin-top: 1rem;
   font-size: 1rem;
   color: var(--grey-60);
@@ -222,9 +221,10 @@ a {
 .cancel--button {
   background: transparent !important;
   color: var(--dark);
-}
-.cancel--button:hover {
-  color: var(--dark-hover);
+
+  &:hover {
+    color: var(--dark-hover);
+  }
 }
 
 .PhoneInputInput,
@@ -249,4 +249,118 @@ a {
 
 select {
   font-size: 1rem;
+}
+
+// Dropdown settings
+.dropdown-settings {
+  z-index: 5;
+  position: relative;
+  padding-left: 2rem;
+
+  .dropdown-tab {
+    min-width: max-content;
+    border-radius: 4px;
+    border: 1px solid var(--stroke);
+    top: 25px;
+    right: 0;
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s linear;
+
+    .dropdown-tab__item {
+      min-width: 5rem;
+      background-color: white;
+      width: 100%;
+      padding: 0.8em 0.6em;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+
+      &:hover {
+        background-color: #f6f6f6;
+      }
+    }
+  }
+
+  &:hover .dropdown-tab {
+    opacity: 1;
+    pointer-events: all;
+  }
+}
+
+.rating-title {
+  font-family: var(--font-wide);
+  font-size: 2rem;
+}
+
+.rating-subtitle {
+  margin-top: 1rem;
+}
+
+.rating-stars {
+  margin-top: 0.5rem;
+}
+
+.rating-textarea {
+  border: 1px solid var(--grey-10);
+  font-size: 1rem;
+  border-radius: 4px;
+  outline: none;
+  width: 100%;
+  margin-top: 0.5rem;
+  min-width: 20rem;
+  padding: 0.5rem;
+  resize: none;
+  min-height: 10rem;
+
+  &::placeholder {
+    color: var(--grey-30);
+  }
+}
+
+.rating-button {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.reviews-title {
+  font-size: 2rem;
+  font-weight: 600;
+  font-family: var(--font-wide);
+}
+
+.reviews-inner {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 50vh;
+  padding-right: 4rem;
+  min-width: 450px;
+
+  .review {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .review-user {
+    font-size: 1rem;
+    font-family: var(--font-wide);
+  }
+
+  .review-text {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    min-width: 10rem;
+    max-width: 15rem;
+  }
+
+  .review-date {
+    margin-top: 1rem;
+    color: var(--grey-60);
+  }
 }

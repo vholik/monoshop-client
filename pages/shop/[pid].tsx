@@ -1,18 +1,11 @@
-import Categories from '@components/Categories/Categories'
-import Header from '@components/Header/Header'
 import { getItemById } from '@store/reducers/item/GetItemByIdSlice'
 import styled from 'styled-components'
 import Image from 'next/image'
 import unfilledHeart from '@public/images/unfilled-heart.svg'
 import filledHeart from '@public/images/filled-heart.svg'
-import Footer from '@components/Footer/Footer'
 import Link from 'next/link'
 import ArrowRight from '@public/images/arrow-right.svg'
-import {
-  useActionCreators,
-  useAppDispatch,
-  useAppSelector
-} from '@store/hooks/redux'
+import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
 import { CSSProperties, Fragment, useEffect, useState } from 'react'
 import Router, { useRouter } from 'next/router'
 import 'react-responsive-carousel/lib/styles/carousel.min.css'
@@ -22,19 +15,15 @@ import {
   checkIsFavoriteActions
 } from '@store/reducers/favorite/CheckIsFavoriteSlice'
 import { toggleFavorite } from '@store/reducers/favorite/ToggleFavoriteSlice'
-import { getCategories } from '@store/reducers/category/GetCategoriesSlice'
-import { getSubcategories } from '@store/reducers/subcategory/GetSubcategoriesSlice'
 import { Gender } from '@store/types/gender.enum'
 import { addToCart } from '@store/reducers/cart/CartSlice'
-import { showErrorToast } from '@utils/ReactTostify/tostifyHandlers'
-import { filterActions } from '@store/reducers/filter/FilterSlice'
-import Layout from '@components/Layout/Layout'
 import ErrorPage from 'pages/404'
 import {
   redirectCategory,
   redirectGender,
   redirectSubcategory
 } from '@utils/redirectionHelper'
+import { UserRating } from '@components/UserRating/UserRating'
 
 const arrowStyles: CSSProperties = {
   position: 'absolute',
@@ -354,7 +343,10 @@ const ShopItem = () => {
                   <Link href={`/user/${item?.user.id}`}>
                     <div className="user-info">
                       <h3 className="user-name">{item?.user.fullName}</h3>
-                      <p className="user-mail">{item?.user.email}</p>
+                      <UserRating
+                        rating={item.user.reviewRating!}
+                        count={item.user.reviewCount!}
+                      />
                     </div>
                   </Link>
                 </div>

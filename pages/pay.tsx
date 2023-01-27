@@ -57,7 +57,7 @@ const Pay = () => {
 
   const getTotalPrice = (price: number) => {
     // Return price plus shop tax 10%
-    return price + price / 10
+    return Number(price) + price / 10
   }
 
   const onSubmit: SubmitHandler<PayFormData> = (data) => {
@@ -330,7 +330,6 @@ const PayStyles = styled.div`
   .wrapper {
     display: grid;
     margin-top: 2rem;
-    padding: 0 50px;
     grid-template-columns: 3fr 2fr;
     column-gap: var(--gap);
   }

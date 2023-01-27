@@ -2,25 +2,25 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import instance from '@utils/axios'
 import { AxiosError, isAxiosError } from 'axios'
 import { RejectError } from '@store/types/error'
-import { IOrder } from '@store/types/order'
+import { Order } from '@stripe/stripe-js'
 
-interface ItemsState {
+interface OrderState {
   status: 'init' | 'loading' | 'error' | 'success'
-  orders: IOrder[]
 }
 
-const initialState: ItemsState = {
-  status: 'init',
-  orders: []
+const initialState: OrderState = {
+  status: 'init'
 }
 
-export const getOrders = createAsyncThunk<
-  IOrder[],
-  void,
+export const changeOrderStatus = createAsyncThunk<
+  Order[],
+  { orderId: string },
   { rejectValue: RejectError }
->('order', async (_, thunkAPI) => {
+>('order', async ({ orderId }, thunkAPI) => {
   try {
-    const response = await instance.get<IOrder[]>('order')
+    const response = await instance.put<Order[]>('order/changeStatus', {
+      orderId
+    })
     return response.data
   } catch (err) {
     if (isAxiosError(err) && err.response) {
@@ -30,23 +30,22 @@ export const getOrders = createAsyncThunk<
   }
 })
 
-export const GetOrdersSlice = createSlice({
-  name: 'order',
+export const ChangeOrderStatusSlice = createSlice({
+  name: 'order/changeStatus',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getOrders.pending, (state) => {
+      .addCase(changeOrderStatus.pending, (state) => {
         state.status = 'loading'
       })
-      .addCase(getOrders.fulfilled, (state, action) => {
-        state.orders = action.payload
+      .addCase(changeOrderStatus.fulfilled, (state) => {
         state.status = 'success'
       })
-      .addCase(getOrders.rejected, (state) => {
+      .addCase(changeOrderStatus.rejected, (state) => {
         state.status = 'error'
       })
   }
 })
 
-export default GetOrdersSlice.reducer
+export default ChangeOrderStatusSlice.reducer

@@ -1,75 +1,75 @@
-import Header from "@components/Header/Header";
-import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
-import { ILoginFormData } from "@store/types/auth";
-import Head from "next/head";
-import Link from "next/link";
-import { useForm, SubmitHandler } from "react-hook-form";
-import styled from "styled-components";
-import { useCookies } from "react-cookie";
-import Router, { useRouter } from "next/router";
-import instance, { AuthResponse } from "@utils/axios";
+import Header from '@components/Header/Header'
+import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
+import { ILoginFormData } from '@store/types/auth'
+import Head from 'next/head'
+import Link from 'next/link'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import styled from 'styled-components'
+import { useCookies } from 'react-cookie'
+import Router, { useRouter } from 'next/router'
+import instance, { AuthResponse } from '@utils/axios'
 import {
   CredentialResponse,
   GoogleLogin,
-  GoogleOAuthProvider,
-} from "@react-oauth/google";
-import { hasGrantedAllScopesGoogle } from "@react-oauth/google";
-import { useEffect, useState } from "react";
-import { loginUser } from "@store/reducers/auth/AuthSlice";
+  GoogleOAuthProvider
+} from '@react-oauth/google'
+import { hasGrantedAllScopesGoogle } from '@react-oauth/google'
+import { useEffect, useState } from 'react'
+import { loginUser } from '@store/reducers/auth/AuthSlice'
 
 export default function Login() {
-  const router = useRouter();
-  const dispatch = useAppDispatch();
+  const router = useRouter()
+  const dispatch = useAppDispatch()
 
-  const [googleError, setGoogleError] = useState("");
+  const [googleError, setGoogleError] = useState('')
 
-  const status = useAppSelector((state) => state.authReducer.status);
-  const error = useAppSelector((state) => state.authReducer.error);
+  const status = useAppSelector((state) => state.authReducer.status)
+  const error = useAppSelector((state) => state.authReducer.error)
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<ILoginFormData>({ mode: "onBlur" });
+    formState: { errors }
+  } = useForm<ILoginFormData>({ mode: 'onBlur' })
 
   const onSubmit: SubmitHandler<ILoginFormData> = (data) => {
     dispatch(loginUser(data))
       .unwrap()
       .then((res) => {
-        localStorage.setItem("access_token", res.accessToken);
-        localStorage.setItem("refresh_token", res.refreshToken);
+        localStorage.setItem('access_token', res.accessToken)
+        localStorage.setItem('refresh_token', res.refreshToken)
 
         // Return to redirect query value
-        const redirect = router.query.redirect as string;
+        const redirect = router.query.redirect as string
         if (redirect) {
-          router.push(redirect);
+          router.push(redirect)
         } else {
-          router.push("/");
+          router.push('/')
         }
       })
       .catch((error) => {
-        console.error("rejected", error);
-      });
-  };
+        console.error('rejected', error)
+      })
+  }
 
   // Google handler
   const successHandler = async (response: CredentialResponse) => {
     await instance
-      .post<AuthResponse>("google-authentication", {
-        token: response.credential,
+      .post<AuthResponse>('google-authentication', {
+        token: response.credential
       })
       .then((res) => {
-        localStorage.setItem("access_token", res.data.accessToken);
-        localStorage.setItem("refresh_token", res.data.refreshToken);
+        localStorage.setItem('access_token', res.data.accessToken)
+        localStorage.setItem('refresh_token', res.data.refreshToken)
 
-        Router.push("/");
+        Router.push('/')
       })
-      .catch((err) => Router.push("/404"));
-  };
+      .catch((err) => Router.push('/404'))
+  }
 
   const googleErrorHandler = () => {
-    setGoogleError("Error google login");
-  };
+    setGoogleError('Error google login')
+  }
 
   return (
     <LoginStyles>
@@ -90,14 +90,15 @@ export default function Login() {
               placeholder="Your email"
               className="input"
               id="email-input"
-              {...register("email", {
-                required: "Please provide your email",
+              {...register('email', {
+                required: 'Please provide your email',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "invalid email address",
-                },
+                  message: 'invalid email address'
+                }
               })}
             />
+            {errors.email && <p className="error">{errors.email.message}</p>}
           </label>
           {/* Password */}
           <label htmlFor="#password-input" className="label">
@@ -107,23 +108,26 @@ export default function Login() {
               placeholder="Password"
               className="input"
               id="password-input"
-              {...register("password", {
+              {...register('password', {
                 required: true,
                 maxLength: {
                   value: 30,
-                  message: "Max 30 symbols",
+                  message: 'Max 30 symbols'
                 },
                 minLength: {
                   value: 8,
-                  message: "Use at least 8 symbols",
-                },
+                  message: 'Use at least 8 symbols'
+                }
               })}
             />
-            {status === "error" && <div className="error">{error}</div>}
+            {errors.password && (
+              <p className="error">{errors.password.message}</p>
+            )}
+            {status === 'error' && <div className="error">{error}</div>}
             {googleError && <div className="error">{googleError}</div>}
           </label>
           <p className="account-action">
-            Haven't created an account yet?{" "}
+            Haven't created an account yet?{' '}
             <Link href="/register">
               <span className="link">Register</span>
             </Link>
@@ -145,7 +149,7 @@ export default function Login() {
         </form>
       </div>
     </LoginStyles>
-  );
+  )
 }
 
 const LoginStyles = styled.div`
@@ -200,4 +204,4 @@ const LoginStyles = styled.div`
       }
     }
   }
-`;
+`

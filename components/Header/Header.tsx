@@ -1,59 +1,64 @@
-import { HeaderStyles } from "./Header.styles";
-import Image from "next/image";
-import SearchIcon from "@public/images/search.svg";
-import Logo from "@public/images/logo.svg";
-import UnfilledHeart from "@public/images/unfilled-heart.svg";
-import Link from "next/link";
-import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
-import { ChangeEvent, useEffect, useState } from "react";
-import { checkIsAuth } from "@store/reducers/auth/AuthSlice";
-import ChatIcon from "@public/images/chat.svg";
-import UserIcon from "@public/images/user.svg";
-import Cross from "@public/images/cross.svg";
-import { filterActions } from "@store/reducers/filter/FilterSlice";
-import Router from "next/router";
+import { HeaderStyles } from './Header.styles'
+import Image from 'next/image'
+import SearchIcon from '@public/images/search.svg'
+import Logo from '@public/images/logo.svg'
+import UnfilledHeart from '@public/images/unfilled-heart.svg'
+import Link from 'next/link'
+import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
+import { ChangeEvent, useEffect, useState } from 'react'
+import { checkIsAuth } from '@store/reducers/auth/AuthSlice'
+import ChatIcon from '@public/images/chat.svg'
+import UserIcon from '@public/images/user.svg'
+import Cross from '@public/images/cross.svg'
+import { filterActions } from '@store/reducers/filter/FilterSlice'
+import Router, { useRouter } from 'next/router'
 
 export default function Header() {
-  const dispatch = useAppDispatch();
-  const authStatus = useAppSelector((state) => state.authReducer.status);
-  const filter = useAppSelector((state) => state.filterReducer);
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+  const authStatus = useAppSelector((state) => state.authReducer.status)
+  const filter = useAppSelector((state) => state.filterReducer)
 
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('')
 
   useEffect(() => {
     // Set store search value to input
     if (filter.search) {
-      setValue(filter.search);
+      setValue(filter.search)
     }
-  }, []);
+
+    dispatch(checkIsAuth())
+      .unwrap()
+      .catch((err) => console.log(err))
+  }, [])
 
   const clearSearch = () => {
-    setValue("");
-    dispatch(filterActions.setSearchValue(""));
-  };
+    setValue('')
+    dispatch(filterActions.setSearchValue(''))
+  }
 
   const inputHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
+    setValue(e.target.value)
 
     if (!e.target.value) {
-      dispatch(filterActions.setSearchValue(""));
+      dispatch(filterActions.setSearchValue(''))
     }
-  };
+  }
 
   const searchSubmit = () => {
-    if (value.length > 50) return;
+    if (value.length > 50) return
 
-    if (value === filter.search) return;
+    if (value === filter.search) return
 
-    dispatch(filterActions.resetFilter());
-    dispatch(filterActions.setSearchValue(value));
+    dispatch(filterActions.resetFilter())
+    dispatch(filterActions.setSearchValue(value))
 
-    Router.push("/shop");
-  };
+    Router.push('/shop')
+  }
 
   return (
     <HeaderStyles>
-      <Link href={"/"}>
+      <Link href={'/'}>
         <Image
           src={Logo}
           alt="Logo"
@@ -95,9 +100,9 @@ export default function Header() {
           </div>
         )}
       </div>
-      {authStatus === "authenticated" ? (
+      {authStatus === 'authenticated' ? (
         <div className="right">
-          <Link href={"/favorites"}>
+          <Link href={'/favorites'}>
             <Image
               src={UnfilledHeart}
               height={25}
@@ -106,7 +111,7 @@ export default function Header() {
               className="search-icon"
             />
           </Link>
-          <Link href={"/settings"}>
+          <Link href={'/settings'}>
             <button className="button chat--button">
               <Image
                 src={UserIcon}
@@ -117,7 +122,7 @@ export default function Header() {
               />
             </button>
           </Link>
-          <Link href={"/chat"}>
+          <Link href={'/chat'}>
             <button className="button chat--button">
               <Image
                 src={ChatIcon}
@@ -129,7 +134,7 @@ export default function Header() {
               Messages
             </button>
           </Link>
-          <Link href={"/sell"}>
+          <Link href={'/sell'}>
             <button className="button">Sell</button>
           </Link>
         </div>
@@ -142,11 +147,11 @@ export default function Header() {
             alt="Search icon"
             className="search-icon"
           />
-          <Link href={"/login"}>
+          <Link href={'/login'}>
             <button className="button">Login</button>
           </Link>
         </div>
       )}
     </HeaderStyles>
-  );
+  )
 }

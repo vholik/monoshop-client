@@ -4,16 +4,13 @@ import Image from 'next/image'
 import TrashCan from '@public/images/trash.svg'
 import Link from 'next/link'
 import { useState } from 'react'
-import Modal from 'react-modal'
 import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
 import { deleteItemById } from '@store/reducers/item/DeleteItemSlice'
 import { getUserItems } from '@store/reducers/item/GetUserItemsSlice'
-import Router from 'next/router'
-import { modalStyles } from '@components/CustomModal/CustomModal.styles'
 import { showSuccesToast } from '@utils/ReactTostify/tostifyHandlers'
 import ErrorPage from 'pages/404'
-
-Modal.setAppElement('#__next')
+import CustomModal from '@components/CustomModal/CustomModal'
+import SettingsDots from '@public/images/settings-dots.svg'
 
 interface ProfileItemsProps {
   items: Item[]
@@ -21,13 +18,13 @@ interface ProfileItemsProps {
 
 const ProfileItems = ({ items }: ProfileItemsProps) => {
   const dispatch = useAppDispatch()
-  const [modalIsOpen, setIsOpen] = useState(false)
+  const [modalIsOpen, setModalIsOpen] = useState(false)
   const [deleteId, setDeleteId] = useState<null | number>(null)
 
   const deleteStatus = useAppSelector((state) => state.deleteItemReducer.status)
 
   const deleteHandler = () => {
-    setIsOpen(false)
+    setModalIsOpen(false)
 
     if (deleteId) {
       dispatch(deleteItemById(deleteId))
@@ -48,11 +45,7 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
   }
 
   function openModal() {
-    setIsOpen(true)
-  }
-
-  function closeModal() {
-    setIsOpen(false)
+    setModalIsOpen(true)
   }
 
   if (deleteStatus === 'error') {
@@ -61,27 +54,14 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
 
   return (
     <ProfileItemsStyles>
-      <Modal
+      <CustomModal
         isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        style={modalStyles}
-        contentLabel="Example Modal"
-      >
-        <div className="modal-inner">
-          <h2 className="modal-inner__title">Delete this item?</h2>
-          <p className="modal-inner__text">
-            You can not return your deleted item
-          </p>
-          <div className="modal-buttons">
-            <button className="button cancel--button" onClick={closeModal}>
-              Cancel
-            </button>
-            <button className="button" onClick={deleteHandler}>
-              Delete
-            </button>
-          </div>
-        </div>
-      </Modal>
+        setIsOpen={setModalIsOpen}
+        subtitle="You can not return your deleted item"
+        title="Delete this item?"
+        actionName="Delete"
+        onSubmit={deleteHandler}
+      />
       {!items.length && (
         <h2 className="no-items">
           You don't have any items on sell.{' '}
@@ -101,20 +81,24 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
           <div className="bar">
             <div className="hero">
               <div className="item-name">{item.name}</div>
-              <Image
-                src={TrashCan}
-                alt="Delete"
-                height={20}
-                width={20}
-                onClick={() => {
-                  openModal(), setDeleteId(item.id)
-                }}
-              />
-            </div>
 
-            <Link href={`/edit/${item.id}`}>
-              <p className="edit">Edit</p>
-            </Link>
+              <div className="dropdown-settings">
+                <Image src={SettingsDots} alt="Settings" draggable={false} />
+                <div className="dropdown-tab">
+                  <Link href={`/edit/${item.id}`}>
+                    <div className="dropdown-tab__item">Edit</div>
+                  </Link>
+                  <div
+                    className="dropdown-tab__item"
+                    onClick={() => {
+                      openModal(), setDeleteId(item.id)
+                    }}
+                  >
+                    Delete
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       ))}

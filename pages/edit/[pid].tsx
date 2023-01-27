@@ -38,6 +38,7 @@ import { Item } from '@store/types/item'
 import { isAxiosError } from 'axios'
 import ErrorPage from 'pages/404'
 import { editItem } from '@store/reducers/item/EditItemSlice'
+import { checkIsAuth } from '@store/reducers/auth/AuthSlice'
 
 export const getServerSideProps = wrapper.getStaticProps(
   (store) =>
@@ -181,7 +182,11 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
     setValue('size', item.size)
     setValue('style', item.style.value)
     setValue('subcategoryId', item.subcategory.id)
-  }, [item])
+
+    dispatch(checkIsAuth())
+      .unwrap()
+      .catch((err) => console.log(err))
+  }, [])
 
   useEffect(() => {
     setCategoryId(item.category.id)

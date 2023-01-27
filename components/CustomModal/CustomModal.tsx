@@ -1,16 +1,16 @@
-import Modal from "react-modal";
-import { modalStyles } from "./CustomModal.styles";
-import { Dispatch, SetStateAction, useState } from "react";
+import Modal from 'react-modal'
+import { modalStyles } from '@utils/customModal.styles'
+import { Dispatch, SetStateAction } from 'react'
 
-Modal.setAppElement("#__next");
+Modal.setAppElement('#__next')
 
 interface CustomModalProps {
-  isOpen: boolean;
-  onSubmit?: () => void;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
-  title: string;
-  subtitle: string;
-  actionName?: string;
+  isOpen: boolean
+  onSubmit?: () => void
+  setIsOpen: Dispatch<SetStateAction<boolean>>
+  title: string
+  subtitle: string
+  actionName?: string
 }
 
 function CustomModal({
@@ -19,11 +19,11 @@ function CustomModal({
   setIsOpen,
   subtitle,
   title,
-  actionName,
+  actionName
 }: CustomModalProps) {
   const closeModal = () => {
-    setIsOpen(false);
-  };
+    setIsOpen(false)
+  }
 
   return (
     <Modal
@@ -47,6 +47,6 @@ function CustomModal({
         )}
       </div>
     </Modal>
-  );
+  )
 }
-export default CustomModal;
+export default CustomModal

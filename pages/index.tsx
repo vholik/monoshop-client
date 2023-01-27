@@ -1,68 +1,77 @@
-import Header from "@components/Header/Header";
-import Head from "next/head";
-import styled from "styled-components";
-import HeroBg from "@public/images/hero-bg.jpg";
-import Categories from "@components/Categories/Categories";
-import Footer from "@components/Footer/Footer";
-import Link from "next/link";
-import { wrapper } from "@store/reducers/store";
-import { getPopularBrands } from "@store/reducers/brand/GetPopularBrandsSlice";
-import { ItemEntityWithImage } from "@store/types/item-entity";
-import { getPopularStyles } from "@store/reducers/style/GetPopularStylesSlice";
-import { getPopularItems } from "@store/reducers/item/GetPopularItemsSlice";
-import { Item } from "@store/types/item";
-import { useAppDispatch } from "@store/hooks/redux";
-import Router from "next/router";
-import { SortBy } from "@store/types/filter-by.enum";
-import { filterActions } from "@store/reducers/filter/FilterSlice";
-import Layout from "@components/Layout/Layout";
+import Header from '@components/Header/Header'
+import Head from 'next/head'
+import styled from 'styled-components'
+import HeroBg from '@public/images/hero-bg.jpg'
+import Categories from '@components/Categories/Categories'
+import Footer from '@components/Footer/Footer'
+import Link from 'next/link'
+import { wrapper } from '@store/reducers/store'
+import { getPopularBrands } from '@store/reducers/brand/GetPopularBrandsSlice'
+import { ItemEntityWithImage } from '@store/types/item-entity'
+import { getPopularStyles } from '@store/reducers/style/GetPopularStylesSlice'
+import { getPopularItems } from '@store/reducers/item/GetPopularItemsSlice'
+import { Item } from '@store/types/item'
+import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
+import Router from 'next/router'
+import { SortBy } from '@store/types/filter-by.enum'
+import { filterActions } from '@store/reducers/filter/FilterSlice'
+import Layout from '@components/Layout/Layout'
+import { useEffect } from 'react'
+import { checkIsAuth } from '@store/reducers/auth/AuthSlice'
 
-export const getServerSideProps = wrapper.getServerSideProps(
-  (store) => async () => {
-    const brands = (await store.dispatch(getPopularBrands())).payload;
-    const styles = (await store.dispatch(getPopularStyles())).payload;
-    const items = (await store.dispatch(getPopularItems())).payload;
+export const getServerSideProps = wrapper.getStaticProps(
+  (store) =>
+    async ({}) => {
+      const brands = (await store.dispatch(getPopularBrands())).payload
+      const styles = (await store.dispatch(getPopularStyles())).payload
+      const items = (await store.dispatch(getPopularItems())).payload
 
-    if (!brands || !styles || !items) {
+      if (!brands || !styles || !items) {
+        return {
+          props: {
+            items: [],
+            styles: [],
+            brands: []
+          }
+        }
+      }
+
       return {
         props: {
-          items: [],
-          styles: [],
-          brands: [],
-        },
-      };
+          brands,
+          styles,
+          items
+        }
+      }
     }
-
-    return {
-      props: {
-        brands,
-        styles,
-        items,
-      },
-    };
-  }
-);
+)
 
 interface HomeProps {
-  brands: ItemEntityWithImage[];
-  styles: ItemEntityWithImage[];
-  items: Item[];
+  brands: ItemEntityWithImage[]
+  styles: ItemEntityWithImage[]
+  items: Item[]
 }
 
 export default function Home({ brands, items, styles }: HomeProps) {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
   const brandRedirect = (brand: ItemEntityWithImage) => {
-    dispatch(filterActions.resetFilter());
-    dispatch(filterActions.setBrand([brand]));
-    Router.push("/shop");
-  };
+    dispatch(filterActions.resetFilter())
+    dispatch(filterActions.setBrand([brand]))
+    Router.push('/shop')
+  }
 
   const styleRedirect = (style: ItemEntityWithImage) => {
-    dispatch(filterActions.resetFilter());
-    dispatch(filterActions.setStyle([style]));
-    Router.push("/shop");
-  };
+    dispatch(filterActions.resetFilter())
+    dispatch(filterActions.setStyle([style]))
+    Router.push('/shop')
+  }
+
+  useEffect(() => {
+    dispatch(checkIsAuth())
+      .unwrap()
+      .catch((err) => console.log(err))
+  }, [])
 
   return (
     <HomeStyles>
@@ -70,14 +79,14 @@ export default function Home({ brands, items, styles }: HomeProps) {
         <title>Monoshop - create your style</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <main className="hero">
-        <div className="container">
+      <div className="container">
+        <main className="hero">
           <h1 className="hero-title">Monoshop marketplace</h1>
           <Link href="/shop">
             <button className="hero-button button">Shop</button>
           </Link>
-        </div>
-      </main>
+        </main>
+      </div>
       {/* Popular categories */}
       {Array.isArray(styles) && (
         <div className="container">
@@ -176,14 +185,14 @@ export default function Home({ brands, items, styles }: HomeProps) {
         </div>
       </div>
     </HomeStyles>
-  );
+  )
 }
 
 const HomeStyles = styled.div`
   .hero {
-    border-radius: 2em;
+    border-radius: 1.5em;
     margin-top: 2rem;
-    padding: 10rem 0;
+    padding: 6em 3em;
     font-family: var(--font-default);
     color: white;
     background-image: url(${HeroBg.src});
@@ -195,7 +204,7 @@ const HomeStyles = styled.div`
   }
 
   .hero-title {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 600;
     font-family: var(--font-wide);
   }
@@ -321,4 +330,4 @@ const HomeStyles = styled.div`
       aspect-ratio: 1 / 1;
     }
   }
-`;
+`

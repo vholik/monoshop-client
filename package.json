@@ -38,6 +38,7 @@
     "react-range": "^1.8.14",
     "react-responsive-carousel": "^3.2.23",
     "react-select": "^5.7.0",
+    "react-simple-star-rating": "^5.1.7",
     "react-swipe": "^6.0.4",
     "react-toastify": "^9.1.1",
     "socket.io-client": "^4.5.4",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@types/react-modal": "^3.13.1",
-    "@types/styled-components": "^5.1.26"
+    "@types/styled-components": "^5.1.26",
+    "sass": "^1.57.1"
   }
 }

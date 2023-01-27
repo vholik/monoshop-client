@@ -3,19 +3,8 @@ import Footer from '@components/Footer/Footer'
 import Header from '@components/Header/Header'
 import { ReactNode } from 'react'
 import { LayoutStyles } from './Layout.styles'
-import { useEffect } from 'react'
-import { useAppDispatch } from '@store/hooks/redux'
-import { checkIsAuth } from '@store/reducers/auth/AuthSlice'
 
 const Layout = ({ children }: { children: ReactNode }) => {
-  const dispatch = useAppDispatch()
-
-  useEffect(() => {
-    dispatch(checkIsAuth())
-      .unwrap()
-      .catch((err) => console.log(err))
-  })
-
   return (
     <LayoutStyles>
       <Header />
