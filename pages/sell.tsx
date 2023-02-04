@@ -29,8 +29,13 @@ import { convertStringToHashtags } from '@utils/hashtagsConverter'
 import { addItem } from '@store/reducers/item/AddItemSlice'
 import Router from 'next/router'
 import { SellStyles } from 'styles/shared/SellStyles'
+import CardIcon from '@public/images/card.svg'
+import AddCardModal from '@components/AddCardModal/AddCardModal'
+import { CardForm } from '@components/AddCardModal/CardForm.interface'
 
 export default function Sell() {
+  const [modalOpen, setModalOpen] = useState(false)
+
   const dispatch = useAppDispatch()
 
   const categoryRef = useRef<any>(null)
@@ -76,6 +81,10 @@ export default function Sell() {
   const itemStatus = useAppSelector((state) => state.addItemReducer.status)
 
   const [formImages, setFormImages] = useState<string[]>([])
+  const [card, setCard] = useState({
+    value: 0,
+    holder: ''
+  })
 
   const [categoryId, setCategoryId] = useState<number | null>(null)
   const [gender, setGender] = useState<Gender | null>(null)
@@ -175,7 +184,13 @@ export default function Sell() {
       ...data,
       images: formImages,
       hashtags: convertStringToHashtags(data.hashtags),
-      description: data.description.replace(/\r\n|\r|\n/g, '<br />')
+      description: data.description.replace(/\r\n|\r|\n/g, '<br />'),
+      cardHolder: card.holder,
+      cardNumber: card.value
+    }
+
+    if (!card.value) {
+      return showErrorToast('Please add the card')
     }
 
     dispatch(addItem(patchedData))
@@ -193,426 +208,458 @@ export default function Sell() {
       })
   }
 
+  const addCardHandler = (data: CardForm) => {
+    setCard(data)
+  }
+
   return (
-    <SellStyles>
-      <div className="container">
-        <div className="wrapper">
-          <h1 className="title-md">Sell new item</h1>
+    <>
+      <AddCardModal
+        addCard={addCardHandler}
+        isOpen={modalOpen}
+        setIsOpen={setModalOpen}
+      />
+      <SellStyles>
+        <div className="container">
+          <div className="wrapper">
+            <h1 className="title-md">Sell new item</h1>
+            <form className="inner" onSubmit={handleSubmit(onSubmit)}>
+              {/* First row */}
+              <div className="row">
+                <label className="image-upload">
+                  <input
+                    type="file"
+                    className="image-upload-input"
+                    accept="image/*"
+                    onChange={handleImageSubmit}
+                    disabled={imageStatus === 'loading'}
+                  />
+                  <Image
+                    src={Upload}
+                    alt="Upload"
+                    className="upload-icon"
+                    height={50}
+                    width={50}
+                  />
+                  Upload an image
+                </label>
 
-          <form className="inner" onSubmit={handleSubmit(onSubmit)}>
-            {/* First row */}
-            <div className="row">
-              <label className="image-upload">
-                <input
-                  type="file"
-                  className="image-upload-input"
-                  accept="image/*"
-                  onChange={handleImageSubmit}
-                  disabled={imageStatus === 'loading'}
-                />
-                <Image
-                  src={Upload}
-                  alt="Upload"
-                  className="upload-icon"
-                  height={50}
-                  width={50}
-                />
-                Upload an image
-              </label>
-
-              {imageStatus === 'loading' && (
-                <div className="item-image skeleton-animation"></div>
-              )}
-              <Reorder.Group
-                as="ol"
-                axis="y"
-                values={formImages}
-                onReorder={setFormImages}
-              >
-                {formImages.map((url, key) => (
-                  <Reorder.Item key={url} value={url}>
-                    <div
-                      className="item-image"
-                      style={{
-                        backgroundImage: `url('${url}')`
-                      }}
-                    >
-                      <div className="item-image__inner">
-                        <div className="image-icon drag--icon">
-                          <Image src={Drag} alt="Drag" />
-                        </div>
-                        <div
-                          className="image-icon delete--icon"
-                          onClick={() => deleteImage(key)}
-                        >
-                          <Image src={Trash} alt="Delete" />
+                {imageStatus === 'loading' && (
+                  <div className="item-image skeleton-animation"></div>
+                )}
+                <Reorder.Group
+                  as="ol"
+                  axis="y"
+                  values={formImages}
+                  onReorder={setFormImages}
+                >
+                  {formImages.map((url, key) => (
+                    <Reorder.Item key={url} value={url}>
+                      <div
+                        className="item-image"
+                        style={{
+                          backgroundImage: `url('${url}')`
+                        }}
+                      >
+                        <div className="item-image__inner">
+                          <div className="image-icon drag--icon">
+                            <Image src={Drag} alt="Drag" />
+                          </div>
+                          <div
+                            className="image-icon delete--icon"
+                            onClick={() => deleteImage(key)}
+                          >
+                            <Image src={Trash} alt="Delete" />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Reorder.Item>
-                ))}
-              </Reorder.Group>
-            </div>
-            <div className="inner-row">
-              {/* Second row */}
-              <div className="row">
-                <label className="label">
-                  Title
-                  <input
-                    type="text"
-                    className="input"
-                    minLength={5}
-                    maxLength={50}
-                    {...register('name', {
-                      required: 'Title is required',
-                      minLength: {
-                        value: 5,
-                        message: 'Name should have at least 5 symbols'
-                      },
-                      maxLength: {
-                        value: 50,
-                        message: 'Name can not have more than 50 symbols'
-                      }
-                    })}
-                  />
-                  {formErrors.name && (
-                    <p className="error">{formErrors.name.message}</p>
-                  )}
-                </label>
-                <label className="label">
-                  Category
-                  <Controller
-                    name="categoryId"
-                    control={control}
-                    rules={{ required: 'Please select category' }}
-                    render={({
-                      field: { value, name, onChange, onBlur, ref }
-                    }) => (
-                      <Select
-                        ref={categoryRef}
-                        instanceId="select"
-                        className="select"
-                        name={name}
-                        isLoading={categoriesStatus === 'loading'}
-                        options={categories}
-                        isClearable={true}
-                        isSearchable={true}
-                        isDisabled={!gender}
-                        styles={colourStyles}
-                        placeholder=""
-                        onChange={(val) => {
-                          onChange(val?.id), setCategoryId(val ? val.id : val)
-                        }}
-                        value={categories.find((c) => c.id === value)}
-                        onBlur={onBlur}
-                      />
+                    </Reorder.Item>
+                  ))}
+                </Reorder.Group>
+              </div>
+              <div className="inner-row">
+                {/* Second row */}
+                <div className="row">
+                  <label className="label">
+                    Title
+                    <input
+                      type="text"
+                      className="input"
+                      minLength={5}
+                      maxLength={50}
+                      {...register('name', {
+                        required: 'Title is required',
+                        minLength: {
+                          value: 5,
+                          message: 'Name should have at least 5 symbols'
+                        },
+                        maxLength: {
+                          value: 50,
+                          message: 'Name can not have more than 50 symbols'
+                        }
+                      })}
+                    />
+                    {formErrors.name && (
+                      <p className="error">{formErrors.name.message}</p>
                     )}
-                  />
-                  {formErrors.categoryId && (
-                    <p className="error">{formErrors.categoryId.message}</p>
-                  )}
-                </label>
-
-                <label className="label">
-                  Style
-                  <Controller
-                    name="style"
-                    control={control}
-                    rules={{ required: 'Please select style' }}
-                    render={({ field: { value, name, onChange, onBlur } }) => (
-                      <Select
-                        instanceId="select"
-                        className="select"
-                        name={name}
-                        isLoading={stylesStatus === 'loading'}
-                        options={styles}
-                        isClearable={true}
-                        isSearchable={true}
-                        styles={colourStyles}
-                        placeholder=""
-                        onChange={(val) => onChange(val?.value)}
-                        value={styles.find((c) => c.value === value)}
-                        onBlur={onBlur}
-                      />
+                  </label>
+                  <label className="label">
+                    Category
+                    <Controller
+                      name="categoryId"
+                      control={control}
+                      rules={{ required: 'Please select category' }}
+                      render={({
+                        field: { value, name, onChange, onBlur, ref }
+                      }) => (
+                        <Select
+                          ref={categoryRef}
+                          instanceId="select"
+                          className="select"
+                          name={name}
+                          isLoading={categoriesStatus === 'loading'}
+                          options={categories}
+                          isClearable={true}
+                          isSearchable={true}
+                          isDisabled={!gender}
+                          styles={colourStyles}
+                          placeholder=""
+                          onChange={(val) => {
+                            onChange(val?.id), setCategoryId(val ? val.id : val)
+                          }}
+                          value={categories.find((c) => c.id === value)}
+                          onBlur={onBlur}
+                        />
+                      )}
+                    />
+                    {formErrors.categoryId && (
+                      <p className="error">{formErrors.categoryId.message}</p>
                     )}
-                  />
-                  {formErrors.style && (
-                    <p className="error">{formErrors.style.message}</p>
-                  )}
-                </label>
-                <label className="label">
-                  Colour
-                  <Controller
-                    name="colour"
-                    control={control}
-                    rules={{ required: 'Please select colour' }}
-                    render={({ field: { value, name, onChange, onBlur } }) => (
-                      <Select
-                        instanceId="select"
-                        className="select"
-                        name={name}
-                        isLoading={coloursStatus === 'loading'}
-                        options={colours}
-                        isClearable={true}
-                        isSearchable={true}
-                        styles={colourStyles}
-                        placeholder=""
-                        onChange={(val) => onChange(val?.value)}
-                        value={styles.find((c) => c.value === value)}
-                        onBlur={onBlur}
-                        formatOptionLabel={(option) => (
-                          <div>
-                            {option.hexCode ? (
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  gap: '10px',
-                                  alignItems: 'center'
-                                }}
-                              >
+                  </label>
+                  <label className="label">
+                    Style
+                    <Controller
+                      name="style"
+                      control={control}
+                      rules={{ required: 'Please select style' }}
+                      render={({
+                        field: { value, name, onChange, onBlur }
+                      }) => (
+                        <Select
+                          instanceId="select"
+                          className="select"
+                          name={name}
+                          isLoading={stylesStatus === 'loading'}
+                          options={styles}
+                          isClearable={true}
+                          isSearchable={true}
+                          styles={colourStyles}
+                          placeholder=""
+                          onChange={(val) => onChange(val?.value)}
+                          value={styles.find((c) => c.value === value)}
+                          onBlur={onBlur}
+                        />
+                      )}
+                    />
+                    {formErrors.style && (
+                      <p className="error">{formErrors.style.message}</p>
+                    )}
+                  </label>
+                  <label className="label">
+                    Colour
+                    <Controller
+                      name="colour"
+                      control={control}
+                      rules={{ required: 'Please select colour' }}
+                      render={({
+                        field: { value, name, onChange, onBlur }
+                      }) => (
+                        <Select
+                          instanceId="select"
+                          className="select"
+                          name={name}
+                          isLoading={coloursStatus === 'loading'}
+                          options={colours}
+                          isClearable={true}
+                          isSearchable={true}
+                          styles={colourStyles}
+                          placeholder=""
+                          onChange={(val) => onChange(val?.value)}
+                          value={styles.find((c) => c.value === value)}
+                          onBlur={onBlur}
+                          formatOptionLabel={(option) => (
+                            <div>
+                              {option.hexCode ? (
                                 <div
                                   style={{
-                                    height: '20px',
-                                    width: '20px',
-                                    borderRadius: '50%',
-                                    backgroundColor: `#${option.hexCode}`
+                                    display: 'flex',
+                                    gap: '10px',
+                                    alignItems: 'center'
                                   }}
-                                ></div>
+                                >
+                                  <div
+                                    style={{
+                                      height: '20px',
+                                      width: '20px',
+                                      borderRadius: '50%',
+                                      backgroundColor: `#${option.hexCode}`
+                                    }}
+                                  ></div>
+                                  <span>{option.label}</span>
+                                </div>
+                              ) : (
                                 <span>{option.label}</span>
-                              </div>
-                            ) : (
-                              <span>{option.label}</span>
-                            )}
-                          </div>
-                        )}
-                      />
+                              )}
+                            </div>
+                          )}
+                        />
+                      )}
+                    />
+                    {formErrors.colour && (
+                      <p className="error">{formErrors.colour.message}</p>
                     )}
-                  />
-                  {formErrors.colour && (
-                    <p className="error">{formErrors.colour.message}</p>
-                  )}
-                </label>
-                <label className="label">
-                  Price
-                  <input
-                    type="number"
-                    className="input"
-                    step="0.01"
-                    min={0}
-                    max={100000}
-                    {...register('price', {
-                      required: 'Price is required',
-                      valueAsNumber: true,
-                      min: {
-                        value: 0,
-                        message: 'Please pick a price'
-                      },
-                      max: {
-                        value: 10000,
-                        message: 'Price can not be greater than 10 000'
-                      }
+                  </label>
+                  <label className="label">
+                    Price
+                    <input
+                      type="number"
+                      className="input"
+                      step="0.01"
+                      min={0}
+                      max={100000}
+                      {...register('price', {
+                        required: 'Price is required',
+                        valueAsNumber: true,
+                        min: {
+                          value: 0,
+                          message: 'Please pick a price'
+                        },
+                        max: {
+                          value: 10000,
+                          message: 'Price can not be greater than 10 000'
+                        }
+                      })}
+                    />
+                    {formErrors.price && (
+                      <p className="error">{formErrors.price.message}</p>
+                    )}
+                  </label>
+                  <label className="label">
+                    Hashtags
+                    <input
+                      type="text"
+                      className="input"
+                      {...register('hashtags', {
+                        onChange: (e: ChangeEvent<HTMLInputElement>) => {
+                          console.log(e.target.value)
+                        },
+                        pattern: {
+                          value: hashtagsRegex,
+                          message: 'Incorrect hashtags (5 hashtags max)'
+                        }
+                      })}
+                    />
+                    {formErrors.hashtags && (
+                      <p className="error">{formErrors.hashtags.message}</p>
+                    )}
+                  </label>
+                  <div
+                    className="add-cart-label label"
+                    onClick={() => setModalOpen(true)}
+                  >
+                    <Image src={CardIcon} alt="Card icon" />
+                    Add cart
+                  </div>
+                </div>
+                {/* Third row */}
+                <div className="row">
+                  <label className="label">
+                    Gender
+                    <Controller
+                      name="gender"
+                      control={control}
+                      rules={{ required: 'Please select gender' }}
+                      render={({
+                        field: { value, name, onChange, onBlur }
+                      }) => (
+                        <Select
+                          instanceId="select"
+                          className="select"
+                          name={name}
+                          options={genders}
+                          isClearable={true}
+                          isSearchable={true}
+                          styles={colourStyles}
+                          placeholder=""
+                          onChange={(val) => {
+                            onChange(val?.value)
+                            setGender(val ? val.value : null)
+                            setCategoryId(null)
+                          }}
+                          value={genders.find((c) => c.value === value)}
+                          onBlur={onBlur}
+                        />
+                      )}
+                    />
+                    {formErrors.gender && (
+                      <p className="error">{formErrors.gender.message}</p>
+                    )}
+                  </label>
+                  <label className="label">
+                    Subcategory
+                    <Controller
+                      name="subcategoryId"
+                      control={control}
+                      rules={{ required: 'Please select subcategory' }}
+                      render={({
+                        field: { value, name, onChange, onBlur, ref }
+                      }) => (
+                        <Select
+                          ref={subcategoryRef}
+                          instanceId="select"
+                          className="select"
+                          name={name}
+                          options={subcategories}
+                          isClearable={true}
+                          isSearchable={true}
+                          isLoading={subcategoriesStatus === 'loading'}
+                          styles={colourStyles}
+                          placeholder=""
+                          isDisabled={!categoryId}
+                          onChange={(val) => {
+                            onChange(val ? val.id : val)
+                          }}
+                          value={subcategories.find((c) => c.id === value)}
+                          onBlur={onBlur}
+                        />
+                      )}
+                    />
+                    {formErrors.subcategoryId && (
+                      <p className="error">
+                        {formErrors.subcategoryId.message}
+                      </p>
+                    )}
+                  </label>
+                  <label className="label">
+                    Condition
+                    <Controller
+                      name="condition"
+                      control={control}
+                      rules={{ required: 'Please select condition' }}
+                      render={({
+                        field: { value, name, onChange, onBlur }
+                      }) => (
+                        <Select
+                          instanceId="select"
+                          className="select"
+                          name={name}
+                          options={conditions}
+                          isClearable={true}
+                          isSearchable={true}
+                          styles={colourStyles}
+                          placeholder=""
+                          onChange={(val) => onChange(val?.value)}
+                          value={conditions.find((c) => c.value === value)}
+                          onBlur={onBlur}
+                        />
+                      )}
+                    />
+                    {formErrors.condition && (
+                      <p className="error">{formErrors.condition.message}</p>
+                    )}
+                  </label>
+                  <label className="label">
+                    Brands
+                    <Controller
+                      name="brand"
+                      control={control}
+                      rules={{
+                        required: 'Please select brands',
+                        maxLength: {
+                          value: 5,
+                          message: 'Max 5 brands'
+                        }
+                      }}
+                      render={({
+                        field: { value, name, onChange, onBlur }
+                      }) => (
+                        <Select
+                          instanceId="select"
+                          className="select"
+                          name={name}
+                          isMulti
+                          options={brands}
+                          isLoading={brandsStatus === 'loading'}
+                          isClearable={true}
+                          isSearchable={true}
+                          styles={colourStyles}
+                          placeholder=""
+                          value={brands.filter(
+                            (brand) => value && value.includes(brand.id)
+                          )}
+                          onChange={(val) => onChange(val.map((c) => c.id))}
+                        />
+                      )}
+                    />
+                    {formErrors.brand && (
+                      <p className="error">{formErrors.brand.message}</p>
+                    )}
+                  </label>
+                  <label className="label">
+                    Size
+                    <Controller
+                      name="size"
+                      control={control}
+                      rules={{ required: 'Please select size' }}
+                      render={({
+                        field: { value, name, onChange, onBlur }
+                      }) => (
+                        <Select
+                          instanceId="select"
+                          className="select"
+                          name={name}
+                          options={sizes}
+                          isClearable={true}
+                          isSearchable={true}
+                          styles={colourStyles}
+                          placeholder=""
+                          onChange={(val) => onChange(val?.value)}
+                          value={sizes.find((c) => c.value === value)}
+                          onBlur={onBlur}
+                        />
+                      )}
+                    />
+                    {formErrors.size && (
+                      <p className="error">{formErrors.size.message}</p>
+                    )}
+                  </label>
+                </div>
+                <label className="label description--label">
+                  Description
+                  <textarea
+                    id="description"
+                    maxLength={200}
+                    {...register('description', {
+                      maxLength: 200
                     })}
-                  />
-                  {formErrors.price && (
-                    <p className="error">{formErrors.price.message}</p>
+                  ></textarea>
+                  {formErrors.description && (
+                    <p className="error">{formErrors.description.message}</p>
                   )}
                 </label>
-                <label className="label">
-                  Hashtags
-                  <input
-                    type="text"
-                    className="input"
-                    {...register('hashtags', {
-                      onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                        console.log(e.target.value)
-                      },
-                      pattern: {
-                        value: hashtagsRegex,
-                        message: 'Incorrect hashtags (5 hashtags max)'
-                      }
-                    })}
-                  />
-                  {formErrors.hashtags && (
-                    <p className="error">{formErrors.hashtags.message}</p>
-                  )}
-                </label>
+                <button
+                  className="button submit--buton"
+                  disabled={
+                    itemStatus === 'loading' || itemStatus === 'success'
+                  }
+                >
+                  Save
+                </button>
               </div>
-              {/* Third row */}
-              <div className="row">
-                <label className="label">
-                  Gender
-                  <Controller
-                    name="gender"
-                    control={control}
-                    rules={{ required: 'Please select gender' }}
-                    render={({ field: { value, name, onChange, onBlur } }) => (
-                      <Select
-                        instanceId="select"
-                        className="select"
-                        name={name}
-                        options={genders}
-                        isClearable={true}
-                        isSearchable={true}
-                        styles={colourStyles}
-                        placeholder=""
-                        onChange={(val) => {
-                          onChange(val?.value)
-                          setGender(val ? val.value : null)
-                          setCategoryId(null)
-                        }}
-                        value={genders.find((c) => c.value === value)}
-                        onBlur={onBlur}
-                      />
-                    )}
-                  />
-                  {formErrors.gender && (
-                    <p className="error">{formErrors.gender.message}</p>
-                  )}
-                </label>
-                <label className="label">
-                  Subcategory
-                  <Controller
-                    name="subcategoryId"
-                    control={control}
-                    rules={{ required: 'Please select subcategory' }}
-                    render={({
-                      field: { value, name, onChange, onBlur, ref }
-                    }) => (
-                      <Select
-                        ref={subcategoryRef}
-                        instanceId="select"
-                        className="select"
-                        name={name}
-                        options={subcategories}
-                        isClearable={true}
-                        isSearchable={true}
-                        isLoading={subcategoriesStatus === 'loading'}
-                        styles={colourStyles}
-                        placeholder=""
-                        isDisabled={!categoryId}
-                        onChange={(val) => {
-                          onChange(val ? val.id : val)
-                        }}
-                        value={subcategories.find((c) => c.id === value)}
-                        onBlur={onBlur}
-                      />
-                    )}
-                  />
-                  {formErrors.subcategoryId && (
-                    <p className="error">{formErrors.subcategoryId.message}</p>
-                  )}
-                </label>
-                <label className="label">
-                  Condition
-                  <Controller
-                    name="condition"
-                    control={control}
-                    rules={{ required: 'Please select condition' }}
-                    render={({ field: { value, name, onChange, onBlur } }) => (
-                      <Select
-                        instanceId="select"
-                        className="select"
-                        name={name}
-                        options={conditions}
-                        isClearable={true}
-                        isSearchable={true}
-                        styles={colourStyles}
-                        placeholder=""
-                        onChange={(val) => onChange(val?.value)}
-                        value={conditions.find((c) => c.value === value)}
-                        onBlur={onBlur}
-                      />
-                    )}
-                  />
-                  {formErrors.condition && (
-                    <p className="error">{formErrors.condition.message}</p>
-                  )}
-                </label>
-                <label className="label">
-                  Brands
-                  <Controller
-                    name="brand"
-                    control={control}
-                    rules={{
-                      required: 'Please select brands',
-                      maxLength: {
-                        value: 5,
-                        message: 'Max 5 brands'
-                      }
-                    }}
-                    render={({ field: { value, name, onChange, onBlur } }) => (
-                      <Select
-                        instanceId="select"
-                        className="select"
-                        name={name}
-                        isMulti
-                        options={brands}
-                        isLoading={brandsStatus === 'loading'}
-                        isClearable={true}
-                        isSearchable={true}
-                        styles={colourStyles}
-                        placeholder=""
-                        value={brands.filter(
-                          (brand) => value && value.includes(brand.id)
-                        )}
-                        onChange={(val) => onChange(val.map((c) => c.id))}
-                      />
-                    )}
-                  />
-                  {formErrors.brand && (
-                    <p className="error">{formErrors.brand.message}</p>
-                  )}
-                </label>
-                <label className="label">
-                  Size
-                  <Controller
-                    name="size"
-                    control={control}
-                    rules={{ required: 'Please select size' }}
-                    render={({ field: { value, name, onChange, onBlur } }) => (
-                      <Select
-                        instanceId="select"
-                        className="select"
-                        name={name}
-                        options={sizes}
-                        isClearable={true}
-                        isSearchable={true}
-                        styles={colourStyles}
-                        placeholder=""
-                        onChange={(val) => onChange(val?.value)}
-                        value={sizes.find((c) => c.value === value)}
-                        onBlur={onBlur}
-                      />
-                    )}
-                  />
-                  {formErrors.size && (
-                    <p className="error">{formErrors.size.message}</p>
-                  )}
-                </label>
-              </div>
-              <label className="label description--label">
-                Description
-                <textarea
-                  id="description"
-                  maxLength={200}
-                  {...register('description', {
-                    maxLength: 200
-                  })}
-                ></textarea>
-                {formErrors.description && (
-                  <p className="error">{formErrors.description.message}</p>
-                )}
-              </label>
-              <button
-                className="button submit--buton"
-                disabled={itemStatus === 'loading' || itemStatus === 'success'}
-              >
-                Save
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
-      </div>
-    </SellStyles>
+      </SellStyles>
+    </>
   )
 }

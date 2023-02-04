@@ -212,7 +212,7 @@ const HomeStyles = styled.div`
   .hero-button {
     background-color: transparent;
     border: 1px solid var(--white);
-    margin-top: 2rem;
+    margin-top: 1rem;
     &:hover {
       background-color: rgba(255, 255, 255, 0.1);
     }

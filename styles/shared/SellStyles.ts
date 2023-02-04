@@ -16,6 +16,22 @@ export const SellStyles = styled.div`
     grid-column: 1;
   }
 
+  .add-cart-label {
+    cursor: pointer;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--stroke);
+    width: fit-content;
+    padding: 0.6em 4em;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: background var(--transition);
+
+    &:hover {
+      background-color: var(--white-hover);
+    }
+  }
+
   #description {
     margin-top: 0.5rem;
     grid-column: 2/4;
@@ -45,6 +61,7 @@ export const SellStyles = styled.div`
     gap: 1rem;
     aspect-ratio: 1 / 1;
     cursor: pointer;
+    border-radius: 6px;
 
     input {
       display: none;
@@ -58,6 +75,7 @@ export const SellStyles = styled.div`
     margin-top: 2rem;
     background-repeat: no-repeat;
     background-size: cover;
+
     &:hover .item-image__inner {
       opacity: 1;
     }

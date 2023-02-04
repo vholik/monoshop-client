@@ -19,7 +19,7 @@ export const UserRating = ({ rating, count }: UserRatingProps) => {
         ))}
         {new Array(5 - rating).fill('rating').map((i, key) => (
           <div className="rating-star" key={key}>
-            <Image src={Star} alt="Star" draggable="false" />
+            <Image src={StarGrey} alt="Star" draggable="false" />
           </div>
         ))}
       </div>

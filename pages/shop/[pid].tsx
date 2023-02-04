@@ -344,7 +344,7 @@ const ShopItem = () => {
                     <div className="user-info">
                       <h3 className="user-name">{item?.user.fullName}</h3>
                       <UserRating
-                        rating={item.user.reviewRating!}
+                        rating={item.user.reviewRating! || 0}
                         count={item.user.reviewCount!}
                       />
                     </div>

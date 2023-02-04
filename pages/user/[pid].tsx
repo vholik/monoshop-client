@@ -1,8 +1,6 @@
 import { wrapper } from '@store/reducers/store'
 import styled from 'styled-components'
 import { User } from '@store/types/user'
-import Header from '@components/Header/Header'
-import Categories from '@components/Categories/Categories'
 import { getUserById } from '@store/reducers/user/GetUserById'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,14 +10,11 @@ import Flash from '@public/images/flash.svg'
 import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
 import { useEffect, useState } from 'react'
 import Router, { useRouter } from 'next/router'
-import Footer from '@components/Footer/Footer'
 import ArrowRight from '@public/images/arrow-left.svg'
-import Layout from '@components/Layout/Layout'
 import ErrorPage from 'pages/404'
 import { checkIsAuth } from '@store/reducers/auth/AuthSlice'
 import { UserRating } from '@components/UserRating/UserRating'
 import { RatingModal } from '@components/RatingModal/RatingModal'
-import { ReviewModalStyles } from '@components/ReviewModal/ReviewModal.styles'
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) =>
@@ -105,8 +100,8 @@ const UserProfile = ({ user }: UserProfileProps) => {
               <h2 className="user-name">{user.fullName}</h2>
               <span onClick={openModal}>
                 <UserRating
-                  count={user.reviewCount!}
-                  rating={user.reviewRating!}
+                  count={Number(user.reviewCount!.toFixed())}
+                  rating={user.reviewRating! || 0}
                 />
               </span>
               <div className="bottom">
@@ -159,7 +154,6 @@ const UserProfile = ({ user }: UserProfileProps) => {
                 </Link>
                 <h2 className="item-name">{item.name}</h2>
                 <p className="item-price">{item.price} PLN</p>
-                <h3 className="item-size">{item.size}</h3>
               </div>
             ))}
           </div>

@@ -147,7 +147,7 @@ h3 {
   }
 
   &:hover {
-    background-color: var(--primary);
+    background-color: var(--primary-hover);
   }
 }
 
@@ -204,6 +204,23 @@ a {
 }
 .modal-inner {
   max-width: 100%;
+  min-width: 300px;
+
+  .card-button {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .card-title {
+    font-size: 2rem;
+    font-family: var(--font-wide);
+    margin-bottom: 1rem;
+  }
+
+  .input {
+    margin-top: 0.5rem;
+  }
 }
 
 .modal-inner__text {
@@ -340,6 +357,10 @@ select {
   max-height: 50vh;
   padding-right: 4rem;
   min-width: 450px;
+
+  .no-items {
+    margin-top: 0.5rem;
+  }
 
   .review {
     display: flex;

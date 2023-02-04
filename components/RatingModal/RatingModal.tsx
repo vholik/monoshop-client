@@ -71,7 +71,7 @@ export const RatingModal = ({
           onScroll={() => handleScroll()}
           ref={listInnerRef}
         >
-          {reviews.length &&
+          {!!reviews.length ? (
             reviews.map((review) => (
               <div className="review" key={review.id}>
                 <Image
@@ -92,7 +92,10 @@ export const RatingModal = ({
                   </p>
                 </div>
               </div>
-            ))}
+            ))
+          ) : (
+            <p className="no-items">There is no reviews</p>
+          )}
           {reviewsStatus === 'loading' ||
             (reviewsStatus === 'init' && <Loading />)}
         </div>

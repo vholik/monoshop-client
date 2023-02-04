@@ -1,50 +1,63 @@
-import Footer from "@components/Footer/Footer";
-import Header from "@components/Header/Header";
-import styled from "styled-components";
-import io, { Socket } from "socket.io-client";
-import { ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
-import { Message } from "@store/types/chat";
-import { Room } from "@store/types/chat";
-import { useRouter } from "next/router";
-import { User } from "@store/types/user";
-import { useAppSelector } from "@store/hooks/redux";
-import CheckedIcon from "@public/images/message-checked.svg";
-import SendedIcon from "@public/images/message-sended.svg";
-import Image from "next/image";
-import moment from "moment";
-import Flash from "@public/images/flash.svg";
-import Link from "next/link";
-import { Item } from "@store/types/item";
-import Layout from "@components/Layout/Layout";
+import Footer from '@components/Footer/Footer'
+import Header from '@components/Header/Header'
+import styled from 'styled-components'
+import io, { Socket } from 'socket.io-client'
+import {
+  ChangeEvent,
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
+import { Message } from '@store/types/chat'
+import { Room } from '@store/types/chat'
+import { useRouter } from 'next/router'
+import { User } from '@store/types/user'
+import { useAppSelector } from '@store/hooks/redux'
+import CheckedIcon from '@public/images/message-checked.svg'
+import SendedIcon from '@public/images/message-sended.svg'
+import Image from 'next/image'
+import moment from 'moment'
+import Flash from '@public/images/flash.svg'
+import Link from 'next/link'
+import { Item } from '@store/types/item'
+import Layout from '@components/Layout/Layout'
 
 type Timestamp = {
-  time: string;
-  index: number;
-};
+  time: string
+  index: number
+}
 
 const Chat = () => {
-  const chatRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const [value, setValue] = useState("");
-  const [socket, setSocket] = useState<Socket>();
-  const [rooms, setRooms] = useState<Room[]>();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [currentUser, setCurrentUser] = useState<User>();
-  const userId = useAppSelector((state) => state.authReducer.userId);
-  const [timeStamps, setTimeStamps] = useState<Timestamp[]>([]);
-  const [roomItem, setRoomItem] = useState<Item>();
+  const chatRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const [value, setValue] = useState('')
+  const [socket, setSocket] = useState<Socket>()
+  const [rooms, setRooms] = useState<Room[]>()
+  const [messages, setMessages] = useState<Message[]>([])
+  const [currentUser, setCurrentUser] = useState<User>()
+  const userId = useAppSelector((state) => state.authReducer.userId)
+  const [timeStamps, setTimeStamps] = useState<Timestamp[]>([])
+  const [roomItem, setRoomItem] = useState<Item>()
 
   const inputHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-  };
+    setValue(e.target.value)
+  }
 
   const send = () => {
-    if (!value) return;
+    if (!value) return
     if (currentUser) {
-      socket?.emit("sendMessage", { text: value });
-      setValue("");
+      socket?.emit('sendMessage', { text: value })
+      setValue('')
     }
-  };
+  }
+
+  const handleUserKeyPress = (event: KeyboardEvent) => {
+    if (event.keyCode === 13) {
+      send()
+    }
+  }
 
   const changeRoom = (room: Room) => {
     if (rooms) {
@@ -55,143 +68,156 @@ const Chat = () => {
             ...chat,
             message: {
               ...chat.message,
-              markedSeen: true,
-            },
-          };
+              markedSeen: true
+            }
+          }
         }
 
-        return chat;
-      });
+        return chat
+      })
 
-      setRooms(setRoomsAsSeen);
+      setRooms(setRoomsAsSeen)
     }
 
     if (room.users.id) {
-      socket?.emit("joinRoom", { user: room.users.id });
+      socket?.emit('joinRoom', { user: room.users.id })
     }
-  };
+  }
 
   useEffect(() => {
-    const user = router.query.send || "";
-    const item = router.query.item || "";
-
-    if (user && socket) {
-      socket.emit("joinRoom", { user, item });
-    }
-  }, [router.isReady, socket]);
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("access_token");
+    const accessToken = localStorage.getItem('access_token')
 
     if (accessToken) {
-      const socket = io("http://localhost:8000", {
+      const socket = io('http://localhost:8000', {
         auth: {
-          token: accessToken,
-        },
-      });
+          token: accessToken
+        }
+      })
 
-      setSocket(socket);
+      setSocket(socket)
 
-      socket.on("connect", () => {
-        console.log("connected to socket");
-      });
+      socket.on('connect', () => {
+        console.log('connected to socket')
 
-      socket.on("disconnect", () => {
-        console.log("disconnected from socket");
-      });
+        // Joining room and changing theme item
+        const user = router.query.send || ''
+        const item = router.query.item || ''
 
-      socket.on("getItem", (item) => {
-        setRoomItem(item);
-      });
+        if (user && socket) {
+          console.log(user, item)
+
+          if (item) {
+            socket.emit('joinRoom', { user, item })
+          } else {
+            socket.emit('joinRoom', { user })
+          }
+        }
+      })
+
+      socket.on('disconnect', () => {
+        console.log('disconnected from socket')
+      })
+
+      socket.on('getItem', (item) => {
+        setRoomItem(item)
+      })
 
       // Get chats
-      socket.on("getChats", (chats: Room[]) => {
+      socket.on('getChats', (chats: Room[]) => {
         const rooms = chats.sort((a, b) => {
           return a.message.markedSeen === b.message.markedSeen
             ? 0
             : a.message.markedSeen
             ? 1
-            : -1;
-        });
+            : -1
+        })
 
-        setRooms(rooms);
-      });
+        setRooms(rooms)
+      })
 
-      socket.on("getRoomMessages", (messages: Message[]) => {
-        setMessages(messages);
-      });
+      socket.on('getRoomMessages', (messages: Message[]) => {
+        setMessages(messages)
+      })
 
-      socket.on("onMessage", (message: Message) => {
-        setMessages((prev) => [...prev, message]);
-      });
+      socket.on('onMessage', (message: Message) => {
+        setMessages((prev) => [...prev, message])
+      })
 
-      socket.on("getUser", (user: User) => {
-        setCurrentUser(user);
-      });
+      socket.on('getUser', (user: User) => {
+        setCurrentUser(user)
+      })
 
       return () => {
-        socket.off("onMessage");
-        socket.off("getRoomMessages");
-        socket.off("getChats");
-        socket.off("getUser");
-        socket.off("connect");
-        socket.off("disconnect");
-        socket.disconnect();
-        socket.off();
-      };
+        socket.off('onMessage')
+        socket.off('getRoomMessages')
+        socket.off('getChats')
+        socket.off('getUser')
+        socket.off('connect')
+        socket.off('disconnect')
+        socket.disconnect()
+        socket.off()
+      }
     }
-  }, []);
+  }, [router.isReady])
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleUserKeyPress)
+    return () => {
+      window.removeEventListener('keydown', handleUserKeyPress)
+    }
+  }, [handleUserKeyPress])
 
   function getTimeStamps() {
-    const arr: Timestamp[] = [];
+    const arr: Timestamp[] = []
 
     const timestamps = messages.map((message, index) => {
-      const time = new Date(message.date).toLocaleString("en-US", {
-        day: "2-digit",
-        month: "long",
-      });
+      const time = new Date(message.date).toLocaleString('en-US', {
+        day: '2-digit',
+        month: 'long'
+      })
 
       if (arr.length === 0) {
-        return arr.push({ time, index });
+        return arr.push({ time, index })
       }
 
-      let alreadyHas = false;
+      let alreadyHas = false
 
       arr.map((it) => {
         if (it.time === time) {
-          alreadyHas = true;
+          alreadyHas = true
         }
-      });
+      })
 
-      if (!alreadyHas) arr.push({ time, index });
-    });
+      if (!alreadyHas) arr.push({ time, index })
+    })
 
-    return arr;
+    return arr
   }
+
   function getActivity(date: string) {
-    const yesterday = moment().subtract(1, "day");
+    const yesterday = moment().subtract(1, 'day')
 
-    const isToday = moment(new Date(date)).isSame(new Date(), "day");
-    const isYesterday = moment(new Date(date)).isSame(yesterday, "day");
-    const isThisWeek = moment(new Date(date)).isSame(new Date(), "week");
-    const isThisMonth = moment(new Date(date)).isSame(new Date(), "month");
-    const isThisYear = moment(new Date(date)).isSame(new Date(), "year");
+    const isToday = moment(new Date(date)).isSame(new Date(), 'day')
+    const isYesterday = moment(new Date(date)).isSame(yesterday, 'day')
+    const isThisWeek = moment(new Date(date)).isSame(new Date(), 'week')
+    const isThisMonth = moment(new Date(date)).isSame(new Date(), 'month')
+    const isThisYear = moment(new Date(date)).isSame(new Date(), 'year')
 
-    if (isToday) return "Today";
-    if (isYesterday) return "Yesterday";
-    if (isThisWeek) return "This week";
-    if (isThisMonth) return "This month";
-    if (isThisYear) return "This year";
+    if (isToday) return 'Today'
+    if (isYesterday) return 'Yesterday'
+    if (isThisWeek) return 'This week'
+    if (isThisMonth) return 'This month'
+    if (isThisYear) return 'This year'
   }
 
   useEffect(() => {
-    const ref = chatRef.current;
+    const ref = chatRef.current
     if (ref) {
-      ref.scrollTop = ref.scrollHeight;
+      ref.scrollTop = ref.scrollHeight
     }
 
-    setTimeStamps(getTimeStamps());
-  }, [messages]);
+    setTimeStamps(getTimeStamps())
+  }, [messages])
 
   return (
     <ChatStyles>
@@ -203,8 +229,8 @@ const Chat = () => {
               <div
                 className={
                   room.users.id === currentUser?.id
-                    ? "room selected-room"
-                    : "room"
+                    ? 'room selected-room'
+                    : 'room'
                 }
                 key={key}
                 onClick={() => changeRoom(room)}
@@ -238,7 +264,7 @@ const Chat = () => {
                   </Link>
                   <p className="user-activity">
                     <Image src={Flash} alt="Activity" />
-                    Last activity{" "}
+                    Last activity{' '}
                     {getActivity(
                       currentUser?.lastActivity
                     )?.toLocaleLowerCase()}
@@ -268,23 +294,28 @@ const Chat = () => {
             <div className="chat-inner" ref={chatRef}>
               {messages.map((message, key) => (
                 <Fragment key={key}>
-                  {timeStamps[key] && (
-                    <p className="timestamp">{timeStamps[key].time}</p>
+                  {timeStamps.find((stamp) => stamp.index === key, 'Date') && (
+                    <p className="timestamp">
+                      {
+                        timeStamps.find((stamp) => stamp.index === key, 'Date')
+                          ?.time
+                      }
+                    </p>
                   )}
                   <div
                     key={key}
                     className={
                       message.userId === userId
-                        ? "message my--message"
-                        : "message"
+                        ? 'message my--message'
+                        : 'message'
                     }
                   >
                     <div className="message-inner">{message.text}</div>
                     <p className="message-time">
-                      {new Date(message.date).toLocaleString("en-US", {
-                        hour: "numeric",
-                        minute: "numeric",
-                        hour12: true,
+                      {new Date(message.date).toLocaleString('en-US', {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
                       })}
                     </p>
                   </div>
@@ -309,8 +340,8 @@ const Chat = () => {
         </div>
       </div>
     </ChatStyles>
-  );
-};
+  )
+}
 
 const ChatStyles = styled.div`
   width: 100%;
@@ -334,8 +365,8 @@ const ChatStyles = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
-    min-height: 600px;
-    max-height: 600px;
+    min-height: 500px;
+    max-height: 500px;
 
     .chat-header {
       padding: 1rem 1rem;
@@ -479,6 +510,6 @@ const ChatStyles = styled.div`
       align-items: center;
     }
   }
-`;
+`
 
-export default Chat;
+export default Chat

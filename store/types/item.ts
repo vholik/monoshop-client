@@ -1,3 +1,4 @@
+import { CardForm } from '@components/AddCardModal/CardForm.interface'
 import { Room } from './chat'
 import { Gender } from './gender.enum'
 import { ItemEntity, ItemEntityWithId } from './item-entity'
@@ -36,6 +37,8 @@ export interface IAddItemFormData {
   price: number
   gender: string
   images: string[]
+  cardHolder: string
+  cardNumber: number
 }
 
 export interface IEditItemFormData extends IAddItemFormData {
