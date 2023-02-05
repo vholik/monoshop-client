@@ -38,12 +38,17 @@ export default function Login() {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="wrapper">
-        <div className="bg"></div>
         <form className="form" onSubmit={handleSubmit(onSubmit)}>
           <h1 className="title-md title">Register an account</h1>
           {/* Email */}
           <label className="label">
-            E-mail
+            <div className="error-label-wrapper">
+              E-mail
+              {errors.email?.message && (
+                <div className="error">{errors.email.message}</div>
+              )}
+            </div>
+
             <input
               type="text"
               placeholder="Your email"
@@ -56,16 +61,18 @@ export default function Login() {
                 }
               })}
             />
-            {errors.email?.message && (
-              <div className="error">{errors.email.message}</div>
-            )}
           </label>
           {/* Fullname  */}
           <label className="label">
-            Fullname
+            <div className="error-label-wrapper">
+              Fullname
+              {errors.fullName?.message && (
+                <div className="error">{errors.fullName.message}</div>
+              )}
+            </div>
             <input
               {...register('fullName', {
-                required: true,
+                required: 'Please provide your name',
                 maxLength: {
                   value: 30,
                   message: 'Max 30 symbols'
@@ -75,16 +82,18 @@ export default function Login() {
               placeholder="Joe Doe"
               className="input"
             />
-            {errors.fullName?.message && (
-              <div className="error">{errors.fullName.message}</div>
-            )}
           </label>
           {/* Password  */}
           <label className="label">
-            Password
+            <div className="error-label-wrapper">
+              Password
+              {errors.password?.message && (
+                <div className="error">{errors.password.message}</div>
+              )}
+            </div>
             <input
               {...register('password', {
-                required: true,
+                required: 'Please provide a password',
                 maxLength: {
                   value: 30,
                   message: 'Max 30 symbols'
@@ -98,10 +107,6 @@ export default function Login() {
               placeholder="Password"
               className="input"
             />
-            {errors.password?.message && (
-              <div className="error">{errors.password.message}</div>
-            )}
-            {status === 'error' && <div className="error">{error}</div>}
           </label>
           <p className="account-action">
             Already have an account?{' '}
@@ -110,12 +115,13 @@ export default function Login() {
             </Link>
           </p>
           <button
-            className="button"
+            className="button-xl"
             type="submit"
             disabled={status === 'loading'}
           >
             Register
           </button>
+          {status === 'error' && <div className="form-error">{error}</div>}
         </form>
       </div>
     </LoginStyles>
@@ -124,41 +130,34 @@ export default function Login() {
 
 const LoginStyles = styled.div`
   .wrapper {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    height: 100vh;
-    grid-column-gap: 4rem;
+    display: flex;
+    justify-content: center;
+    margin-top: 4rem;
 
     .title {
       margin-bottom: 2rem;
     }
 
-    .bg {
-      height: 100%;
-      background-color: var(--grey-30);
-    }
-
     .form {
       display: flex;
       flex-direction: column;
+      align-items: center;
 
       .input {
         width: 20rem;
-        margin-top: 1rem;
-        margin-bottom: 0.5rem;
       }
 
-      .button {
-        margin-top: 2rem;
-        width: fit-content;
-        margin-bottom: 1rem;
+      .button-xl {
+        margin-top: 1rem;
       }
+    }
+
+    .label {
+      margin-bottom: 1rem;
     }
 
     .account-action {
       color: var(--grey-60);
-      margin-top: 0.5rem;
       .link {
         color: var(--dark);
         text-decoration: underline;

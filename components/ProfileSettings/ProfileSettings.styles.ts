@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const ProfileSettingsStyles = styled.div`
   .form {
@@ -8,10 +8,14 @@ export const ProfileSettingsStyles = styled.div`
   .submit--buton {
     margin-top: 1rem;
     background-color: var(--dark);
+
+    &:hover {
+      background-color: var(--dark-hover);
+    }
   }
 
-  .input {
-    margin-top: 0.5rem;
+  .label {
+    margin-bottom: 1rem;
   }
 
   .button {
@@ -55,4 +59,4 @@ export const ProfileSettingsStyles = styled.div`
       display: none;
     }
   }
-`;
+`

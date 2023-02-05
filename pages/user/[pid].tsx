@@ -72,6 +72,8 @@ const UserProfile = ({ user }: UserProfileProps) => {
     setIsReviewModalOpen(true)
   }
 
+  console.log(user.items)
+
   return (
     <UserProfileStyles>
       {user && (

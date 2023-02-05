@@ -1,20 +1,20 @@
-import { IProfileFormData, User } from "@store/types/user";
-import { ProfileSettingsStyles } from "./ProfileSettings.styles";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { useAppDispatch, useAppSelector } from "@store/hooks/redux";
-import { uploadImage } from "@store/reducers/image/UploadImageSlice";
-import { editProfile } from "@store/reducers/user/EditProfileSlice";
-import "react-phone-number-input/style.css";
+import { IProfileFormData, User } from '@store/types/user'
+import { ProfileSettingsStyles } from './ProfileSettings.styles'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
+import { uploadImage } from '@store/reducers/image/UploadImageSlice'
+import { editProfile } from '@store/reducers/user/EditProfileSlice'
+import 'react-phone-number-input/style.css'
 import {
   showErrorToast,
   showLoadingToast,
-  showSuccesToast,
-} from "@utils/ReactTostify/tostifyHandlers";
+  showSuccesToast
+} from '@utils/ReactTostify/tostifyHandlers'
 
 interface IProfileSetting {
-  user: User | null;
+  user: User | null
 }
 
 const ProfileSettings = ({ user }: IProfileSetting) => {
@@ -23,47 +23,45 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
     handleSubmit,
     control,
     setValue,
-    formState: { errors },
+    formState: { errors }
   } = useForm<IProfileFormData>({
-    mode: "onBlur",
-  });
+    mode: 'onBlur'
+  })
 
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
-  const imageStatus = useAppSelector(
-    (state) => state.uploadImageReducer.status
-  );
+  const imageStatus = useAppSelector((state) => state.uploadImageReducer.status)
   const profileStatus = useAppSelector(
     (state) => state.editProfileReducer.status
-  );
+  )
 
   useEffect(() => {
-    if (profileStatus === "error") {
-      showErrorToast("Error displaying profile page");
+    if (profileStatus === 'error') {
+      showErrorToast('Error displaying profile page')
     }
-  }, []);
+  }, [])
 
-  const [profilePhoto, setProfilePhoto] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState('')
 
   const handleImageSubmit = (e: ChangeEvent<HTMLInputElement>) => {
-    const image = e.target.files![0];
+    const image = e.target.files![0]
 
     if (image) {
-      let body = new FormData();
-      body.set("key", process.env.NEXT_PUBLIC_IMAGE_API_KEY!);
-      body.append("image", image);
+      let body = new FormData()
+      body.set('key', process.env.NEXT_PUBLIC_IMAGE_API_KEY!)
+      body.append('image', image)
 
       dispatch(uploadImage(body))
         .unwrap()
         .then((result) => {
-          const image = result.data.url;
-          setProfilePhoto(image);
+          const image = result.data.url
+          setProfilePhoto(image)
         })
         .catch((error) => {
-          showErrorToast("Error uploading photo");
-        });
+          showErrorToast('Error uploading photo')
+        })
     }
-  };
+  }
 
   const onSubmit: SubmitHandler<IProfileFormData> = (data) => {
     if (
@@ -72,31 +70,31 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
       (data.location === user?.location || !data.location) &&
       (data.phone === user?.phone || !data.phone)
     ) {
-      showErrorToast("Please make some changes");
+      showErrorToast('Please make some changes')
 
-      return;
+      return
     }
 
-    if (imageStatus === "loading") {
-      showLoadingToast("Wait until photo uploads");
+    if (imageStatus === 'loading') {
+      showLoadingToast('Wait until photo uploads')
 
-      return;
+      return
     }
 
     //Remove keys with empty strings
     const mappedObject = Object.fromEntries(
       Object.entries(data).filter(([_, v]) => v != false)
-    );
+    )
 
     dispatch(
       editProfile({ ...mappedObject, image: profilePhoto || user?.image })
     )
       .unwrap()
-      .then(() => showSuccesToast("Succesfuly updated profile"))
+      .then(() => showSuccesToast('Succesfuly updated profile'))
       .catch((err) => {
-        showErrorToast("Error updating profile");
-      });
-  };
+        showErrorToast('Error updating profile')
+      })
+  }
 
   return (
     <ProfileSettingsStyles>
@@ -107,15 +105,15 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
             type="text"
             className="input"
             defaultValue={user?.fullName}
-            {...register("fullName", {
+            {...register('fullName', {
               maxLength: {
                 value: 30,
-                message: "Max 30 symbols",
+                message: 'Max 30 symbols'
               },
               minLength: {
                 value: 4,
-                message: "Use at least 4 symbols",
-              },
+                message: 'Use at least 4 symbols'
+              }
             })}
           />
           {errors.fullName?.message && (
@@ -128,15 +126,15 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
             type="text"
             className="input"
             defaultValue={user?.phone}
-            {...register("phone", {
+            {...register('phone', {
               minLength: {
                 value: 9,
-                message: "Phone number must have at least 9 numbers",
+                message: 'Phone number must have at least 9 numbers'
               },
               maxLength: {
                 value: 13,
-                message: "Phone number can not have more than 13 numbers",
-              },
+                message: 'Phone number can not have more than 13 numbers'
+              }
             })}
           />
           {errors.phone?.message && (
@@ -149,15 +147,15 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
             type="text"
             className="input"
             defaultValue={user?.location}
-            {...register("location", {
+            {...register('location', {
               minLength: {
                 value: 4,
-                message: "Use at least 4 symbols",
+                message: 'Use at least 4 symbols'
               },
               maxLength: {
                 value: 30,
-                message: "Max 30 symbols",
-              },
+                message: 'Max 30 symbols'
+              }
             })}
           />
           {errors.location?.message && (
@@ -168,7 +166,7 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
           <div className="label">
             Photo
             <div className="photo-wrapper">
-              {imageStatus === "loading" ? (
+              {imageStatus === 'loading' ? (
                 <div className="photo skeleton-animation"></div>
               ) : (
                 <Image
@@ -177,7 +175,7 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
                   width={150}
                   height={150}
                   className="photo"
-                  style={{ objectFit: "cover" }}
+                  style={{ objectFit: 'cover' }}
                 />
               )}
               <label className="upload-btn button">
@@ -192,19 +190,19 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
           </div>
         )}
         <button
-          className="button submit--buton"
+          className="button-xl submit--buton"
           type="submit"
           disabled={
-            imageStatus === "loading" ||
-            profileStatus === "loading" ||
-            profileStatus === "success"
+            imageStatus === 'loading' ||
+            profileStatus === 'loading' ||
+            profileStatus === 'success'
           }
         >
-          Save
+          Save settings
         </button>
       </form>
     </ProfileSettingsStyles>
-  );
-};
+  )
+}
 
-export default ProfileSettings;
+export default ProfileSettings

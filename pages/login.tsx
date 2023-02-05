@@ -79,12 +79,15 @@ export default function Login() {
       </Head>
 
       <div className="wrapper">
-        <div className="bg"></div>
         <form className="form" onSubmit={handleSubmit(onSubmit)}>
           <h1 className="title-md title">Login to your account</h1>
           {/* Email */}
           <label htmlFor="#email-input" className="label">
-            Your email
+            <div className="error-label-wrapper">
+              Your email
+              {errors.email && <p className="error">{errors.email.message}</p>}
+            </div>
+
             <input
               type="text"
               placeholder="Your email"
@@ -94,22 +97,26 @@ export default function Login() {
                 required: 'Please provide your email',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'invalid email address'
+                  message: 'Invalid email address'
                 }
               })}
             />
-            {errors.email && <p className="error">{errors.email.message}</p>}
           </label>
           {/* Password */}
           <label htmlFor="#password-input" className="label">
-            Password
+            <div className="error-label-wrapper">
+              Password
+              {errors.password && (
+                <p className="error">{errors.password.message}</p>
+              )}
+            </div>
             <input
               type="password"
               placeholder="Password"
               className="input"
               id="password-input"
               {...register('password', {
-                required: true,
+                required: 'Please provide a password',
                 maxLength: {
                   value: 30,
                   message: 'Max 30 symbols'
@@ -120,11 +127,6 @@ export default function Login() {
                 }
               })}
             />
-            {errors.password && (
-              <p className="error">{errors.password.message}</p>
-            )}
-            {status === 'error' && <div className="error">{error}</div>}
-            {googleError && <div className="error">{googleError}</div>}
           </label>
           <p className="account-action">
             Haven't created an account yet?{' '}
@@ -132,8 +134,7 @@ export default function Login() {
               <span className="link">Register</span>
             </Link>
           </p>
-          <button className="button">Login</button>
-
+          <button className="button-xl">Continue</button>
           <GoogleOAuthProvider
             clientId={process.env.NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID!}
           >
@@ -146,6 +147,7 @@ export default function Login() {
               />
             </div>
           </GoogleOAuthProvider>
+          {status === 'error' && <div className="form-error">{error}</div>}
         </form>
       </div>
     </LoginStyles>
@@ -153,20 +155,14 @@ export default function Login() {
 }
 
 const LoginStyles = styled.div`
-  .google-login-btn {
-    max-width: 10rem;
-  }
-
   .wrapper {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    height: 100vh;
-    grid-column-gap: 4rem;
+    display: flex;
+    justify-content: center;
+    margin-top: 4rem;
 
-    .error {
-      color: red;
-      margin-bottom: 0.5rem;
+    .label {
+      font-size: 0.9rem;
+      color: var(--grey-60);
     }
 
     .title {
@@ -181,16 +177,25 @@ const LoginStyles = styled.div`
     .form {
       display: flex;
       flex-direction: column;
+      align-items: center;
 
       .input {
         width: 20rem;
-        margin-top: 1rem;
-        margin-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+        padding: 0.8rem 0;
+        border: none;
+        border-radius: unset;
+        border-bottom: 1px solid var(--grey-10);
+
+        &::placeholder {
+          font-weight: 500;
+          color: var(--grey-30);
+        }
       }
 
-      .button {
-        margin-top: 2rem;
-        width: fit-content;
+      .button-xl {
+        margin-top: 1rem;
         margin-bottom: 1rem;
       }
     }

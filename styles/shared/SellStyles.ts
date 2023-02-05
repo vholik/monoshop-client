@@ -44,6 +44,12 @@ export const SellStyles = styled.div`
     font-size: 1rem;
     padding: 1.2em 1em;
     height: 10em;
+
+    &::placeholder {
+      font-size: 1.2rem;
+      color: var(--grey-30);
+      font-weight: 500;
+    }
   }
 
   .title-md {
@@ -117,24 +123,16 @@ export const SellStyles = styled.div`
     }
   }
 
+  .label {
+    margin-bottom: 1rem;
+  }
+
   .inner {
     margin-top: 2rem;
     display: grid;
     grid-template-columns: 1fr 2fr;
     grid-column-gap: 2rem;
     align-items: flex-start;
-
-    .select,
-    .input {
-      margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-  }
-
-  .error {
-    font-size: 1rem;
-    color: red;
-    margin-top: 0.5rem;
   }
 
   .button {

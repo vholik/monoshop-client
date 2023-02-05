@@ -281,12 +281,18 @@ export default function Sell() {
                 {/* Second row */}
                 <div className="row">
                   <label className="label">
-                    Title
+                    <div className="error-label-wrapper">
+                      Title
+                      {formErrors.name && (
+                        <p className="error">{formErrors.name.message}</p>
+                      )}
+                    </div>
                     <input
                       type="text"
                       className="input"
                       minLength={5}
                       maxLength={50}
+                      placeholder="Enter the title"
                       {...register('name', {
                         required: 'Title is required',
                         minLength: {
@@ -299,12 +305,14 @@ export default function Sell() {
                         }
                       })}
                     />
-                    {formErrors.name && (
-                      <p className="error">{formErrors.name.message}</p>
-                    )}
                   </label>
                   <label className="label">
-                    Category
+                    <div className="error-label-wrapper">
+                      Category
+                      {formErrors.categoryId && (
+                        <p className="error">{formErrors.categoryId.message}</p>
+                      )}
+                    </div>
                     <Controller
                       name="categoryId"
                       control={control}
@@ -323,7 +331,7 @@ export default function Sell() {
                           isSearchable={true}
                           isDisabled={!gender}
                           styles={colourStyles}
-                          placeholder=""
+                          placeholder="Select a category"
                           onChange={(val) => {
                             onChange(val?.id), setCategoryId(val ? val.id : val)
                           }}
@@ -332,12 +340,14 @@ export default function Sell() {
                         />
                       )}
                     />
-                    {formErrors.categoryId && (
-                      <p className="error">{formErrors.categoryId.message}</p>
-                    )}
                   </label>
                   <label className="label">
-                    Style
+                    <div className="error-label-wrapper">
+                      Style
+                      {formErrors.style && (
+                        <p className="error">{formErrors.style.message}</p>
+                      )}
+                    </div>
                     <Controller
                       name="style"
                       control={control}
@@ -354,19 +364,21 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder=""
+                          placeholder="Select a style"
                           onChange={(val) => onChange(val?.value)}
                           value={styles.find((c) => c.value === value)}
                           onBlur={onBlur}
                         />
                       )}
                     />
-                    {formErrors.style && (
-                      <p className="error">{formErrors.style.message}</p>
-                    )}
                   </label>
                   <label className="label">
-                    Colour
+                    <div className="error-label-wrapper">
+                      Colour
+                      {formErrors.colour && (
+                        <p className="error">{formErrors.colour.message}</p>
+                      )}
+                    </div>
                     <Controller
                       name="colour"
                       control={control}
@@ -383,7 +395,7 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder=""
+                          placeholder="Select a color"
                           onChange={(val) => onChange(val?.value)}
                           value={styles.find((c) => c.value === value)}
                           onBlur={onBlur}
@@ -415,17 +427,20 @@ export default function Sell() {
                         />
                       )}
                     />
-                    {formErrors.colour && (
-                      <p className="error">{formErrors.colour.message}</p>
-                    )}
                   </label>
                   <label className="label">
-                    Price
+                    <div className="error-label-wrapper">
+                      Price
+                      {formErrors.price && (
+                        <p className="error">{formErrors.price.message}</p>
+                      )}
+                    </div>
                     <input
                       type="number"
                       className="input"
                       step="0.01"
                       min={0}
+                      placeholder="Enter the price"
                       max={100000}
                       {...register('price', {
                         required: 'Price is required',
@@ -440,15 +455,18 @@ export default function Sell() {
                         }
                       })}
                     />
-                    {formErrors.price && (
-                      <p className="error">{formErrors.price.message}</p>
-                    )}
                   </label>
                   <label className="label">
-                    Hashtags
+                    <div className="error-label-wrapper">
+                      Hashtags
+                      {formErrors.hashtags && (
+                        <p className="error">{formErrors.hashtags.message}</p>
+                      )}
+                    </div>
                     <input
                       type="text"
                       className="input"
+                      placeholder="Enter hashtags (Not required)"
                       {...register('hashtags', {
                         onChange: (e: ChangeEvent<HTMLInputElement>) => {
                           console.log(e.target.value)
@@ -459,9 +477,6 @@ export default function Sell() {
                         }
                       })}
                     />
-                    {formErrors.hashtags && (
-                      <p className="error">{formErrors.hashtags.message}</p>
-                    )}
                   </label>
                   <div
                     className="add-cart-label label"
@@ -474,7 +489,12 @@ export default function Sell() {
                 {/* Third row */}
                 <div className="row">
                   <label className="label">
-                    Gender
+                    <div className="error-label-wrapper">
+                      Genderwear
+                      {formErrors.gender && (
+                        <p className="error">{formErrors.gender.message}</p>
+                      )}
+                    </div>
                     <Controller
                       name="gender"
                       control={control}
@@ -490,7 +510,7 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder=""
+                          placeholder="Select a gender"
                           onChange={(val) => {
                             onChange(val?.value)
                             setGender(val ? val.value : null)
@@ -501,12 +521,16 @@ export default function Sell() {
                         />
                       )}
                     />
-                    {formErrors.gender && (
-                      <p className="error">{formErrors.gender.message}</p>
-                    )}
                   </label>
                   <label className="label">
-                    Subcategory
+                    <div className="error-label-wrapper">
+                      Subcategory
+                      {formErrors.subcategoryId && (
+                        <p className="error">
+                          {formErrors.subcategoryId.message}
+                        </p>
+                      )}
+                    </div>
                     <Controller
                       name="subcategoryId"
                       control={control}
@@ -524,7 +548,7 @@ export default function Sell() {
                           isSearchable={true}
                           isLoading={subcategoriesStatus === 'loading'}
                           styles={colourStyles}
-                          placeholder=""
+                          placeholder="Select a subcategory"
                           isDisabled={!categoryId}
                           onChange={(val) => {
                             onChange(val ? val.id : val)
@@ -534,14 +558,14 @@ export default function Sell() {
                         />
                       )}
                     />
-                    {formErrors.subcategoryId && (
-                      <p className="error">
-                        {formErrors.subcategoryId.message}
-                      </p>
-                    )}
                   </label>
                   <label className="label">
-                    Condition
+                    <div className="error-label-wrapper">
+                      Condition
+                      {formErrors.condition && (
+                        <p className="error">{formErrors.condition.message}</p>
+                      )}
+                    </div>
                     <Controller
                       name="condition"
                       control={control}
@@ -557,19 +581,21 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder=""
+                          placeholder="Select a condition"
                           onChange={(val) => onChange(val?.value)}
                           value={conditions.find((c) => c.value === value)}
                           onBlur={onBlur}
                         />
                       )}
                     />
-                    {formErrors.condition && (
-                      <p className="error">{formErrors.condition.message}</p>
-                    )}
                   </label>
                   <label className="label">
-                    Brands
+                    <div className="error-label-wrapper">
+                      Brands
+                      {formErrors.brand && (
+                        <p className="error">{formErrors.brand.message}</p>
+                      )}
+                    </div>
                     <Controller
                       name="brand"
                       control={control}
@@ -593,7 +619,7 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder=""
+                          placeholder="Select a brand"
                           value={brands.filter(
                             (brand) => value && value.includes(brand.id)
                           )}
@@ -601,12 +627,14 @@ export default function Sell() {
                         />
                       )}
                     />
-                    {formErrors.brand && (
-                      <p className="error">{formErrors.brand.message}</p>
-                    )}
                   </label>
                   <label className="label">
-                    Size
+                    <div className="error-label-wrapper">
+                      Size
+                      {formErrors.size && (
+                        <p className="error">{formErrors.size.message}</p>
+                      )}
+                    </div>
                     <Controller
                       name="size"
                       control={control}
@@ -622,33 +650,33 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder=""
+                          placeholder="Select a size"
                           onChange={(val) => onChange(val?.value)}
                           value={sizes.find((c) => c.value === value)}
                           onBlur={onBlur}
                         />
                       )}
                     />
-                    {formErrors.size && (
-                      <p className="error">{formErrors.size.message}</p>
-                    )}
                   </label>
                 </div>
                 <label className="label description--label">
-                  Description
+                  <div className="error-label-wrapper">
+                    Description
+                    {formErrors.description && (
+                      <p className="error">{formErrors.description.message}</p>
+                    )}
+                  </div>
                   <textarea
                     id="description"
                     maxLength={200}
+                    placeholder="Description (not required)"
                     {...register('description', {
                       maxLength: 200
                     })}
                   ></textarea>
-                  {formErrors.description && (
-                    <p className="error">{formErrors.description.message}</p>
-                  )}
                 </label>
                 <button
-                  className="button submit--buton"
+                  className="button-xl submit--buton "
                   disabled={
                     itemStatus === 'loading' || itemStatus === 'success'
                   }

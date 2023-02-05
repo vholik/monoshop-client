@@ -102,41 +102,43 @@ export default function Header() {
       </div>
       {authStatus === 'authenticated' ? (
         <div className="right">
-          <Link href={'/favorites'}>
-            <Image
-              src={UnfilledHeart}
-              height={25}
-              width={25}
-              alt="Search icon"
-              className="search-icon"
-            />
-          </Link>
-          <Link href={'/settings'}>
-            <button className="button chat--button">
-              <Image
-                src={UserIcon}
-                height={25}
-                width={25}
-                alt="Search icon"
-                className="search-icon"
-              />
-            </button>
+          <Link href={'/sell'}>
+            <button className="button">Sell clothes</button>
           </Link>
           <Link href={'/chat'}>
-            <button className="button chat--button">
-              <Image
-                src={ChatIcon}
-                height={25}
-                width={25}
-                alt="Search icon"
-                className="search-icon"
-              />
-              Messages
-            </button>
+            <Image src={ChatIcon} alt="Chat" />
           </Link>
-          <Link href={'/sell'}>
-            <button className="button">Sell</button>
-          </Link>
+
+          <div className="profile-wrapper">
+            <div className="profile-image"></div>
+            <div className="profile-menu">
+              <div className="profile">
+                <div className="profile-image"></div>
+                <div className="profile-info">
+                  <h3 className="profile-name">Hello world</h3>
+                  <p className="profile-subname">Not activated</p>
+                </div>
+              </div>
+              <ul className="link-list">
+                <Link href="/settings">
+                  <li>Settings</li>
+                </Link>
+                <Link href="/ordered">
+                  <li>Orders</li>
+                </Link>
+                <Link href="/selling">
+                  <li>Selling</li>
+                </Link>
+                <Link href="/sold">
+                  <li>Sold</li>
+                </Link>
+                <Link href="/favorites">
+                  <li>Favorites</li>
+                </Link>
+              </ul>
+              <p className="logout-btn">Log out</p>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="right">
