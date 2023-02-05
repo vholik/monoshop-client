@@ -88,7 +88,14 @@ const Pay = () => {
           <h1 className="title">Shipping method</h1>
           <form className="form" onSubmit={handleSubmit(onSubmit)}>
             <label className="label">
-              First name and last name
+              <div className="error-label-wrapper">
+                First name and last name
+                {errors?.fullName?.message && (
+                  <div className="error">
+                    {errors?.fullName && errors.fullName.message}
+                  </div>
+                )}
+              </div>
               <input
                 type="text"
                 className="input"
@@ -100,14 +107,16 @@ const Pay = () => {
                   }
                 })}
               />
-              {errors?.fullName?.message && (
-                <div className="error">
-                  {errors?.fullName && errors.fullName.message}
-                </div>
-              )}
             </label>
             <label className="label">
-              Adress line 1
+              <div className="error-label-wrapper">
+                Adress line 1
+                {errors?.line1?.message && (
+                  <div className="error">
+                    {errors?.line1 && errors.line1.message}
+                  </div>
+                )}
+              </div>
               <input
                 type="text"
                 className="input"
@@ -119,14 +128,17 @@ const Pay = () => {
                   }
                 })}
               />
-              {errors?.line1?.message && (
-                <div className="error">
-                  {errors?.line1 && errors.line1.message}
-                </div>
-              )}
             </label>
             <label className="label">
-              Adress line 2 (optional)
+              <div className="error-label-wrapper">
+                Adress line 2 (optional)
+                {errors?.line2?.message && (
+                  <div className="error">
+                    {errors?.line2 && errors.line2.message}
+                  </div>
+                )}
+              </div>
+
               <input
                 type="text"
                 className="input"
@@ -137,14 +149,17 @@ const Pay = () => {
                   }
                 })}
               />
-              {errors?.line2?.message && (
-                <div className="error">
-                  {errors?.line2 && errors.line2.message}
-                </div>
-              )}
             </label>
             <label className="label">
-              City
+              <div className="error-label-wrapper">
+                City
+                {errors?.city?.message && (
+                  <div className="error">
+                    {errors?.city && errors.city.message}
+                  </div>
+                )}
+              </div>
+
               <input
                 type="text"
                 className="input"
@@ -156,14 +171,17 @@ const Pay = () => {
                   }
                 })}
               />
-              {errors?.city?.message && (
-                <div className="error">
-                  {errors?.city && errors.city.message}
-                </div>
-              )}
             </label>
             <label className="label">
-              State or Country
+              <div className="error-label-wrapper">
+                State or Country
+                {errors?.state?.message && (
+                  <div className="error">
+                    {errors?.state && errors.state.message}
+                  </div>
+                )}
+              </div>
+
               <input
                 type="text"
                 className="input"
@@ -175,14 +193,17 @@ const Pay = () => {
                   }
                 })}
               />
-              {errors?.state?.message && (
-                <div className="error">
-                  {errors?.state && errors.state.message}
-                </div>
-              )}
             </label>
             <label className="label">
-              Zip or postal code
+              <div className="error-label-wrapper">
+                Zip or postal code
+                {errors?.postalCode?.message && (
+                  <div className="error">
+                    {errors?.postalCode && errors.postalCode.message}
+                  </div>
+                )}
+              </div>
+
               <input
                 type="text"
                 className="input"
@@ -196,14 +217,17 @@ const Pay = () => {
                   }
                 })}
               />
-              {errors?.postalCode?.message && (
-                <div className="error">
-                  {errors?.postalCode && errors.postalCode.message}
-                </div>
-              )}
             </label>
             <label className="label">
-              Country
+              <div className="error-label-wrapper">
+                Country
+                {errors?.country?.message && (
+                  <div className="error">
+                    {errors?.country && errors.country.message}
+                  </div>
+                )}
+              </div>
+
               <Controller
                 name="country"
                 rules={{
@@ -220,14 +244,17 @@ const Pay = () => {
                 )}
                 control={control}
               />
-              {errors?.country?.message && (
-                <div className="error">
-                  {errors?.country && errors.country.message}
-                </div>
-              )}
             </label>
             <label className="label">
-              Email adress
+              <div className="error-label-wrapper">
+                Email adress
+                {errors?.email?.message && (
+                  <div className="error">
+                    {errors?.email && errors.email.message}
+                  </div>
+                )}
+              </div>
+
               <input
                 type="text"
                 className="input"
@@ -239,14 +266,13 @@ const Pay = () => {
                   }
                 })}
               />
-              {errors?.email?.message && (
-                <div className="error">
-                  {errors?.email && errors.email.message}
-                </div>
-              )}
             </label>
             <label className="label">
-              Phone number
+              <div className="error-label-wrapper">
+                Phone number
+                {errors['phone'] && <p className="error">Invalid Phone</p>}
+              </div>
+
               <Controller
                 name="phone"
                 control={control}
@@ -263,7 +289,6 @@ const Pay = () => {
                   />
                 )}
               />
-              {errors['phone'] && <p className="error">Invalid Phone</p>}
             </label>
             <button className="button" disabled={status === 'loading'}>
               Continue to payment
@@ -421,8 +446,8 @@ const PayStyles = styled.div`
     grid-template-columns: 1fr 1fr;
     column-gap: var(--gap);
 
-    .input {
-      margin-top: 0.5rem;
+    .label {
+      margin-bottom: 1rem;
     }
 
     .button {

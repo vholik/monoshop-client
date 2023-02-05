@@ -72,8 +72,6 @@ const UserProfile = ({ user }: UserProfileProps) => {
     setIsReviewModalOpen(true)
   }
 
-  console.log(user.items)
-
   return (
     <UserProfileStyles>
       {user && (
@@ -145,7 +143,11 @@ const UserProfile = ({ user }: UserProfileProps) => {
             {user.items?.map((item) => (
               <div className="item" key={item.id}>
                 <Link href={`/shop/${item.id}`}>
-                  <div className="item-image">
+                  <div
+                    className={
+                      item.selled ? 'item-image sold--item' : 'item-image'
+                    }
+                  >
                     <Image
                       src={item.images[0]}
                       alt="Image"
@@ -184,7 +186,7 @@ const UserProfileStyles = styled.div`
     &__inner {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      grid-gap: 0.5vw;
+      grid-gap: 1rem;
     }
   }
 
@@ -207,6 +209,25 @@ const UserProfileStyles = styled.div`
 
     .item-price {
       margin-top: 0.5rem;
+    }
+  }
+
+  .sold--item {
+    position: relative;
+    &::after {
+      position: absolute;
+      content: 'SOLD';
+      background-color: var(--grey-30);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 500;
+      font-size: 1rem;
     }
   }
 

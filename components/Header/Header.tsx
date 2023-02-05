@@ -6,7 +6,7 @@ import UnfilledHeart from '@public/images/unfilled-heart.svg'
 import Link from 'next/link'
 import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
 import { ChangeEvent, useEffect, useState } from 'react'
-import { checkIsAuth } from '@store/reducers/auth/AuthSlice'
+import { checkIsAuth, logout } from '@store/reducers/auth/AuthSlice'
 import ChatIcon from '@public/images/chat.svg'
 import UserIcon from '@public/images/user.svg'
 import Cross from '@public/images/cross.svg'
@@ -14,8 +14,9 @@ import { filterActions } from '@store/reducers/filter/FilterSlice'
 import Router, { useRouter } from 'next/router'
 
 export default function Header() {
-  const router = useRouter()
   const dispatch = useAppDispatch()
+  const username = useAppSelector((state) => state.authReducer.fullName)
+  const userPhoto = useAppSelector((state) => state.authReducer.photo)
   const authStatus = useAppSelector((state) => state.authReducer.status)
   const filter = useAppSelector((state) => state.filterReducer)
 
@@ -54,6 +55,16 @@ export default function Header() {
     dispatch(filterActions.setSearchValue(value))
 
     Router.push('/shop')
+  }
+
+  const logoutHandler = () => {
+    console.log('start')
+    dispatch(logout())
+      .unwrap()
+      .catch((err) => console.log(err))
+
+    window.localStorage.removeItem('access_token')
+    window.localStorage.removeItem('refresh_token')
   }
 
   return (
@@ -110,13 +121,35 @@ export default function Header() {
           </Link>
 
           <div className="profile-wrapper">
-            <div className="profile-image"></div>
+            {userPhoto ? (
+              <Image
+                src={userPhoto}
+                alt="User photo"
+                className="profile-image"
+                width={40}
+                height={40}
+                style={{ objectFit: 'cover' }}
+              />
+            ) : (
+              <div className="profile-image"></div>
+            )}
             <div className="profile-menu">
               <div className="profile">
-                <div className="profile-image"></div>
+                {userPhoto ? (
+                  <Image
+                    src={userPhoto}
+                    alt="User photo"
+                    className="profile-image"
+                    width={40}
+                    height={40}
+                    style={{ objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div className="profile-image"></div>
+                )}
                 <div className="profile-info">
-                  <h3 className="profile-name">Hello world</h3>
-                  <p className="profile-subname">Not activated</p>
+                  <h3 className="profile-name">{username}</h3>
+                  {/* <p className="profile-subname">Not activated</p> */}
                 </div>
               </div>
               <ul className="link-list">
@@ -136,7 +169,9 @@ export default function Header() {
                   <li>Favorites</li>
                 </Link>
               </ul>
-              <p className="logout-btn">Log out</p>
+              <p className="logout-btn" onClick={logoutHandler}>
+                Log out
+              </p>
             </div>
           </div>
         </div>

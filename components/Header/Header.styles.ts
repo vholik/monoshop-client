@@ -31,8 +31,11 @@ export const HeaderStyles = styled.div`
     width: 100%;
     border: none;
     background-color: #f5f5f5;
+    font-size: 1rem;
 
     &::placeholder {
+      font-size: 1rem;
+      font-weight: 400;
       color: #ccc !important;
     }
   }
@@ -70,6 +73,7 @@ export const HeaderStyles = styled.div`
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     opacity: 0;
     pointer-events: none;
+    transition: opacity var(--transition);
 
     .profile {
       display: flex;

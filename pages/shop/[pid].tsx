@@ -376,19 +376,28 @@ const ShopItem = () => {
                   </Link>
                 ) : (
                   <Fragment>
-                    <button
-                      className="button item--button"
-                      onClick={buyHandler}
-                    >
-                      Buy now
-                    </button>
+                    {/* Sold button */}
+                    {item?.selled ? (
+                      <button className="button item--button sold--button">
+                        Sold
+                      </button>
+                    ) : (
+                      <Fragment>
+                        <button
+                          className="button item--button"
+                          onClick={buyHandler}
+                        >
+                          Buy now
+                        </button>
 
-                    <button
-                      className="button item--button message--button"
-                      onClick={sendMessage}
-                    >
-                      Message
-                    </button>
+                        <button
+                          className="button item--button message--button"
+                          onClick={sendMessage}
+                        >
+                          Message
+                        </button>
+                      </Fragment>
+                    )}
                   </Fragment>
                 )}
               </div>
@@ -541,6 +550,12 @@ const LoadingItemStyles = styled.div`
 `
 
 const ShopItemStyles = styled.div`
+  .sold--button {
+    background-color: #f4d408;
+    color: var(--dark);
+    cursor: default;
+  }
+
   .user-items-head {
     margin-top: 2rem;
     display: flex;

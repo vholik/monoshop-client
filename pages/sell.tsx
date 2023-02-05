@@ -292,7 +292,7 @@ export default function Sell() {
                       className="input"
                       minLength={5}
                       maxLength={50}
-                      placeholder="Enter the title"
+                      placeholder=""
                       {...register('name', {
                         required: 'Title is required',
                         minLength: {
@@ -331,7 +331,7 @@ export default function Sell() {
                           isSearchable={true}
                           isDisabled={!gender}
                           styles={colourStyles}
-                          placeholder="Select a category"
+                          placeholder=""
                           onChange={(val) => {
                             onChange(val?.id), setCategoryId(val ? val.id : val)
                           }}
@@ -364,7 +364,7 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder="Select a style"
+                          placeholder=""
                           onChange={(val) => onChange(val?.value)}
                           value={styles.find((c) => c.value === value)}
                           onBlur={onBlur}
@@ -395,7 +395,7 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder="Select a color"
+                          placeholder=""
                           onChange={(val) => onChange(val?.value)}
                           value={styles.find((c) => c.value === value)}
                           onBlur={onBlur}
@@ -440,7 +440,7 @@ export default function Sell() {
                       className="input"
                       step="0.01"
                       min={0}
-                      placeholder="Enter the price"
+                      placeholder=""
                       max={100000}
                       {...register('price', {
                         required: 'Price is required',
@@ -466,7 +466,7 @@ export default function Sell() {
                     <input
                       type="text"
                       className="input"
-                      placeholder="Enter hashtags (Not required)"
+                      placeholder=""
                       {...register('hashtags', {
                         onChange: (e: ChangeEvent<HTMLInputElement>) => {
                           console.log(e.target.value)
@@ -510,7 +510,7 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder="Select a gender"
+                          placeholder=""
                           onChange={(val) => {
                             onChange(val?.value)
                             setGender(val ? val.value : null)
@@ -548,7 +548,7 @@ export default function Sell() {
                           isSearchable={true}
                           isLoading={subcategoriesStatus === 'loading'}
                           styles={colourStyles}
-                          placeholder="Select a subcategory"
+                          placeholder=""
                           isDisabled={!categoryId}
                           onChange={(val) => {
                             onChange(val ? val.id : val)
@@ -581,7 +581,7 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder="Select a condition"
+                          placeholder=""
                           onChange={(val) => onChange(val?.value)}
                           value={conditions.find((c) => c.value === value)}
                           onBlur={onBlur}
@@ -619,7 +619,7 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder="Select a brand"
+                          placeholder=""
                           value={brands.filter(
                             (brand) => value && value.includes(brand.id)
                           )}
@@ -650,7 +650,7 @@ export default function Sell() {
                           isClearable={true}
                           isSearchable={true}
                           styles={colourStyles}
-                          placeholder="Select a size"
+                          placeholder=""
                           onChange={(val) => onChange(val?.value)}
                           value={sizes.find((c) => c.value === value)}
                           onBlur={onBlur}
@@ -669,7 +669,6 @@ export default function Sell() {
                   <textarea
                     id="description"
                     maxLength={200}
-                    placeholder="Description (not required)"
                     {...register('description', {
                       maxLength: 200
                     })}

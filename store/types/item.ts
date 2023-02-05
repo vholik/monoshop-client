@@ -24,6 +24,7 @@ export interface Item {
   isFavorite?: boolean
   room: Room
   roomId: number
+  selled: boolean
 }
 
 export interface IAddItemFormData {

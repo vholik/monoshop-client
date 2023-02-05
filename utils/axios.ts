@@ -11,6 +11,20 @@ export const basicInstance = axios.create({
   baseURL: API_URL
 })
 
+export const logoutInstance = axios.create({
+  baseURL: API_URL
+})
+
+logoutInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('access_token')
+
+  if (token) {
+    config.headers!.Authorization = `Bearer ${token}`
+  }
+
+  return config
+})
+
 instance.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token')
 
@@ -24,6 +38,9 @@ instance.interceptors.request.use((config) => {
 export interface AuthResponse {
   accessToken: string
   refreshToken: string
+  fullName: string
+  photo: string
+  userId: number
 }
 
 instance.interceptors.response.use(

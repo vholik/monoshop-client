@@ -124,8 +124,6 @@ const Chat = () => {
 
       // Get chats
       socket.on('getChats', (chats: Room[]) => {
-        console.log(chats)
-
         const rooms = chats.sort((a, b) => {
           if (new Date(a.message.date)) return -1
           if (new Date(b.message.date)) return 1
