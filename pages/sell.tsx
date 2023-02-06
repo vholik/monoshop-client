@@ -49,7 +49,7 @@ export default function Sell() {
     resetField,
     formState: { errors: formErrors }
   } = useForm<ISellForm>({
-    mode: 'onBlur'
+    mode: 'onChange'
   })
 
   const imageStatus = useAppSelector((state) => state.uploadImageReducer.status)

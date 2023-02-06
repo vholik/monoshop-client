@@ -41,7 +41,7 @@ const Pay = () => {
 
     formState: { errors }
   } = useForm<PayFormData>({
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: {
       email: '',
       phone: '',
@@ -85,7 +85,7 @@ const Pay = () => {
     <PayStyles>
       <div className="wrapper">
         <div className="shipping">
-          <h1 className="title">Shipping method</h1>
+          <h1 className="title-md">Shipping method</h1>
           <form className="form" onSubmit={handleSubmit(onSubmit)}>
             <label className="label">
               <div className="error-label-wrapper">
@@ -300,7 +300,7 @@ const Pay = () => {
           </p>
         </div>
         <div className="cart">
-          <h1 className="title">Cart</h1>
+          <h1 className="title-md">Cart</h1>
           <div className="cart-table">
             <div className="cart-table__item">
               <h3 className="cart-table__name">Subtotal</h3>

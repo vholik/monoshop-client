@@ -43,7 +43,18 @@ export const HeaderStyles = styled.div`
   .right {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
+
+    .button {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+
+  .register-btn {
+    background-color: transparent;
+    border: 1px solid var(--stroke);
+    color: var(--dark);
   }
 
   .profile-wrapper {

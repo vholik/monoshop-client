@@ -91,7 +91,7 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
     resetField,
     formState: { errors: formErrors }
   } = useForm<ISellForm>({
-    mode: 'onBlur'
+    mode: 'onChange'
   })
 
   const imageStatus = useAppSelector((state) => state.uploadImageReducer.status)

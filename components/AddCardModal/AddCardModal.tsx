@@ -22,7 +22,7 @@ const AddCardModal = ({ addCard, isOpen, setIsOpen }: AddCardModalProps) => {
     resetField,
     formState: { errors: formErrors }
   } = useForm<CardForm>({
-    mode: 'onBlur'
+    mode: 'onChange'
   })
 
   const onSubmit: SubmitHandler<CardForm> = (data) => {

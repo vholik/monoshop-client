@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const CategoriesStyles = styled.div`
   font-family: var(--font-default);
@@ -10,15 +10,13 @@ export const CategoriesStyles = styled.div`
   position: relative;
 
   &::before {
-    content: "";
-    background-color: #fbfaf9;
+    content: '';
     position: absolute;
     top: 0;
     bottom: 0;
     left: -100%;
     right: -100%;
     border-top: 1px solid var(--grey-10);
-    border-bottom: 1px solid var(--grey-10);
   }
 
   .category {
@@ -58,4 +56,4 @@ export const CategoriesStyles = styled.div`
       }
     }
   }
-`;
+`

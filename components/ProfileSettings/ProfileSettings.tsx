@@ -25,7 +25,7 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
     setValue,
     formState: { errors }
   } = useForm<IProfileFormData>({
-    mode: 'onBlur'
+    mode: 'onChange'
   })
 
   const dispatch = useAppDispatch()

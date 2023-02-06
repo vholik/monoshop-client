@@ -58,7 +58,6 @@ export default function Header() {
   }
 
   const logoutHandler = () => {
-    console.log('start')
     dispatch(logout())
       .unwrap()
       .catch((err) => console.log(err))
@@ -89,7 +88,7 @@ export default function Header() {
         />
         <input
           type="text"
-          placeholder="Search for brand, color etc."
+          placeholder="Search"
           className="input"
           onChange={inputHandler}
           value={value}
@@ -149,7 +148,6 @@ export default function Header() {
                 )}
                 <div className="profile-info">
                   <h3 className="profile-name">{username}</h3>
-                  {/* <p className="profile-subname">Not activated</p> */}
                 </div>
               </div>
               <ul className="link-list">
@@ -177,15 +175,11 @@ export default function Header() {
         </div>
       ) : (
         <div className="right">
-          <Image
-            src={UnfilledHeart}
-            height={25}
-            width={25}
-            alt="Search icon"
-            className="search-icon"
-          />
           <Link href={'/login'}>
-            <button className="button">Login</button>
+            <button className="button">Log in</button>
+          </Link>
+          <Link href={'/register'}>
+            <button className="button register-btn">Register</button>
           </Link>
         </div>
       )}

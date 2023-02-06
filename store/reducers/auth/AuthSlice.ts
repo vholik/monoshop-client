@@ -9,7 +9,13 @@ interface InitState {
   userId: number | null
   fullName: string | null
   photo: string | null
-  status: 'init' | 'loading' | 'error' | 'authenticated' | 'unauthorized'
+  status:
+    | 'init'
+    | 'loading'
+    | 'error'
+    | 'authenticated'
+    | 'unauthorized'
+    | 'email_wait'
   error: string
 }
 
@@ -43,17 +49,23 @@ export const loginUser = createAsyncThunk<
   AuthResponse,
   ILoginFormData,
   {
-    rejectValue: RejectError
+    rejectValue: RejectError | number
   }
 >('auth/login', async (formData, thunkAPI) => {
   try {
     const response = await instance.post<AuthResponse>('auth/login', formData)
     return response.data
-  } catch (e) {
+  } catch (e: any) {
     if (isAxiosError(e) && e.response) {
+      if (e.response.status === 401) {
+        return thunkAPI.rejectWithValue(401)
+      }
       return thunkAPI.rejectWithValue(e.response.data)
     }
-    return thunkAPI.rejectWithValue({ message: 'Can not login' })
+
+    return thunkAPI.rejectWithValue({
+      message: 'There is a problem occured with authorization'
+    })
   }
 })
 
@@ -95,7 +107,7 @@ export const AuthSlice = createSlice({
         if (action.payload) {
           state.error = action.payload.message
         }
-        state.status = 'error'
+        state.status = 'unauthorized'
       })
     // Log in
     builder
@@ -109,9 +121,16 @@ export const AuthSlice = createSlice({
         state.status = 'authenticated'
       })
       .addCase(loginUser.rejected, (state, action) => {
-        if (action.payload) {
+        if (action.payload === 401) {
+          state.status = 'email_wait'
+
+          return
+        }
+
+        if (action.payload && typeof action.payload !== 'number') {
           state.error = action.payload.message
         }
+
         state.status = 'error'
       })
     // Me

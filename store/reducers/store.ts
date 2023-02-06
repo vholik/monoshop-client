@@ -31,6 +31,7 @@ import payReducer from './payments/PaySlice'
 import getOrdersReducer from './order/GetOrdersSlice'
 import getSelledReducer from './order/GetSelledSlice'
 import getReviewsReducer from './review/GetReviewsSlice'
+import confirmEmailReducer from './auth/ConfirmEmailSlice'
 
 export type AppDispatch = Store['dispatch']
 export type RootState = ReturnType<Store['getState']>
@@ -67,7 +68,8 @@ const combinedReducer = combineReducers({
   payReducer,
   getOrdersReducer,
   getSelledReducer,
-  getReviewsReducer
+  getReviewsReducer,
+  confirmEmailReducer
 })
 
 const reducer: typeof combinedReducer = (state, action) => {
