@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 export const CategoriesStyles = styled.div`
   font-family: var(--font-default);
-  margin-top: 2rem;
+  margin-top: 1rem;
   padding: 1rem 0;
   display: flex;
   align-items: center;

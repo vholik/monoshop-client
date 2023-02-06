@@ -1,10 +1,9 @@
 import styled from 'styled-components'
 
 export const HeaderStyles = styled.div`
-  padding-top: 2rem;
+  padding-top: 1rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
 
   .input--button {
     font-size: 1rem;
@@ -14,29 +13,31 @@ export const HeaderStyles = styled.div`
   }
 
   .input-wrapper {
-    border-radius: 6px;
+    max-width: 350px;
+    border-radius: 2em;
     display: flex;
     align-items: center;
-    padding: 0.4em 1em;
+    padding: 0 0em 0 1em;
     background-color: white;
     width: fit-content;
     width: 100%;
-    margin: 0 5rem;
-    background-color: #f6f6f6;
-    border: 1px solid var(--stroke);
+    border: 2px solid var(--stroke);
+
+    margin-left: 2rem;
+    z-index: 1;
   }
 
   .input {
     padding-left: 0.5em;
-    width: 100%;
+    width: 95%;
     border: none;
-    background-color: #f5f5f5;
     font-size: 1rem;
+    border-radius: 2em;
 
     &::placeholder {
       font-size: 1rem;
       font-weight: 400;
-      color: #ccc !important;
+      color: var(--dark);
     }
   }
 
@@ -44,6 +45,7 @@ export const HeaderStyles = styled.div`
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin-left: auto;
 
     .button {
       padding-left: 1rem;
@@ -137,5 +139,20 @@ export const HeaderStyles = styled.div`
     color: var(--grey-60);
     cursor: pointer;
     width: fit-content;
+  }
+
+  .search-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cross-icon {
+    cursor: pointer;
+    transition: background 0.1s linear;
+    border-radius: 50%;
+    &:hover {
+      background-color: var(--grey-10);
+    }
   }
 `
