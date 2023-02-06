@@ -224,14 +224,20 @@ const Shop = () => {
     }
   }
 
+  const conditionHandler = (
+    e: MultiValue<{ label: string; value: number }>
+  ) => {
+    if (e) {
+      dispatch(filterActions.setCondition(e))
+    }
+  }
+
   const filterHandler = (
     e: MultiValue<ItemEntity>,
     filterName: keyof IFilter
   ) => {
     if (e) {
-      if (filterName === 'condition') {
-        dispatch(filterActions.setCondition(e))
-      } else if (filterName === 'style') {
+      if (filterName === 'style') {
         dispatch(filterActions.setStyle(e))
       } else if (filterName === 'colour') {
         dispatch(filterActions.setColour(e))
@@ -491,7 +497,7 @@ const Shop = () => {
               className="select"
               required={true}
               isDisabled={false}
-              onChange={(e) => filterHandler(e, 'condition' as keyof IFilter)}
+              onChange={(e) => conditionHandler(e)}
               isLoading={false}
               isSearchable={true}
               name={'condition'}
@@ -815,7 +821,7 @@ const ShopStyling = styled.div`
     grid-template-columns: repeat(4, 1fr);
     grid-column-gap: 1vw;
     grid-row-gap: 2vw;
-    margin-top: 2rem;
+    margin-top: 1rem;
 
     .item {
       position: relative;

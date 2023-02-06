@@ -164,6 +164,9 @@ const LoginStyles = styled.div`
       display: flex;
       flex-direction: column;
       align-items: center;
+      border: 1px solid var(--stroke);
+      padding: 2rem 2rem 3rem 2rem;
+      border-radius: 1em;
 
       .input {
         width: 20rem;

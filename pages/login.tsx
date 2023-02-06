@@ -259,16 +259,6 @@ const LoginStyles = styled.div`
       .input {
         width: 20rem;
         margin-bottom: 1rem;
-        font-size: 1.3rem;
-        padding: 0.8rem 0;
-        border: none;
-        border-radius: unset;
-        border-bottom: 1px solid var(--grey-10);
-
-        &::placeholder {
-          font-weight: 500;
-          color: var(--grey-30);
-        }
       }
 
       .button-xl {

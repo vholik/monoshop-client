@@ -322,7 +322,13 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
               {/* Second row */}
               <div className="row">
                 <label className="label">
-                  Title
+                  <div className="error-label-wrapper">
+                    Title
+                    {formErrors.name && (
+                      <p className="error">{formErrors.name.message}</p>
+                    )}
+                  </div>
+
                   <input
                     type="text"
                     className="input"
@@ -340,12 +346,14 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                       }
                     })}
                   />
-                  {formErrors.name && (
-                    <p className="error">{formErrors.name.message}</p>
-                  )}
                 </label>
                 <label className="label">
-                  Category
+                  <div className="error-label-wrapper">
+                    Category
+                    {formErrors.categoryId && (
+                      <p className="error">{formErrors.categoryId.message}</p>
+                    )}
+                  </div>
                   <Controller
                     name="categoryId"
                     control={control}
@@ -372,13 +380,16 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                       />
                     )}
                   />
-                  {formErrors.categoryId && (
-                    <p className="error">{formErrors.categoryId.message}</p>
-                  )}
                 </label>
 
                 <label className="label">
-                  Style
+                  <div className="error-label-wrapper">
+                    Style
+                    {formErrors.style && (
+                      <p className="error">{formErrors.style.message}</p>
+                    )}
+                  </div>
+
                   <Controller
                     name="style"
                     control={control}
@@ -399,12 +410,14 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                       />
                     )}
                   />
-                  {formErrors.style && (
-                    <p className="error">{formErrors.style.message}</p>
-                  )}
                 </label>
                 <label className="label">
-                  Colour
+                  <div className="error-label-wrapper">
+                    Colour
+                    {formErrors.colour && (
+                      <p className="error">{formErrors.colour.message}</p>
+                    )}
+                  </div>
                   <Controller
                     name="colour"
                     control={control}
@@ -459,12 +472,15 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                       />
                     )}
                   />
-                  {formErrors.colour && (
-                    <p className="error">{formErrors.colour.message}</p>
-                  )}
                 </label>
                 <label className="label">
-                  Price
+                  <div className="error-label-wrapper">
+                    Price
+                    {formErrors.price && (
+                      <p className="error">{formErrors.price.message}</p>
+                    )}
+                  </div>
+
                   <input
                     type="number"
                     className="input"
@@ -484,31 +500,37 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                       }
                     })}
                   />
-                  {formErrors.price && (
-                    <p className="error">{formErrors.price.message}</p>
-                  )}
                 </label>
                 <label className="label">
-                  Hashtags
+                  <div className="error-label-wrapper">
+                    Hashtags
+                    {formErrors.hashtags && (
+                      <p className="error">{formErrors.hashtags.message}</p>
+                    )}
+                  </div>
+
                   <input
                     type="text"
                     className="input"
                     {...register('hashtags', {
                       pattern: {
                         value: hashtagsRegex,
-                        message: 'Incorrect hashtags (5 hashtags max)'
+                        message: 'Incorrect hashtags'
                       }
                     })}
                   />
-                  {formErrors.hashtags && (
-                    <p className="error">{formErrors.hashtags.message}</p>
-                  )}
                 </label>
               </div>
               {/* Third row */}
               <div className="row">
                 <label className="label">
-                  Gender
+                  <div className="error-label-wrapper">
+                    Gender
+                    {formErrors.gender && (
+                      <p className="error">{formErrors.gender.message}</p>
+                    )}
+                  </div>
+
                   <Controller
                     name="gender"
                     control={control}
@@ -530,12 +552,17 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                       />
                     )}
                   />
-                  {formErrors.gender && (
-                    <p className="error">{formErrors.gender.message}</p>
-                  )}
                 </label>
                 <label className="label">
-                  Subcategory
+                  <div className="error-label-wrapper">
+                    Subcategory
+                    {formErrors.subcategoryId && (
+                      <p className="error">
+                        {formErrors.subcategoryId.message}
+                      </p>
+                    )}
+                  </div>
+
                   <Controller
                     name="subcategoryId"
                     control={control}
@@ -562,12 +589,15 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                       />
                     )}
                   />
-                  {formErrors.subcategoryId && (
-                    <p className="error">{formErrors.subcategoryId.message}</p>
-                  )}
                 </label>
                 <label className="label">
-                  Condition
+                  <div className="error-label-wrapper">
+                    Condition
+                    {formErrors.condition && (
+                      <p className="error">{formErrors.condition.message}</p>
+                    )}
+                  </div>
+
                   <Controller
                     name="condition"
                     control={control}
@@ -588,12 +618,15 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                       />
                     )}
                   />
-                  {formErrors.condition && (
-                    <p className="error">{formErrors.condition.message}</p>
-                  )}
                 </label>
                 <label className="label">
-                  Brands
+                  <div className="error-label-wrapper">
+                    Brands
+                    {formErrors.brand && (
+                      <p className="error">{formErrors.brand.message}</p>
+                    )}
+                  </div>
+
                   <Controller
                     name="brand"
                     control={control}
@@ -622,12 +655,15 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                       />
                     )}
                   />
-                  {formErrors.brand && (
-                    <p className="error">{formErrors.brand.message}</p>
-                  )}
                 </label>
                 <label className="label">
-                  Size
+                  <div className="error-label-wrapper">
+                    Size
+                    {formErrors.size && (
+                      <p className="error">{formErrors.size.message}</p>
+                    )}
+                  </div>
+
                   <Controller
                     name="size"
                     control={control}
@@ -648,13 +684,16 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                       />
                     )}
                   />
-                  {formErrors.size && (
-                    <p className="error">{formErrors.size.message}</p>
-                  )}
                 </label>
               </div>
               <label className="label description--label">
-                Description
+                <div className="error-label-wrapper">
+                  Description
+                  {formErrors.description && (
+                    <p className="error">{formErrors.description.message}</p>
+                  )}
+                </div>
+
                 <textarea
                   id="description"
                   maxLength={200}
@@ -662,9 +701,6 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                     maxLength: 200
                   })}
                 ></textarea>
-                {formErrors.description && (
-                  <p className="error">{formErrors.description.message}</p>
-                )}
               </label>
               <button
                 className="button submit--buton"

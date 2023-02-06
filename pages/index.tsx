@@ -191,7 +191,7 @@ export default function Home({ brands, items, styles }: HomeProps) {
 const HomeStyles = styled.div`
   .hero {
     border-radius: 1.5em;
-    margin-top: 2rem;
+    margin-top: 1rem;
     padding: 6em 3em;
     font-family: var(--font-default);
     color: white;

@@ -147,7 +147,7 @@ h3 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 4px;
+  border-radius: 2em;
   transition: background var(--transition);
 
   &:disabled {
@@ -178,7 +178,7 @@ h3 {
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 4px;
+  border-radius: 2em;
   transition: background var(--transition);
 
   &:disabled {

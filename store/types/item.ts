@@ -42,6 +42,8 @@ export interface IAddItemFormData {
   cardNumber: number
 }
 
-export interface IEditItemFormData extends IAddItemFormData {
+type ExcludeCardInfo = Omit<IAddItemFormData, 'cardHolder' | 'cardNumber'>
+
+export interface IEditItemFormData extends ExcludeCardInfo {
   id: number
 }

@@ -22,9 +22,7 @@ export const HeaderStyles = styled.div`
     width: fit-content;
     width: 100%;
     border: 2px solid var(--stroke);
-
     margin-left: 2rem;
-    z-index: 1;
   }
 
   .input {

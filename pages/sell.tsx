@@ -473,7 +473,7 @@ export default function Sell() {
                         },
                         pattern: {
                           value: hashtagsRegex,
-                          message: 'Incorrect hashtags (5 hashtags max)'
+                          message: 'Incorrect hashtags'
                         }
                       })}
                     />

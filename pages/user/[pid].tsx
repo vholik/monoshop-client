@@ -268,8 +268,6 @@ const UserProfileStyles = styled.div`
 
     .button {
       margin-top: 1rem;
-      padding: 1rem 2rem;
-      border-radius: 4px;
     }
   }
 `
