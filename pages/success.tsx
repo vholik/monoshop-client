@@ -1,36 +1,38 @@
-import styled from "styled-components";
-import SuccessIllustration from "@public/images/success.png";
-import ArrowLeft from "@public/images/arrow-left.svg";
-import Image from "next/image";
-import Link from "next/link";
-import Header from "@components/Header/Header";
-import Router, { useRouter } from "next/router";
-import Layout from "@components/Layout/Layout";
+import styled from 'styled-components'
+import SuccessIllustration from '@public/images/success.png'
+import ArrowLeft from '@public/images/arrow-left.svg'
+import Image from 'next/image'
+import Link from 'next/link'
+import Header from '@components/Header/Header'
+import Router, { useRouter } from 'next/router'
+import Layout from '@components/Layout/Layout'
+import { CustomHead } from '@utils/CustomHead'
 
 export default function Success() {
-  const router = useRouter();
-  const { pid } = router.query;
+  const router = useRouter()
+  const { pid } = router.query
 
   return (
     <SuccessStyling>
+      <CustomHead title="Success" />
       <div className="image">
         <Image
           src={SuccessIllustration}
           alt="Success"
-          style={{ position: "absolute", objectFit: "contain" }}
+          style={{ position: 'absolute', objectFit: 'contain' }}
           fill
         />
       </div>
       {router.query.message && <h1 className="text">{router.query.message}</h1>}
 
-      <Link href={"/"}>
+      <Link href={'/'}>
         <div className="return">
           <Image src={ArrowLeft} alt="Arrow" />
           Return to home page
         </div>
       </Link>
     </SuccessStyling>
-  );
+  )
 }
 
 export const SuccessStyling = styled.div`
@@ -61,4 +63,4 @@ export const SuccessStyling = styled.div`
     gap: 10px;
     font-weight: 700;
   }
-`;
+`

@@ -24,6 +24,6 @@ export const OrderStatuses = [
   {
     status: OrderStatus.DELIVERED,
     label: 'Delivered',
-    color: '#3FF367'
+    color: '#3C8224'
   }
 ]

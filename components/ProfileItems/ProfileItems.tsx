@@ -52,6 +52,8 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
     return <ErrorPage />
   }
 
+  console.log(items)
+
   return (
     <ProfileItemsStyles>
       <CustomModal
@@ -70,7 +72,7 @@ const ProfileItems = ({ items }: ProfileItemsProps) => {
           </Link>
         </h2>
       )}
-      {}
+
       {items.map((item) => (
         <div className="item" key={item.id}>
           <div className="item-image">

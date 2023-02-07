@@ -1,20 +1,22 @@
-import styled from "styled-components";
-import ErrorIllustration from "@public/images/404.png";
-import ArrowLeft from "@public/images/arrow-left.svg";
-import Image from "next/image";
-import Link from "next/link";
-import Header from "@components/Header/Header";
-import Router from "next/router";
+import styled from 'styled-components'
+import ErrorIllustration from '@public/images/404.png'
+import ArrowLeft from '@public/images/arrow-left.svg'
+import Image from 'next/image'
+import Link from 'next/link'
+import Header from '@components/Header/Header'
+import Router from 'next/router'
+import { CustomHead } from '@utils/CustomHead'
 
 export default function ErrorPage() {
   return (
     <>
+      <CustomHead title="Error" />
       <ErrorStyling>
         <div className="image">
           <Image
             src={ErrorIllustration}
             alt="Error"
-            style={{ position: "absolute", objectFit: "contain" }}
+            style={{ position: 'absolute', objectFit: 'contain' }}
             fill
           />
         </div>
@@ -22,7 +24,7 @@ export default function ErrorPage() {
           Houston we got a problem... Updating your cordinates directions to the
           motherpage in 3...2... 1.
         </h1>
-        <Link href={"/"}>
+        <Link href={'/'}>
           <div className="return">
             <Image src={ArrowLeft} alt="Arrow" />
             Return to home page
@@ -30,7 +32,7 @@ export default function ErrorPage() {
         </Link>
       </ErrorStyling>
     </>
-  );
+  )
 }
 
 export const ErrorStyling = styled.div`
@@ -60,4 +62,4 @@ export const ErrorStyling = styled.div`
     gap: 10px;
     font-weight: 700;
   }
-`;
+`

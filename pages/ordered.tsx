@@ -13,6 +13,7 @@ import Profile from '@components/Profile/Profile'
 import { showErrorToast } from '@utils/ReactTostify/tostifyHandlers'
 import OrderedItems from '@components/OrderedItems/OrderedItems'
 import Layout from '@components/Layout/Layout'
+import { CustomHead } from '@utils/CustomHead'
 
 const Ordered = () => {
   const dispatch = useAppDispatch()
@@ -28,9 +29,9 @@ const Ordered = () => {
   return (
     <Profile
       isLoading={status === 'loading' || status === 'init'}
-      // isError={status === "error"}
       isError={false}
     >
+      <CustomHead title="Ordered clothes" />
       <OrderedItems orders={orders} />
     </Profile>
   )

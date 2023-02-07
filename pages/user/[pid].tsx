@@ -15,6 +15,7 @@ import ErrorPage from 'pages/404'
 import { checkIsAuth } from '@store/reducers/auth/AuthSlice'
 import { UserRating } from '@components/UserRating/UserRating'
 import { RatingModal } from '@components/RatingModal/RatingModal'
+import { CustomHead } from '@utils/CustomHead'
 
 export const getServerSideProps = wrapper.getServerSideProps(
   (store) =>
@@ -74,6 +75,9 @@ const UserProfile = ({ user }: UserProfileProps) => {
 
   return (
     <UserProfileStyles>
+      <CustomHead
+        title={user.fullName ? `${user.fullName} page` : 'User page'}
+      />
       {user && (
         <RatingModal
           isOpen={isReviewModalOpen}

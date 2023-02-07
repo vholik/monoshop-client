@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import Profile from '@components/Profile/Profile'
 import SoldList from '@components/SoldItems/SoldItems'
 import { getSelled } from '@store/reducers/order/GetSelledSlice'
+import { CustomHead } from '@utils/CustomHead'
 
 const Sold = () => {
   const dispatch = useAppDispatch()
@@ -23,6 +24,7 @@ const Sold = () => {
       isLoading={status === 'loading' || status === 'init'}
       isError={status === 'error'}
     >
+      <CustomHead title="Sold clothes" />
       <SoldList orders={orders} />
     </Profile>
   )

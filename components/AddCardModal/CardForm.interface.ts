@@ -1,4 +1,4 @@
 export interface CardForm {
-  value: number
+  value: string
   holder: string
 }

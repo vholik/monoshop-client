@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const ProfileStyles = styled.div`
   margin-top: 2rem;
@@ -10,4 +10,4 @@ export const ProfileStyles = styled.div`
     width: 100%;
     text-align: center;
   }
-`;
+`

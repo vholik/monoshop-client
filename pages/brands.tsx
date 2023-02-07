@@ -11,6 +11,7 @@ import Router from "next/router";
 import Footer from "@components/Footer/Footer";
 import { filterActions } from "@store/reducers/filter/FilterSlice";
 import Layout from "@components/Layout/Layout";
+import { CustomHead } from "@utils/CustomHead";
 
 const Brands = () => {
   const dispatch = useAppDispatch();
@@ -38,6 +39,7 @@ const Brands = () => {
 
   return (
     <BrandsStyles>
+    <CustomHead title="Brands" />
       <div className="container">
         <h1 className="title">Search for brands</h1>
         <div className="search-wrapper">

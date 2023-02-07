@@ -78,7 +78,10 @@ export const ReviewModal = ({ id, isOpen, setIsOpen }: ReviewModalProps) => {
             fillColor="#ff6243"
             className="rating-stars"
           />
-          <p className="rating-subtitle">Describe your experience:</p>
+          <div className="error-label-wrapper">
+            <p className="rating-subtitle">Describe your experience:</p>
+            {errors.text && <p className="error">{errors.text.message}</p>}
+          </div>
           <textarea
             className="rating-textarea"
             placeholder="Fine cool shirt..."
@@ -94,7 +97,6 @@ export const ReviewModal = ({ id, isOpen, setIsOpen }: ReviewModalProps) => {
               }
             })}
           />
-          {errors.text && <p className="error">{errors.text.message}</p>}
           <button className="rating-button button" type="submit">
             Submit
           </button>

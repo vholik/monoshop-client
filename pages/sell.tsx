@@ -32,6 +32,7 @@ import { SellStyles } from 'styles/shared/SellStyles'
 import CardIcon from '@public/images/card.svg'
 import AddCardModal from '@components/AddCardModal/AddCardModal'
 import { CardForm } from '@components/AddCardModal/CardForm.interface'
+import { CustomHead } from '@utils/CustomHead'
 
 export default function Sell() {
   const [modalOpen, setModalOpen] = useState(false)
@@ -49,7 +50,7 @@ export default function Sell() {
     resetField,
     formState: { errors: formErrors }
   } = useForm<ISellForm>({
-    mode: 'onChange'
+    mode: 'onBlur'
   })
 
   const imageStatus = useAppSelector((state) => state.uploadImageReducer.status)
@@ -82,7 +83,7 @@ export default function Sell() {
 
   const [formImages, setFormImages] = useState<string[]>([])
   const [card, setCard] = useState({
-    value: 0,
+    value: '',
     holder: ''
   })
 
@@ -186,7 +187,7 @@ export default function Sell() {
       hashtags: convertStringToHashtags(data.hashtags),
       description: data.description.replace(/\r\n|\r|\n/g, '<br />'),
       cardHolder: card.holder,
-      cardNumber: card.value
+      cardNumber: card.value.trim()
     }
 
     if (!card.value) {
@@ -197,9 +198,9 @@ export default function Sell() {
       .unwrap()
       .then(() => {
         Router.push({
-          pathname: '/success',
+          pathname: '/selling',
           query: {
-            message: 'Successfully added your item to selling'
+            sucess: 'Successfully posted'
           }
         })
       })
@@ -214,6 +215,7 @@ export default function Sell() {
 
   return (
     <>
+      <CustomHead title="Sell" />
       <AddCardModal
         addCard={addCardHandler}
         isOpen={modalOpen}

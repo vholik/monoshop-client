@@ -39,6 +39,7 @@ import { isAxiosError } from 'axios'
 import ErrorPage from 'pages/404'
 import { editItem } from '@store/reducers/item/EditItemSlice'
 import { checkIsAuth } from '@store/reducers/auth/AuthSlice'
+import { CustomHead } from '@utils/CustomHead'
 
 export const getServerSideProps = wrapper.getStaticProps(
   (store) =>
@@ -91,7 +92,7 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
     resetField,
     formState: { errors: formErrors }
   } = useForm<ISellForm>({
-    mode: 'onChange'
+    mode: 'onBlur'
   })
 
   const imageStatus = useAppSelector((state) => state.uploadImageReducer.status)
@@ -243,9 +244,9 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
       .unwrap()
       .then(() => {
         Router.push({
-          pathname: '/success',
+          pathname: '/selling',
           query: {
-            message: 'Successfully edited your item'
+            success: 'Successfully edited'
           }
         })
       })
@@ -260,6 +261,7 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
 
   return (
     <SellStyles>
+      <CustomHead title={item?.name ? `${item?.name} edit` : 'Edit page'} />
       <div className="container">
         <div className="wrapper">
           <h1 className="title-md">Sell new item</h1>
@@ -703,7 +705,7 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
                 ></textarea>
               </label>
               <button
-                className="button submit--buton"
+                className="button-xl submit--buton"
                 disabled={itemStatus === 'loading' || itemStatus === 'success'}
               >
                 Save

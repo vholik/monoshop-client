@@ -26,8 +26,8 @@ const AddCardModal = ({ addCard, isOpen, setIsOpen }: AddCardModalProps) => {
   })
 
   const onSubmit: SubmitHandler<CardForm> = (data) => {
-    console.log(data)
     addCard(data)
+    setIsOpen(false)
   }
 
   return (
@@ -40,7 +40,12 @@ const AddCardModal = ({ addCard, isOpen, setIsOpen }: AddCardModalProps) => {
       <form className="modal-inner" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="card-title">Add card</h1>
         <label htmlFor="" className="label">
-          Card number
+          <div className="error-label-wrapper">
+            Card number
+            {formErrors.value && (
+              <p className="error">{formErrors.value?.message}</p>
+            )}
+          </div>
           <input
             className="input"
             type="text"
@@ -57,12 +62,14 @@ const AddCardModal = ({ addCard, isOpen, setIsOpen }: AddCardModalProps) => {
               }
             })}
           />
-          {formErrors.value && (
-            <p className="error">{formErrors.value?.message}</p>
-          )}
         </label>
         <label htmlFor="" className="label">
-          Card holdername
+          <div className="error-label-wrapper">
+            Card holdername
+            {formErrors.holder && (
+              <p className="error">{formErrors.holder?.message}</p>
+            )}
+          </div>
           <input
             type="text"
             className="input"
@@ -75,9 +82,6 @@ const AddCardModal = ({ addCard, isOpen, setIsOpen }: AddCardModalProps) => {
               }
             })}
           />
-          {formErrors.holder && (
-            <p className="error">{formErrors.holder?.message}</p>
-          )}
         </label>
         <button className="button card-button">Save</button>
       </form>

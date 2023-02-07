@@ -24,6 +24,7 @@ import {
   redirectSubcategory
 } from '@utils/redirectionHelper'
 import { UserRating } from '@components/UserRating/UserRating'
+import { CustomHead } from '@utils/CustomHead'
 
 const arrowStyles: CSSProperties = {
   position: 'absolute',
@@ -177,6 +178,7 @@ const ShopItem = () => {
 
   return (
     <ShopItemStyles>
+      <CustomHead title={item?.name ? item?.name : 'Clothes page'} />
       <div className="container">
         {itemStatus === 'success' && (
           <div className="url">

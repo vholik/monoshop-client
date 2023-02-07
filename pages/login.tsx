@@ -18,6 +18,7 @@ import ErrorIcon from '@public/images/error.svg'
 import Image from 'next/image'
 import { showErrorToast } from '@utils/ReactTostify/tostifyHandlers'
 import { confirmEmail } from '@store/reducers/auth/ConfirmEmailSlice'
+import { CustomHead } from '@utils/CustomHead'
 
 export default function Login() {
   const router = useRouter()
@@ -90,11 +91,7 @@ export default function Login() {
 
   return (
     <LoginStyles>
-      <Head>
-        <title>Monoshop - Login to your account</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      </Head>
-
+      <CustomHead title="Login" />
       {status === 'email_wait' ? (
         <div className="email-confirm-table">
           <h2 className="title-md">Confirm an e-mail</h2>

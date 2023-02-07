@@ -49,6 +49,7 @@ import StateManagedSelect from 'react-select'
 import ReactSelect from 'react-select'
 import { filterActions } from '@store/reducers/filter/FilterSlice'
 import Layout from '@components/Layout/Layout'
+import { CustomHead } from '@utils/CustomHead'
 
 const STEP = 1
 const MIN = 0
@@ -297,6 +298,7 @@ const Shop = () => {
 
   return (
     <ShopStyling onClick={() => setIsPriceOpen(false)}>
+      <CustomHead title="Shop page" />
       <div className="wrapper">
         <div className="filter">
           <div className="filter-inner">

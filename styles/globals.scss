@@ -21,6 +21,8 @@ li {
   --dark: #0e0e0f;
   --dark-hover: #2c2c2c;
   --field-highlight: #625bf6;
+  --green-status: #3c8224;
+  --green-status-bg: #dcf2d9;
   --loading: #ebebeb;
   --grey-60: rgba(40, 40, 40, 0.6);
   --grey-30: rgba(40, 40, 40, 0.3);
@@ -253,6 +255,7 @@ a {
   .card-button {
     width: 100%;
     display: flex;
+    margin-top: 1rem;
     justify-content: center;
   }
 
@@ -262,8 +265,8 @@ a {
     margin-bottom: 1rem;
   }
 
-  .input {
-    margin-top: 0.5rem;
+  .label {
+    margin-bottom: 1rem;
   }
 }
 
@@ -428,4 +431,18 @@ select {
     margin-top: 1rem;
     color: var(--grey-60);
   }
+}
+
+.sucess-table {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--green-status-bg);
+  color: var(--green-status);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0.5rem;
 }

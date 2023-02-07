@@ -18,6 +18,7 @@ import { filterActions } from '@store/reducers/filter/FilterSlice'
 import Layout from '@components/Layout/Layout'
 import { useEffect } from 'react'
 import { checkIsAuth } from '@store/reducers/auth/AuthSlice'
+import { CustomHead } from '@utils/CustomHead'
 
 export const getServerSideProps = wrapper.getStaticProps(
   (store) =>
@@ -75,10 +76,7 @@ export default function Home({ brands, items, styles }: HomeProps) {
 
   return (
     <HomeStyles>
-      <Head>
-        <title>Monoshop - create your style</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      </Head>
+      <CustomHead title="Home page" />
       <div className="container">
         <main className="hero">
           <h1 className="hero-title">Monoshop marketplace</h1>
@@ -210,12 +208,12 @@ const HomeStyles = styled.div`
   }
 
   .hero-button {
-    background-color: transparent;
-    border: 1px solid var(--white);
+    /* background-color: transparent;
+    border: 1px solid var(--white); */
     margin-top: 1rem;
-    &:hover {
+    /* &:hover {
       background-color: rgba(255, 255, 255, 0.1);
-    }
+    } */
   }
 
   /* Popular categories */

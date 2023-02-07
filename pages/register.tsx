@@ -7,6 +7,7 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
 import { registerUser } from '@store/reducers/auth/RegisterSlice'
 import Router from 'next/router'
+import { CustomHead } from '@utils/CustomHead'
 
 export default function Login() {
   const dispatch = useAppDispatch()
@@ -30,10 +31,7 @@ export default function Login() {
 
   return (
     <LoginStyles>
-      <Head>
-        <title>Monoshop - Register your account</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      </Head>
+      <CustomHead title="Register" />
       {status === 'success' ? (
         <div className="success-table">
           <h1 className="success-title title-md">Check your email</h1>

@@ -25,6 +25,7 @@ import { getStripeSession } from '@store/reducers/payments/PaySlice'
 import { showErrorToast } from '@utils/ReactTostify/tostifyHandlers'
 import Layout from '@components/Layout/Layout'
 import ErrorPage from './404'
+import { CustomHead } from '@utils/CustomHead'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -83,6 +84,7 @@ const Pay = () => {
 
   return (
     <PayStyles>
+      <CustomHead title="Pay" />
       <div className="wrapper">
         <div className="shipping">
           <h1 className="title-md">Shipping method</h1>

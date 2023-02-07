@@ -23,6 +23,7 @@ import Flash from '@public/images/flash.svg'
 import Link from 'next/link'
 import { Item } from '@store/types/item'
 import Layout from '@components/Layout/Layout'
+import { CustomHead } from '@utils/CustomHead'
 
 type Timestamp = {
   time: string
@@ -46,7 +47,7 @@ const Chat = () => {
   }
 
   const send = () => {
-    if (!value) return
+    if (!value || value.length > 200) return
     if (currentUser) {
       socket?.emit('sendMessage', { text: value })
       setValue('')
@@ -219,6 +220,7 @@ const Chat = () => {
 
   return (
     <ChatStyles>
+      <CustomHead title="Chat" />
       <div className="container">
         <div className="title-md">Messages</div>
         <div className="chat-wrapper">
@@ -328,6 +330,7 @@ const Chat = () => {
                   placeholder="Type something..."
                   onChange={inputHandler}
                   value={value}
+                  maxLength={200}
                 />
                 <button className="button" onClick={send}>
                   Send
@@ -363,8 +366,8 @@ const ChatStyles = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
-    min-height: 500px;
-    max-height: 500px;
+    min-height: 550px;
+    max-height: 550px;
 
     .chat-header {
       padding: 1rem 1rem;
@@ -373,7 +376,9 @@ const ChatStyles = styled.div`
       border-bottom: 1px solid var(--grey-10);
 
       .user-name {
-        font-size: 1.2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: var(--font-wide);
       }
 
       .user-activity {
@@ -481,7 +486,7 @@ const ChatStyles = styled.div`
     display: grid;
     grid-template-columns: 1fr 3fr;
     grid-column-gap: 1rem;
-    height: 500px;
+    height: 550px;
   }
 
   .rooms-wrapper {
@@ -496,6 +501,10 @@ const ChatStyles = styled.div`
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
+
+      .user-name {
+        font-family: var(--font-wide);
+      }
     }
 
     .selected-room {

@@ -39,7 +39,7 @@ export interface IAddItemFormData {
   gender: string
   images: string[]
   cardHolder: string
-  cardNumber: number
+  cardNumber: string
 }
 
 type ExcludeCardInfo = Omit<IAddItemFormData, 'cardHolder' | 'cardNumber'>
