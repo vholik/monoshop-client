@@ -2,29 +2,30 @@
 const nextConfig = {
   reactStrictMode: false,
   swcMinify: true,
+
   images: {
-    domains: ["i.ibb.co", "t4.ftcdn.net","lh3.googleusercontent.com"],
+    domains: ['i.ibb.co', 't4.ftcdn.net', 'lh3.googleusercontent.com']
   },
   async headers() {
     return [
       {
-        source: "/api/:path*",
+        source: '/api/:path*',
         headers: [
-          { key: "origins", value: "*" },
-          { key: "Bypass-Tunnel-Reminder", value: "*" },
-          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: 'origins', value: '*' },
+          { key: 'Bypass-Tunnel-Reminder', value: '*' },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
           {
-            key: "Access-Control-Request-Methods",
-            value: "POST, GET, OPTIONS",
+            key: 'Access-Control-Request-Methods',
+            value: 'POST, GET, OPTIONS'
           },
           {
-            key: "Access-Control-Allow-Headers",
-            value: "Authorization, Content-Type",
-          },
-        ],
-      },
-    ];
-  },
-};
+            key: 'Access-Control-Allow-Headers',
+            value: 'Authorization, Content-Type'
+          }
+        ]
+      }
+    ]
+  }
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

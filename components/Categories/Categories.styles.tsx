@@ -45,6 +45,7 @@ export const CategoriesStyles = styled.div`
     opacity: 0;
     pointer-events: none;
     z-index: 5;
+    min-width: 150px;
 
     &__subcategory {
       cursor: pointer;

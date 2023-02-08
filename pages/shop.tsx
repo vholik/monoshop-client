@@ -50,6 +50,8 @@ import ReactSelect from 'react-select'
 import { filterActions } from '@store/reducers/filter/FilterSlice'
 import Layout from '@components/Layout/Layout'
 import { CustomHead } from '@utils/CustomHead'
+import { BrandSelector } from '@utils/BrandSelector/BrandSelector'
+import { IOption } from '@utils/BrandSelector/BrandSelector.type'
 
 const STEP = 1
 const MIN = 0
@@ -215,14 +217,10 @@ const Shop = () => {
     dispatch(filterActions.setSubcategory(e))
   }
 
-  const brandHandler = (e: MultiValue<ItemEntity>) => {
-    if (e) {
-      const mapped = e.map((item) => {
-        return item.value
-      })
+  const brandHandler = (e: IOption[]) => {
+    if (e.length === filter.brand?.length) return
 
-      dispatch(filterActions.setBrand(e))
-    }
+    dispatch(filterActions.setBrand(e))
   }
 
   const conditionHandler = (
@@ -512,27 +510,11 @@ const Shop = () => {
                 ValueContainer
               }}
             />
-            <Select
-              placeholder={'Brand'}
-              styles={multiplefilterColourStyles}
-              isMulti
-              options={brands}
-              className="select"
+            <BrandSelector
               onChange={brandHandler}
-              required={true}
-              isDisabled={false}
-              isLoading={brandStatus === 'loading'}
-              isSearchable={true}
-              name={'brand'}
-              isClearable={true}
-              instanceId="brand-select"
-              closeMenuOnSelect={false}
-              hideSelectedOptions={false}
-              onInputChange={onInputBrandChange}
-              value={filter.brand}
-              components={{
-                ValueContainer
-              }}
+              options={brands as IOption[]}
+              inputValue={onInputBrandChange}
+              value={filter.brand as IOption[]}
             />
             <Select
               placeholder={'Style'}

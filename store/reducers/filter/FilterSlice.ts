@@ -3,6 +3,7 @@ import { IFilter } from '@store/types/filter'
 import { SortBy } from '@store/types/filter-by.enum'
 import { Gender } from '@store/types/gender.enum'
 import { ItemEntity, ItemEntityWithId } from '@store/types/item-entity'
+import { IOption } from '@utils/BrandSelector/BrandSelector.type'
 import { MultiValue, SingleValue } from 'react-select'
 
 const initialState: IFilter = {
@@ -60,7 +61,7 @@ export const FilterSlice = createSlice({
     ) => {
       state.condition = [...action.payload]
     },
-    setBrand: (state, action: PayloadAction<MultiValue<ItemEntity>>) => {
+    setBrand: (state, action: PayloadAction<IOption[]>) => {
       state.brand = [...action.payload]
     },
     setStyle: (state, action: PayloadAction<MultiValue<ItemEntity>>) => {
