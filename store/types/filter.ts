@@ -1,3 +1,4 @@
+import { IOption } from '@utils/CustomSelector.type'
 import { MultiValue, SingleValue } from 'react-select'
 import { SortBy } from './filter-by.enum'
 import { Gender } from './gender.enum'
@@ -6,9 +7,9 @@ import { ItemEntity, ItemEntityWithId } from './item-entity'
 
 export interface IFilter {
   price?: [number, number]
-  gender?: SingleValue<{ value: string; label: string }>
-  category?: SingleValue<ItemEntity>
-  subcategory?: MultiValue<ItemEntityWithId> | null
+  gender?: Gender | null
+  category?: IOption | null
+  subcategory?: IOption[]
   size?: MultiValue<ItemEntity> | null
   condition?: MultiValue<{ label: string; value: number }> | null
   brand?: MultiValue<ItemEntity> | null

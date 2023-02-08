@@ -4,57 +4,37 @@ import ChevronDown from '@public/images/chevron-down.svg'
 import SearchIcon from '@public/images/search.svg'
 import Image from 'next/image'
 import styled from 'styled-components'
-import { IOption } from '../CustomSelector.type'
+import { IOption } from '@utils/CustomSelector.type'
+import { useAppDispatch } from '@store/hooks/redux'
+import { filterActions } from '@store/reducers/filter/FilterSlice'
 
 interface CustomSelectorProps<T extends IOption> {
   onChange: (value: T[]) => any
   value?: T[]
-  inputValue?: (value: string) => any
   options: T[]
+  label: string
 }
 
-export const BrandSelector = <T extends IOption>({
-  onChange,
-  value,
-  inputValue,
-  options
-}: CustomSelectorProps<T>) => {
+export const PriceSelector = () => {
+  const dispatch = useAppDispatch()
   const [isOpen, setIsOpen] = useState(false)
-  const [chosen, setChosen] = useState<T[]>([])
+
+  const [price, setPrice] = useState<{ [value: string]: number }>({
+    min: 0,
+    max: 0
+  })
 
   const selectRef = useRef<HTMLDivElement>(null)
 
   const submitHandler = () => {
-    onChange(chosen)
+    dispatch(filterActions.setPrice([price.min || 0, price.max || 10000]))
   }
 
   const switchHandler = () => {
     setIsOpen((prev) => !prev)
   }
 
-  const changeHandler = (e: ChangeEvent<HTMLInputElement>, option: T) => {
-    const isChecked = e.target.checked
-    if (isChecked) {
-      setChosen((prev) => [...prev, option])
-    } else {
-      setChosen(chosen.filter((it) => it.value !== option.value))
-    }
-  }
-
-  const clearHandler = () => {
-    setChosen([])
-    onChange([])
-  }
-
-  const isChecked = (option: T) => {
-    const find = chosen.find((it) => it.value === option.value)
-
-    if (find) {
-      return true
-    }
-
-    return false
-  }
+  const clearHandler = () => {}
 
   const closeSelectByWindow = (e: MouseEvent) => {
     if (!selectRef.current?.contains(e.target as Node)) {
@@ -72,32 +52,18 @@ export const BrandSelector = <T extends IOption>({
     }
   }, [])
 
-  useEffect(() => {
-    if (value) {
-      setChosen(value)
-    }
-  }, [value])
-
-  const inputHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    if (inputValue) {
-      inputValue(value)
-    }
-  }
-
   return (
     <CustomSelectorStyles ref={selectRef}>
       <button
         className="label-btn"
         onClick={switchHandler}
-        style={
-          chosen.length
-            ? { backgroundColor: 'var(--dark)', color: 'var(--white)' }
-            : {}
-        }
+        // style={
+        //   chosen.length
+        //     ? { backgroundColor: 'var(--dark)', color: 'var(--white)' }
+        //     : {}
+        // }
       >
-        {!!chosen.length && <span>{chosen.length}</span>}
-        Brands
+        Price
         {isOpen ? (
           <Image
             src={ChevronUp}
@@ -105,9 +71,9 @@ export const BrandSelector = <T extends IOption>({
             width={20}
             height={20}
             color={'#fff'}
-            style={
-              chosen.length ? { filter: 'invert(1)' } : { filter: 'invert(0)' }
-            }
+            // style={
+            //   chosen.length ? { filter: 'invert(1)' } : { filter: 'invert(0)' }
+            // }
           />
         ) : (
           <Image
@@ -115,9 +81,9 @@ export const BrandSelector = <T extends IOption>({
             alt="Chevron down"
             width={20}
             height={20}
-            style={
-              chosen.length ? { filter: 'invert(1)' } : { filter: 'invert(0)' }
-            }
+            // style={
+            //   chosen.length ? { filter: 'invert(1)' } : { filter: 'invert(0)' }
+            // }
           />
         )}
       </button>
@@ -130,43 +96,57 @@ export const BrandSelector = <T extends IOption>({
         }
       >
         <div className="select-container">
-          <div className="custom-input">
-            <Image src={SearchIcon} alt="Search" />
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search"
-              maxLength={50}
-              onChange={inputHandler}
-            />
-          </div>
           <button
             className="clear-btn"
             onClick={clearHandler}
-            disabled={!chosen.length}
+            // disabled={!chosen.length}
           >
-            Clear all
+            Reset
           </button>
         </div>
-
         <div className="select-inner">
-          {chosen
-            .concat(
-              options.filter(
-                (it) => !chosen.find((it2) => it.value === it2.value)
-              )
-            )
-            .map((item: T) => (
-              <div className="option" key={item.value}>
-                <input
-                  checked={isChecked(item)}
-                  type="checkbox"
-                  className="checkbox"
-                  onChange={(e) => changeHandler(e, item)}
-                />
-                {item.label}
-              </div>
-            ))}
+          <div className="left">
+            <label className="label">
+              Min
+              <input
+                value={price.min || ''}
+                type="num"
+                placeholder="0"
+                className="input"
+                min={0}
+                max={10000}
+                onChange={(e) => {
+                  if (
+                    Number(e.target.value) < 10000 &&
+                    Number(e.target.value) > 0
+                  ) {
+                    setPrice({ ...price, min: Number(e.target.value) })
+                  }
+                }}
+              />
+            </label>
+          </div>
+          <div className="price-line"></div>
+          <div className="right">
+            <label className="label">
+              Max
+              <input
+                onChange={(e) => {
+                  if (
+                    Number(e.target.value) < 10000 &&
+                    Number(e.target.value) > 0
+                  ) {
+                    setPrice({ ...price, max: Number(e.target.value) })
+                  }
+                }}
+                type="num"
+                value={price.max || ''}
+                placeholder="10000"
+                className="input"
+                max={100000}
+              />
+            </label>
+          </div>
         </div>
         <hr className="select-line" />
         <div className="select-container">
@@ -182,6 +162,12 @@ export const BrandSelector = <T extends IOption>({
 const CustomSelectorStyles = styled.div`
   position: relative;
   width: fit-content;
+
+  .color-circle {
+    border-radius: 50%;
+    min-height: 15px;
+    min-width: 15px;
+  }
 
   .custom-input {
     background-color: #f6f6f6;
@@ -211,7 +197,6 @@ const CustomSelectorStyles = styled.div`
     font-family: var(--font-default);
     transition: background var(--transition);
     cursor: pointer;
-    margin-top: 1rem;
 
     &:disabled {
       cursor: not-allowed;
@@ -230,6 +215,7 @@ const CustomSelectorStyles = styled.div`
     height: 1px;
     background-color: var(--grey-10);
     border: none;
+    margin-top: 1rem;
   }
 
   .submit-btn {
@@ -273,49 +259,22 @@ const CustomSelectorStyles = styled.div`
     opacity: 0;
     transition: opacity var(--transition);
     z-index: 5;
+    width: max-content;
 
     .select-inner {
       display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      min-height: 200px;
-      max-height: 200px;
-      overflow-y: auto;
-      padding: 0rem 1rem 0.5rem 1rem;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 0 1rem;
 
-      .checkbox {
-        appearance: none;
-        background-color: #fff;
-        margin: 0;
-        font: inherit;
-        color: currentColor;
-        width: 1em;
-        height: 1em;
-        border: 1px solid var(--dark);
-        border-radius: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        &::before {
-          display: block;
-          content: '';
-          width: 0.5em;
-          height: 0.5em;
-          transform: scale(0);
-          box-shadow: inset 1em 1em var(--dark);
-        }
-
-        &:checked::before {
-          transform: scale(1);
-        }
+      .label {
+        max-width: 60px;
       }
 
-      .option {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 1.1rem;
+      .price-line {
+        height: 1px;
+        min-width: 1rem;
+        background-color: var(--grey-30);
       }
     }
   }

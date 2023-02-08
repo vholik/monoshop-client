@@ -3,14 +3,14 @@ import { IFilter } from '@store/types/filter'
 import { SortBy } from '@store/types/filter-by.enum'
 import { Gender } from '@store/types/gender.enum'
 import { ItemEntity, ItemEntityWithId } from '@store/types/item-entity'
-import { IOption } from '@utils/BrandSelector/BrandSelector.type'
+import { IOption } from '@utils/CustomSelector.type'
 import { MultiValue, SingleValue } from 'react-select'
 
 const initialState: IFilter = {
   price: [0, 10000],
   gender: null,
   category: null,
-  subcategory: null,
+  subcategory: [],
   size: null,
   condition: null,
   brand: null,
@@ -34,43 +34,31 @@ export const FilterSlice = createSlice({
     setPrice: (state, action: PayloadAction<[number, number]>) => {
       state.price = action.payload
     },
-    setGender: (
-      state,
-      action: PayloadAction<{ value: string; label: string }>
-    ) => {
+    setGender: (state, action: PayloadAction<Gender | null>) => {
       state.gender = action.payload
     },
     changePage: (state, action: PayloadAction<number>) => {
       state.page = action.payload
     },
-    setCategory: (
-      state,
-      action: PayloadAction<SingleValue<ItemEntity> | null>
-    ) => {
+    setCategory: (state, action: PayloadAction<IOption | null>) => {
       state.category = action.payload
     },
-    setSubcategory: (
-      state,
-      action: PayloadAction<MultiValue<ItemEntityWithId>>
-    ) => {
+    setSubcategory: (state, action: PayloadAction<IOption[]>) => {
       state.subcategory = [...action.payload]
     },
-    setCondition: (
-      state,
-      action: PayloadAction<MultiValue<{ label: string; value: number }>>
-    ) => {
+    setCondition: (state, action: PayloadAction<IOption[]>) => {
       state.condition = [...action.payload]
     },
     setBrand: (state, action: PayloadAction<IOption[]>) => {
       state.brand = [...action.payload]
     },
-    setStyle: (state, action: PayloadAction<MultiValue<ItemEntity>>) => {
+    setStyle: (state, action: PayloadAction<IOption[]>) => {
       state.style = [...action.payload]
     },
-    setColour: (state, action: PayloadAction<MultiValue<ItemEntity>>) => {
+    setColour: (state, action: PayloadAction<IOption[]>) => {
       state.colour = [...action.payload]
     },
-    setSize: (state, action: PayloadAction<MultiValue<ItemEntity>>) => {
+    setSize: (state, action: PayloadAction<IOption[]>) => {
       state.size = [...action.payload]
     },
     setSearchValue: (state, action: PayloadAction<string>) => {

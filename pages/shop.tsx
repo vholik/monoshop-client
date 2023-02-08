@@ -51,11 +51,10 @@ import { filterActions } from '@store/reducers/filter/FilterSlice'
 import Layout from '@components/Layout/Layout'
 import { CustomHead } from '@utils/CustomHead'
 import { BrandSelector } from '@utils/BrandSelector/BrandSelector'
-import { IOption } from '@utils/BrandSelector/BrandSelector.type'
-
-const STEP = 1
-const MIN = 0
-const MAX = 10000
+import { IOption } from '@utils/CustomSelector.type'
+import { CustomSelector } from '@utils/CustomSelector/CustomSelector'
+import { CategorySelector } from '@utils/CategorySelector/CategorySelector'
+import { PriceSelector } from '@utils/PriceSelector/PriceSelector'
 
 const Shop = () => {
   const dispatch = useAppDispatch()
@@ -88,15 +87,6 @@ const Shop = () => {
     (state) => state.getSubcategoriesReducer.status
   )
 
-  const categoriesStatus = useAppSelector(
-    (state) => state.getCategoriesReducer.status
-  )
-  const categories = useAppSelector(
-    (state) => state.getCategoriesReducer.categories
-  )
-
-  const [values, setValues] = useState([0, 10000])
-  const [isPriceOpen, setIsPriceOpen] = useState(false)
   const debouncedValue = useDebounce<IFilter>(filter, 1000)
 
   const convertFilterToQuery = useMemo(
@@ -112,7 +102,7 @@ const Shop = () => {
         condition: filter.condition
           ? filter.condition.map((condition) => condition.value)
           : undefined,
-        gender: filter.gender ? filter.gender.value : undefined,
+        gender: filter.gender ? filter.gender : undefined,
         page: filter.page ? filter.page : undefined,
         price: filter.price ? filter.price : undefined,
         search: filter.search ? filter.search : undefined,
@@ -170,50 +160,7 @@ const Shop = () => {
       })
   }, [])
 
-  const priceValuesHandler = (values: number[]) => {
-    setValues(values)
-  }
-
-  const priceHandler = () => {
-    if (filter.price) {
-      const isPreviousPrice =
-        Math.round(values[0]) === filter.price[0] &&
-        Math.round(values[1]) === filter.price[1]
-
-      if (!isPreviousPrice) {
-        const roundedPrice = [
-          Math.round(values[0]),
-          Math.round(values[1])
-        ] as const
-
-        dispatch(filterActions.setPrice([roundedPrice[0], roundedPrice[1]]))
-
-        //Change page to first
-        dispatch(filterActions.changePage(1))
-      }
-    }
-  }
-
-  const categoryHandler = (e: SingleValue<ItemEntity>) => {
-    if (e) {
-      // Fetch subcategories with this id
-      if (typeof e.id === 'number') {
-        dispatch(getSubcategories(e.id))
-          .unwrap()
-          .catch((err) => console.log('rejected', err))
-      }
-    }
-
-    dispatch(filterActions.setCategory(e))
-    // Clear subcategory value
-    dispatch(filterActions.setSubcategory([]))
-  }
-
-  const subcategoriesHandler = (e: MultiValue<ItemEntityWithId>) => {
-    const mapped = e.map((subcategory) => {
-      return subcategory.id
-    })
-
+  const subcategoriesHandler = (e: IOption[]) => {
     dispatch(filterActions.setSubcategory(e))
   }
 
@@ -223,27 +170,20 @@ const Shop = () => {
     dispatch(filterActions.setBrand(e))
   }
 
-  const conditionHandler = (
-    e: MultiValue<{ label: string; value: number }>
-  ) => {
-    if (e) {
-      dispatch(filterActions.setCondition(e))
-    }
+  const conditionHandler = (e: IOption[]) => {
+    dispatch(filterActions.setCondition(e))
   }
 
-  const filterHandler = (
-    e: MultiValue<ItemEntity>,
-    filterName: keyof IFilter
-  ) => {
-    if (e) {
-      if (filterName === 'style') {
-        dispatch(filterActions.setStyle(e))
-      } else if (filterName === 'colour') {
-        dispatch(filterActions.setColour(e))
-      } else if (filterName === 'size') {
-        dispatch(filterActions.setSize(e))
-      }
-    }
+  const sizeHandler = (e: IOption[]) => {
+    dispatch(filterActions.setSize(e))
+  }
+
+  const styleHandler = (e: IOption[]) => {
+    dispatch(filterActions.setStyle(e))
+  }
+
+  const colorHandler = (e: IOption[]) => {
+    dispatch(filterActions.setColour(e))
   }
 
   const sortingHandler = (e: SingleValue<ItemEntity>) => {
@@ -277,238 +217,33 @@ const Shop = () => {
       })
   }
 
-  const genderHandler = (
-    e: SingleValue<{
-      value: string
-      label: string
-    }>
-  ) => {
-    if (e) {
-      dispatch(filterActions.setGender(e))
-      dispatch(filterActions.setCategory(null))
-      dispatch(filterActions.setSubcategory([]))
-
-      dispatch(getCategories(e.value as Gender))
-        .unwrap()
-        .catch((err) => console.log('rejected', err))
-    }
-  }
-
   return (
-    <ShopStyling onClick={() => setIsPriceOpen(false)}>
+    <ShopStyling>
       <CustomHead title="Shop page" />
       <div className="wrapper">
         <div className="filter">
           <div className="filter-inner">
-            <div
-              className="price"
-              onClick={(e) => {
-                e.stopPropagation(), setIsPriceOpen(!isPriceOpen)
-              }}
-            >
-              <p className="price-tag">Price</p>
-              <div className="price-arrow">
-                <svg
-                  height="20"
-                  width="20"
-                  viewBox="0 0 20 20"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path>
-                </svg>
-              </div>
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="price-handler"
-                style={isPriceOpen ? undefined : { display: 'none' }}
-              >
-                <div className="price-range">
-                  <Range
-                    values={values}
-                    step={STEP}
-                    min={MIN}
-                    max={MAX}
-                    onChange={(values) => priceValuesHandler(values)}
-                    renderTrack={({ props, children }) => (
-                      <div
-                        onMouseDown={props.onMouseDown}
-                        onTouchStart={props.onTouchStart}
-                        style={{
-                          ...props.style,
-                          height: '36px',
-                          display: 'flex',
-                          width: '100%'
-                        }}
-                      >
-                        <div
-                          ref={props.ref}
-                          style={{
-                            height: '5px',
-                            width: '100%',
-                            borderRadius: '4px',
-                            background: getTrackBackground({
-                              values,
-                              colors: [
-                                'var(--grey-30)',
-                                'var(--dark)',
-                                'var(--grey-30)'
-                              ],
-                              min: MIN,
-                              max: MAX
-                            }),
-                            alignSelf: 'center'
-                          }}
-                        >
-                          {children}
-                        </div>
-                      </div>
-                    )}
-                    renderThumb={({ index, props, isDragged }) => (
-                      <div
-                        {...props}
-                        style={{
-                          ...props.style,
-                          height: '25px',
-                          width: '25px',
-                          borderRadius: '4px',
-                          backgroundColor: '#FFF',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          border: '1px solid var(--grey-30)',
-                          outline: 'none'
-                        }}
-                      >
-                        <div
-                          style={{
-                            position: 'absolute',
-                            top: '-28px',
-                            color: '#fff',
-                            fontWeight: '400',
-                            fontSize: '14px',
-                            fontFamily: 'var(--font-default)',
-                            padding: '4px',
-                            borderRadius: '4px',
-                            backgroundColor: 'var(--dark)'
-                          }}
-                        >
-                          {values[index].toFixed(1)}
-                        </div>
-                        <div
-                          style={{
-                            height: '16px',
-                            width: '5px',
-                            backgroundColor: isDragged
-                              ? 'var(--grey-30)'
-                              : 'var(--grey-30)'
-                          }}
-                        />
-                      </div>
-                    )}
-                  />
-                </div>
-                <button
-                  disabled={itemsStatus === 'loading'}
-                  className="button price--buton"
-                  onClick={priceHandler}
-                >
-                  Apply
-                </button>
-              </div>
-            </div>
-            <Select
-              placeholder={'Gender'}
-              styles={multiplefilterColourStyles}
-              onChange={genderHandler}
-              options={genders}
-              className="select"
-              required={true}
-              isDisabled={false}
-              isLoading={false}
-              isSearchable={true}
-              isClearable={false}
-              name={'gender'}
-              instanceId="gender-select"
-              value={filter.gender}
-            />
-            <Select
-              placeholder={'Categories'}
-              styles={multiplefilterColourStyles}
-              onChange={categoryHandler}
-              options={categories}
-              className="select"
-              required={true}
-              isDisabled={!filter.gender}
-              isLoading={categoriesStatus === 'loading'}
-              isSearchable={true}
-              name={'category'}
-              instanceId="category-select"
-              isClearable={true}
-              value={filter.category}
-            />
-            <Select
-              placeholder={'Subcategories'}
-              styles={multiplefilterColourStyles}
-              onChange={subcategoriesHandler}
-              options={subcategories}
-              isMulti
-              className="select"
-              required={true}
-              isDisabled={!filter.category}
-              isLoading={subcategoriesStatus === 'loading'}
-              isSearchable={true}
-              name={'subcategory'}
-              instanceId="category-select"
-              isClearable={true}
-              closeMenuOnSelect={false}
-              hideSelectedOptions={false}
-              value={filter.subcategory}
-              components={{
-                ValueContainer
-              }}
-            />
-            <Select
-              placeholder={'Size'}
-              styles={multiplefilterColourStyles}
-              onChange={(e) => filterHandler(e, 'size' as keyof IFilter)}
+            <CategorySelector />
+            {filter.category && (
+              <CustomSelector
+                onChange={subcategoriesHandler}
+                options={subcategories as IOption[]}
+                value={filter.subcategory as IOption[]}
+                label="Subcategory"
+              />
+            )}
+            <PriceSelector />
+            <CustomSelector
+              onChange={sizeHandler}
               options={sizes}
-              isMulti
-              className="select"
-              required={true}
-              isDisabled={false}
-              isLoading={false}
-              isSearchable={true}
-              name={'size'}
-              instanceId="size-select"
-              isClearable={true}
-              closeMenuOnSelect={false}
-              hideSelectedOptions={false}
-              value={filter.size}
-              components={{
-                ValueContainer
-              }}
+              value={filter.size as IOption[]}
+              label="Size"
             />
-            <Select
-              placeholder={'Condition'}
-              styles={multiplefilterColourStyles}
-              isMulti
+            <CustomSelector
+              onChange={conditionHandler}
               options={conditions}
-              className="select"
-              required={true}
-              isDisabled={false}
-              onChange={(e) => conditionHandler(e)}
-              isLoading={false}
-              isSearchable={true}
-              name={'condition'}
-              isClearable={true}
-              instanceId="condition-select"
-              closeMenuOnSelect={false}
-              hideSelectedOptions={false}
-              value={filter.condition}
-              components={{
-                ValueContainer
-              }}
+              value={filter.condition as IOption[]}
+              label="Condition"
             />
             <BrandSelector
               onChange={brandHandler}
@@ -516,72 +251,17 @@ const Shop = () => {
               inputValue={onInputBrandChange}
               value={filter.brand as IOption[]}
             />
-            <Select
-              placeholder={'Style'}
-              styles={multiplefilterColourStyles}
-              isMulti
-              options={styles}
-              className="select"
-              onChange={(e) => filterHandler(e, 'style' as keyof IFilter)}
-              required={true}
-              isDisabled={false}
-              isLoading={stylesStatus === 'loading'}
-              isSearchable={true}
-              name={'style'}
-              isClearable={true}
-              instanceId="style-select"
-              closeMenuOnSelect={false}
-              hideSelectedOptions={false}
-              value={filter.style}
-              components={{
-                ValueContainer
-              }}
+            <CustomSelector
+              onChange={styleHandler}
+              options={styles as IOption[]}
+              value={filter.style as IOption[]}
+              label="Style"
             />
-            <Select
-              placeholder={'Colour'}
-              styles={multiplefilterColourStyles}
-              isMulti
-              options={colours}
-              className="select"
-              required={true}
-              isDisabled={false}
-              isLoading={coloursStatus === 'loading'}
-              isSearchable={true}
-              name={'colour'}
-              onChange={(e) => filterHandler(e, 'colour' as keyof IFilter)}
-              isClearable={true}
-              instanceId="colour-select"
-              closeMenuOnSelect={false}
-              hideSelectedOptions={false}
-              value={filter.colour}
-              components={{
-                ValueContainer
-              }}
-              formatOptionLabel={(option) => (
-                <div>
-                  {option.hexCode ? (
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: '10px',
-                        alignItems: 'center'
-                      }}
-                    >
-                      <div
-                        style={{
-                          minHeight: '30px',
-                          minWidth: '30px',
-                          borderRadius: '50%',
-                          backgroundColor: `#${option.hexCode}`
-                        }}
-                      ></div>
-                      <span>{option.label}</span>
-                    </div>
-                  ) : (
-                    <span>{option.label}</span>
-                  )}
-                </div>
-              )}
+            <CustomSelector
+              onChange={colorHandler}
+              options={colours as IOption[]}
+              value={filter.colour as IOption[]}
+              label="Color"
             />
           </div>
           <div className="sorting">

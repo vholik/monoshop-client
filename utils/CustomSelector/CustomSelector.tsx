@@ -4,20 +4,20 @@ import ChevronDown from '@public/images/chevron-down.svg'
 import SearchIcon from '@public/images/search.svg'
 import Image from 'next/image'
 import styled from 'styled-components'
-import { IOption } from '../CustomSelector.type'
+import { IOption } from '@utils/CustomSelector.type'
 
 interface CustomSelectorProps<T extends IOption> {
   onChange: (value: T[]) => any
   value?: T[]
-  inputValue?: (value: string) => any
   options: T[]
+  label: string
 }
 
-export const BrandSelector = <T extends IOption>({
+export const CustomSelector = <T extends IOption>({
   onChange,
   value,
-  inputValue,
-  options
+  options,
+  label
 }: CustomSelectorProps<T>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [chosen, setChosen] = useState<T[]>([])
@@ -78,13 +78,6 @@ export const BrandSelector = <T extends IOption>({
     }
   }, [value])
 
-  const inputHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    if (inputValue) {
-      inputValue(value)
-    }
-  }
-
   return (
     <CustomSelectorStyles ref={selectRef}>
       <button
@@ -97,7 +90,7 @@ export const BrandSelector = <T extends IOption>({
         }
       >
         {!!chosen.length && <span>{chosen.length}</span>}
-        Brands
+        {label}
         {isOpen ? (
           <Image
             src={ChevronUp}
@@ -130,16 +123,6 @@ export const BrandSelector = <T extends IOption>({
         }
       >
         <div className="select-container">
-          <div className="custom-input">
-            <Image src={SearchIcon} alt="Search" />
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search"
-              maxLength={50}
-              onChange={inputHandler}
-            />
-          </div>
           <button
             className="clear-btn"
             onClick={clearHandler}
@@ -150,23 +133,23 @@ export const BrandSelector = <T extends IOption>({
         </div>
 
         <div className="select-inner">
-          {chosen
-            .concat(
-              options.filter(
-                (it) => !chosen.find((it2) => it.value === it2.value)
-              )
-            )
-            .map((item: T) => (
-              <div className="option" key={item.value}>
-                <input
-                  checked={isChecked(item)}
-                  type="checkbox"
-                  className="checkbox"
-                  onChange={(e) => changeHandler(e, item)}
-                />
-                {item.label}
-              </div>
-            ))}
+          {options.map((item: T) => (
+            <div className="option" key={item.value}>
+              <input
+                checked={isChecked(item)}
+                type="checkbox"
+                className="checkbox"
+                onChange={(e) => changeHandler(e, item)}
+              />
+              {item.hexCode && (
+                <div
+                  className="color-circle"
+                  style={{ backgroundColor: `#${item.hexCode}` }}
+                ></div>
+              )}
+              {item.label}
+            </div>
+          ))}
         </div>
         <hr className="select-line" />
         <div className="select-container">
@@ -182,6 +165,12 @@ export const BrandSelector = <T extends IOption>({
 const CustomSelectorStyles = styled.div`
   position: relative;
   width: fit-content;
+
+  .color-circle {
+    border-radius: 50%;
+    min-height: 15px;
+    min-width: 15px;
+  }
 
   .custom-input {
     background-color: #f6f6f6;
@@ -211,7 +200,6 @@ const CustomSelectorStyles = styled.div`
     font-family: var(--font-default);
     transition: background var(--transition);
     cursor: pointer;
-    margin-top: 1rem;
 
     &:disabled {
       cursor: not-allowed;
@@ -273,6 +261,7 @@ const CustomSelectorStyles = styled.div`
     opacity: 0;
     transition: opacity var(--transition);
     z-index: 5;
+    min-width: 200px;
 
     .select-inner {
       display: flex;
