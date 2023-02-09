@@ -62,15 +62,19 @@ export const CategorySelector = <T extends IOption>({
   }
 
   useEffect(() => {
-    window.addEventListener('click', closeSelectByWindow, { capture: true })
-
     if (filter.gender) {
       setCurrentGender(filter.gender)
     }
+  }, [filter.gender])
 
+  useEffect(() => {
     if (filter.category?.id) {
       setCurrentCategory(filter.category.id)
     }
+  }, [filter.category])
+
+  useEffect(() => {
+    window.addEventListener('click', closeSelectByWindow, { capture: true })
 
     return () => {
       window.removeEventListener('click', closeSelectByWindow, {
