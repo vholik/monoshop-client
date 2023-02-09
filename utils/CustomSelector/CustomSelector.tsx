@@ -22,6 +22,8 @@ export const CustomSelector = <T extends IOption>({
   const [isOpen, setIsOpen] = useState(false)
   const [chosen, setChosen] = useState<T[]>([])
 
+  const [submitedOptionsLength, setSubmitedOptionsLength] = useState(0)
+
   const selectRef = useRef<HTMLDivElement>(null)
 
   const submitHandler = () => {
@@ -43,7 +45,10 @@ export const CustomSelector = <T extends IOption>({
 
   const clearHandler = () => {
     setChosen([])
-    onChange([])
+
+    if (submitedOptionsLength) {
+      onChange([])
+    }
   }
 
   const isChecked = (option: T) => {
@@ -75,6 +80,8 @@ export const CustomSelector = <T extends IOption>({
   useEffect(() => {
     if (value) {
       setChosen(value)
+
+      setSubmitedOptionsLength(value.length)
     }
   }, [value])
 
@@ -84,12 +91,12 @@ export const CustomSelector = <T extends IOption>({
         className="label-btn"
         onClick={switchHandler}
         style={
-          chosen.length
+          submitedOptionsLength
             ? { backgroundColor: 'var(--dark)', color: 'var(--white)' }
             : {}
         }
       >
-        {!!chosen.length && <span>{chosen.length}</span>}
+        {!!submitedOptionsLength && <span>{submitedOptionsLength}</span>}
         {label}
         {isOpen ? (
           <Image
@@ -99,7 +106,9 @@ export const CustomSelector = <T extends IOption>({
             height={20}
             color={'#fff'}
             style={
-              chosen.length ? { filter: 'invert(1)' } : { filter: 'invert(0)' }
+              submitedOptionsLength
+                ? { filter: 'invert(1)' }
+                : { filter: 'invert(0)' }
             }
           />
         ) : (
@@ -109,7 +118,9 @@ export const CustomSelector = <T extends IOption>({
             width={20}
             height={20}
             style={
-              chosen.length ? { filter: 'invert(1)' } : { filter: 'invert(0)' }
+              submitedOptionsLength
+                ? { filter: 'invert(1)' }
+                : { filter: 'invert(0)' }
             }
           />
         )}
@@ -153,7 +164,11 @@ export const CustomSelector = <T extends IOption>({
         </div>
         <hr className="select-line" />
         <div className="select-container">
-          <button className="submit-btn" onClick={submitHandler}>
+          <button
+            className="submit-btn"
+            onClick={submitHandler}
+            disabled={!chosen.length}
+          >
             Submit
           </button>
         </div>

@@ -5,7 +5,7 @@ import SearchIcon from '@public/images/search.svg'
 import Image from 'next/image'
 import styled from 'styled-components'
 import { IOption } from '@utils/CustomSelector.type'
-import { useAppDispatch } from '@store/hooks/redux'
+import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
 import { filterActions } from '@store/reducers/filter/FilterSlice'
 
 interface CustomSelectorProps<T extends IOption> {
@@ -18,6 +18,10 @@ interface CustomSelectorProps<T extends IOption> {
 export const PriceSelector = () => {
   const dispatch = useAppDispatch()
   const [isOpen, setIsOpen] = useState(false)
+
+  const storedPrice = useAppSelector((store) => store.filterReducer.price)
+
+  const isPriceSumbited = !!storedPrice?.[0] || !!storedPrice?.[1]
 
   const [price, setPrice] = useState<{ [value: string]: number }>({
     min: 0,
@@ -34,7 +38,12 @@ export const PriceSelector = () => {
     setIsOpen((prev) => !prev)
   }
 
-  const clearHandler = () => {}
+  const clearHandler = () => {
+    setPrice({ min: 0, max: 0 })
+    if (isPriceSumbited) {
+      dispatch(filterActions.setPrice([]))
+    }
+  }
 
   const closeSelectByWindow = (e: MouseEvent) => {
     if (!selectRef.current?.contains(e.target as Node)) {
@@ -43,6 +52,14 @@ export const PriceSelector = () => {
   }
 
   useEffect(() => {
+    // Set store values when mounts
+    if (storedPrice?.length) {
+      setPrice({
+        min: storedPrice[0],
+        max: storedPrice[1]
+      })
+    }
+
     window.addEventListener('click', closeSelectByWindow, { capture: true })
 
     return () => {
@@ -57,11 +74,11 @@ export const PriceSelector = () => {
       <button
         className="label-btn"
         onClick={switchHandler}
-        // style={
-        //   chosen.length
-        //     ? { backgroundColor: 'var(--dark)', color: 'var(--white)' }
-        //     : {}
-        // }
+        style={
+          isPriceSumbited
+            ? { backgroundColor: 'var(--dark)', color: 'var(--white)' }
+            : {}
+        }
       >
         Price
         {isOpen ? (
@@ -71,9 +88,11 @@ export const PriceSelector = () => {
             width={20}
             height={20}
             color={'#fff'}
-            // style={
-            //   chosen.length ? { filter: 'invert(1)' } : { filter: 'invert(0)' }
-            // }
+            style={
+              isPriceSumbited
+                ? { filter: 'invert(1)' }
+                : { filter: 'invert(0)' }
+            }
           />
         ) : (
           <Image
@@ -81,9 +100,11 @@ export const PriceSelector = () => {
             alt="Chevron down"
             width={20}
             height={20}
-            // style={
-            //   chosen.length ? { filter: 'invert(1)' } : { filter: 'invert(0)' }
-            // }
+            style={
+              isPriceSumbited
+                ? { filter: 'invert(1)' }
+                : { filter: 'invert(0)' }
+            }
           />
         )}
       </button>
@@ -99,7 +120,7 @@ export const PriceSelector = () => {
           <button
             className="clear-btn"
             onClick={clearHandler}
-            // disabled={!chosen.length}
+            disabled={!price.min && !price.max}
           >
             Reset
           </button>
@@ -111,14 +132,14 @@ export const PriceSelector = () => {
               <input
                 value={price.min || ''}
                 type="num"
-                placeholder="0"
+                placeholder="Min"
                 className="input"
                 min={0}
                 max={10000}
                 onChange={(e) => {
                   if (
-                    Number(e.target.value) < 10000 &&
-                    Number(e.target.value) > 0
+                    Number(e.target.value) <= 10000 &&
+                    Number(e.target.value) >= 0
                   ) {
                     setPrice({ ...price, min: Number(e.target.value) })
                   }
@@ -133,15 +154,15 @@ export const PriceSelector = () => {
               <input
                 onChange={(e) => {
                   if (
-                    Number(e.target.value) < 10000 &&
-                    Number(e.target.value) > 0
+                    Number(e.target.value) <= 10000 &&
+                    Number(e.target.value) >= 0
                   ) {
                     setPrice({ ...price, max: Number(e.target.value) })
                   }
                 }}
                 type="num"
                 value={price.max || ''}
-                placeholder="10000"
+                placeholder="Max"
                 className="input"
                 max={100000}
               />
@@ -150,7 +171,11 @@ export const PriceSelector = () => {
         </div>
         <hr className="select-line" />
         <div className="select-container">
-          <button className="submit-btn" onClick={submitHandler}>
+          <button
+            className="submit-btn"
+            onClick={submitHandler}
+            disabled={!price.min && !price.max}
+          >
             Submit
           </button>
         </div>

@@ -5,6 +5,7 @@ import SearchIcon from '@public/images/search.svg'
 import Image from 'next/image'
 import styled from 'styled-components'
 import { IOption } from '../CustomSelector.type'
+import { useAppSelector } from '@store/hooks/redux'
 
 interface CustomSelectorProps<T extends IOption> {
   onChange: (value: T[]) => any
@@ -23,6 +24,10 @@ export const BrandSelector = <T extends IOption>({
   const [chosen, setChosen] = useState<T[]>([])
 
   const selectRef = useRef<HTMLDivElement>(null)
+
+  const storedBrands = useAppSelector((store) => store.filterReducer.brand)
+
+  const storedBrandsNumber = storedBrands && storedBrands.length
 
   const submitHandler = () => {
     onChange(chosen)
@@ -91,12 +96,12 @@ export const BrandSelector = <T extends IOption>({
         className="label-btn"
         onClick={switchHandler}
         style={
-          chosen.length
+          storedBrandsNumber
             ? { backgroundColor: 'var(--dark)', color: 'var(--white)' }
             : {}
         }
       >
-        {!!chosen.length && <span>{chosen.length}</span>}
+        {!!storedBrandsNumber && <span>{storedBrandsNumber}</span>}
         Brands
         {isOpen ? (
           <Image
@@ -106,7 +111,9 @@ export const BrandSelector = <T extends IOption>({
             height={20}
             color={'#fff'}
             style={
-              chosen.length ? { filter: 'invert(1)' } : { filter: 'invert(0)' }
+              storedBrandsNumber
+                ? { filter: 'invert(1)' }
+                : { filter: 'invert(0)' }
             }
           />
         ) : (
@@ -116,7 +123,9 @@ export const BrandSelector = <T extends IOption>({
             width={20}
             height={20}
             style={
-              chosen.length ? { filter: 'invert(1)' } : { filter: 'invert(0)' }
+              storedBrandsNumber
+                ? { filter: 'invert(1)' }
+                : { filter: 'invert(0)' }
             }
           />
         )}

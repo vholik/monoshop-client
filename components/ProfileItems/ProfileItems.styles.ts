@@ -3,7 +3,7 @@ import styled from 'styled-components'
 export const ProfileItemsStyles = styled.div`
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  grid-gap: 0.5rem;
+  grid-gap: 1rem;
   grid-row-gap: 2vw;
   width: 100%;
 

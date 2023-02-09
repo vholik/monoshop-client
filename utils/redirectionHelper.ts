@@ -7,11 +7,12 @@ import { AppDispatch } from '@store/reducers/store'
 import { ItemEntity, ItemEntityWithId } from '@store/types/item-entity'
 import { getCategories } from '@store/reducers/category/GetCategoriesSlice'
 import { getSubcategories } from '@store/reducers/subcategory/GetSubcategoriesSlice'
+import { IOption } from './CustomSelector.type'
 
 export const redirectGender = (gender: Gender, dispatch: AppDispatch) => {
   const findGender = genders.find((candidate) => candidate.value === gender)
 
-  if (findGender) dispatch(filterActions.setGender(findGender))
+  if (findGender) dispatch(filterActions.setGender(findGender.value))
 
   // Reset categories
   dispatch(filterActions.setCategory(null))
@@ -51,6 +52,7 @@ export const redirectSubcategory = (
   dispatch: AppDispatch
 ) => {
   redirectCategory(category, gender, dispatch)
-
-  dispatch(filterActions.setSubcategory([subcategory]))
+  if (subcategory) {
+    dispatch(filterActions.setSubcategory([subcategory as IOption]))
+  }
 }

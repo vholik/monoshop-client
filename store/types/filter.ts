@@ -6,7 +6,7 @@ import { Item } from './item'
 import { ItemEntity, ItemEntityWithId } from './item-entity'
 
 export interface IFilter {
-  price?: [number, number]
+  price?: [number, number] | []
   gender?: Gender | null
   category?: IOption | null
   subcategory?: IOption[]

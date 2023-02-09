@@ -19,6 +19,7 @@ import Layout from '@components/Layout/Layout'
 import { useEffect } from 'react'
 import { checkIsAuth } from '@store/reducers/auth/AuthSlice'
 import { CustomHead } from '@utils/CustomHead'
+import { IOption } from '@utils/CustomSelector.type'
 
 export const getServerSideProps = wrapper.getStaticProps(
   (store) =>
@@ -58,13 +59,13 @@ export default function Home({ brands, items, styles }: HomeProps) {
 
   const brandRedirect = (brand: ItemEntityWithImage) => {
     dispatch(filterActions.resetFilter())
-    dispatch(filterActions.setBrand([brand]))
+    dispatch(filterActions.setBrand([brand as IOption]))
     Router.push('/shop')
   }
 
   const styleRedirect = (style: ItemEntityWithImage) => {
     dispatch(filterActions.resetFilter())
-    dispatch(filterActions.setStyle([style]))
+    dispatch(filterActions.setStyle([style as IOption]))
     Router.push('/shop')
   }
 
@@ -208,12 +209,7 @@ const HomeStyles = styled.div`
   }
 
   .hero-button {
-    /* background-color: transparent;
-    border: 1px solid var(--white); */
     margin-top: 1rem;
-    /* &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    } */
   }
 
   /* Popular categories */
@@ -326,6 +322,13 @@ const HomeStyles = styled.div`
     .bg {
       background-color: var(--grey-30);
       aspect-ratio: 1 / 1;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .advertisement-section {
+      row-gap: 4rem;
+      grid-template-columns: 1fr;
     }
   }
 `

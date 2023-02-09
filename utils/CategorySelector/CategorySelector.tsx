@@ -171,8 +171,8 @@ export const CategorySelector = <T extends IOption>({
             Clear all
           </button>
         </div>
-        <div className="select-inner">
-          <div className="gender" onClick={() => genderHandler(Gender.MEN)}>
+        <ul className="select-inner">
+          <li className="gender" onClick={() => genderHandler(Gender.MEN)}>
             Menswear
             <Image
               src={currentGender === Gender.MEN ? ChevronUp : ChevronDown}
@@ -180,13 +180,13 @@ export const CategorySelector = <T extends IOption>({
               width={20}
               height={20}
             />
-          </div>
-          <div className="categories-wrapper">
+          </li>
+          <ul className="categories-wrapper">
             {categoriesStatus !== 'loading' &&
               currentGender === Gender.MEN &&
               categories.map((category) => (
                 <Fragment key={category.id}>
-                  <div
+                  <li
                     className="category"
                     onClick={() => categoryHandler(category)}
                   >
@@ -199,11 +199,11 @@ export const CategorySelector = <T extends IOption>({
                         height={15}
                       />
                     )}
-                  </div>
+                  </li>
                 </Fragment>
               ))}
-          </div>
-          <div className="gender" onClick={() => genderHandler(Gender.WOMEN)}>
+          </ul>
+          <li className="gender" onClick={() => genderHandler(Gender.WOMEN)}>
             Womenswear
             <Image
               src={currentGender === Gender.WOMEN ? ChevronUp : ChevronDown}
@@ -211,13 +211,13 @@ export const CategorySelector = <T extends IOption>({
               width={20}
               height={20}
             />
-          </div>
-          <div className="categories-wrapper">
+          </li>
+          <ul className="categories-wrapper">
             {categoriesStatus !== 'loading' &&
               currentGender === Gender.WOMEN &&
               categories.map((category) => (
                 <Fragment key={category.id}>
-                  <div
+                  <li
                     className="category"
                     onClick={() => categoryHandler(category)}
                   >
@@ -230,11 +230,11 @@ export const CategorySelector = <T extends IOption>({
                         height={15}
                       />
                     )}
-                  </div>
+                  </li>
                 </Fragment>
               ))}
-          </div>
-        </div>
+          </ul>
+        </ul>
       </div>
     </CustomSelectorStyles>
   )

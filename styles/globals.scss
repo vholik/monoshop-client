@@ -446,3 +446,21 @@ select {
   margin-right: auto;
   margin-top: 0.5rem;
 }
+
+@media screen and (max-width: 1368px) {
+  .container {
+    max-width: 1000px;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    max-width: 360px;
+  }
+}

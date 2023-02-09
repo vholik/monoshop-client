@@ -281,6 +281,7 @@ const Chat = () => {
                     alt="Item photo"
                     width={50}
                     height={50}
+                    style={{ objectFit: 'cover' }}
                   />
                 </Link>
                 <div className="right">

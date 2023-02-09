@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const FavoritesStyles = styled.div`
   width: 100%;
@@ -6,7 +6,7 @@ export const FavoritesStyles = styled.div`
   .items-inner {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    grid-gap: 0.5vw;
+    grid-gap: 1rem;
 
     .item {
       aspect-ratio: 1/1;
@@ -29,4 +29,4 @@ export const FavoritesStyles = styled.div`
       justify-content: space-between;
     }
   }
-`;
+`

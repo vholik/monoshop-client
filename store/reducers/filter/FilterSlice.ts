@@ -7,7 +7,7 @@ import { IOption } from '@utils/CustomSelector.type'
 import { MultiValue, SingleValue } from 'react-select'
 
 const initialState: IFilter = {
-  price: [0, 10000],
+  price: [],
   gender: null,
   category: null,
   subcategory: [],
@@ -31,7 +31,7 @@ export const FilterSlice = createSlice({
     resetFilter: (state) => {
       Object.assign(state, initialState)
     },
-    setPrice: (state, action: PayloadAction<[number, number]>) => {
+    setPrice: (state, action: PayloadAction<[number, number] | []>) => {
       state.price = action.payload
     },
     setGender: (state, action: PayloadAction<Gender | null>) => {
