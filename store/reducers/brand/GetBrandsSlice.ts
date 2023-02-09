@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import instance, { API_URL, basicInstance } from '@utils/axios'
 import axios, { AxiosError, isAxiosError } from 'axios'
-import { ItemEntityWithId } from '@store/types/item-entity'
+import { ItemEntityWithImage } from '@store/types/item-entity'
 import { RejectError } from '@store/types/error'
 
 interface BrandsState {
   status: 'init' | 'loading' | 'error' | 'success'
-  brands: ItemEntityWithId[]
+  brands: ItemEntityWithImage[]
 }
 
 const initialState: BrandsState = {
@@ -15,14 +15,14 @@ const initialState: BrandsState = {
 }
 
 export const getBrands = createAsyncThunk<
-  ItemEntityWithId[],
+  ItemEntityWithImage[],
   string | undefined,
   {
     rejectValue: RejectError
   }
 >('brand', async (keywords: string | undefined, thunkAPI) => {
   try {
-    const response = await basicInstance.get<ItemEntityWithId[]>('brand', {
+    const response = await basicInstance.get<ItemEntityWithImage[]>('brand', {
       params: {
         search: keywords || ''
       }

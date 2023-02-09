@@ -137,9 +137,7 @@ const Shop = () => {
   }
 
   useEffect(() => {
-    if (items && itemsStatus !== 'loading') {
-      dispatchItems()
-    }
+    dispatchItems()
   }, [debouncedValue])
 
   useEffect(() => {

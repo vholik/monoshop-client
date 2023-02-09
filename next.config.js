@@ -2,9 +2,14 @@
 const nextConfig = {
   reactStrictMode: false,
   swcMinify: true,
-
   images: {
-    domains: ['i.ibb.co', 't4.ftcdn.net', 'lh3.googleusercontent.com']
+    // domains: ['i.ibb.co', 't4.ftcdn.net', 'lh3.googleusercontent.com']
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
   },
   async headers() {
     return [
