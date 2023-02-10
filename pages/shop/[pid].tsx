@@ -458,7 +458,7 @@ const ShopItem = () => {
                   ></p>
                 </div>
               )}
-              {item?.hashtags.length !== 0 && item?.hashtags && (
+              {item?.hashtags?.length !== 0 && item?.hashtags && (
                 <div className="hashtags-wrapper">
                   {item?.hashtags.map((hashtag, key) => (
                     <div className="hashtag" key={key}>
@@ -470,7 +470,7 @@ const ShopItem = () => {
             </div>
           </div>
         )}
-        {item?.userItems.length && (
+        {item?.userItems?.length && (
           <Fragment>
             <div className="user-items-head">
               <h2 className="title-sm">Also from this user</h2>

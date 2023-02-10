@@ -181,13 +181,14 @@ export default function Sell() {
       return
     }
 
+
     const patchedData = {
       ...data,
       images: formImages,
       hashtags: convertStringToHashtags(data.hashtags),
       description: data.description.replace(/\r\n|\r|\n/g, '<br />'),
       cardHolder: card.holder,
-      cardNumber: card.value.trim()
+      cardNumber: card.value.replace(/\s+/g, '')
     }
 
     if (!card.value) {
@@ -200,7 +201,7 @@ export default function Sell() {
         Router.push({
           pathname: '/selling',
           query: {
-            sucess: 'Successfully posted'
+            success: 'Successfully posted'
           }
         })
       })

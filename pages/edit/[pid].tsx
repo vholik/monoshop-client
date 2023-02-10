@@ -706,7 +706,7 @@ export default function Edit({ item, brands, colours, styles }: EditProps) {
               </label>
               <button
                 className="button-xl submit--buton"
-                disabled={itemStatus === 'loading' || itemStatus === 'success'}
+                disabled={itemStatus === 'loading'}
               >
                 Save
               </button>

@@ -1,63 +1,45 @@
-import Categories from '@components/Categories/Categories'
-import Header from '@components/Header/Header'
 import styled from 'styled-components'
 import Select, {
   components,
-  GroupBase,
-  MultiValue,
-  SelectInstance,
   SingleValue,
   ValueContainerProps
 } from 'react-select'
 import {
   conditions,
-  filterColourStyles,
-  genders,
-  multiplefilterColourStyles,
   sizes,
   sortingColourStyles,
   sortingValues
 } from '@utils/ReactSelect/reactSelectUtils'
-import {
-  useActionCreators,
-  useAppDispatch,
-  useAppSelector
-} from '@store/hooks/redux'
+import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
 import { getItems, setFavorite } from '@store/reducers/item/GetItemsSlice'
 import Image from 'next/image'
-import { getTrackBackground, Range } from 'react-range'
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { getBrands } from '@store/reducers/brand/GetBrandsSlice'
-import { getStyles } from '@store/reducers/style/GetStylesSlice'
-import { getColours } from '@store/reducers/colour/GetColoursSlice'
-import { ItemEntity, ItemEntityWithId } from '@store/types/item-entity'
-import { getCategories } from '@store/reducers/category/GetCategoriesSlice'
-import { Gender } from '@store/types/gender.enum'
+import { ItemEntity } from '@store/types/item-entity'
 import { IFilter } from '@store/types/filter'
-import { SortBy } from '@store/types/filter-by.enum'
 import Link from 'next/link'
 import Pagination from 'rc-pagination'
 import 'rc-pagination/assets/index.css'
 import UnfilledWhiteHeart from '@public/images/unfilled-white-heart.svg'
 import FilledHeart from '@public/images/filled-heart.svg'
-import { getSubcategories } from '@store/reducers/subcategory/GetSubcategoriesSlice'
-import SortingIcon from '@public/images/filter.svg'
+import SortingIcon from '@public/images/sort.svg'
+import FilterIcon from '@public/images/filter.svg'
 import { toggleFavorite } from '@store/reducers/favorite/ToggleFavoriteSlice'
-import Footer from '@components/Footer/Footer'
 import useDebounce from '@utils/useDebounce'
-import StateManagedSelect from 'react-select'
-import ReactSelect from 'react-select'
 import { filterActions } from '@store/reducers/filter/FilterSlice'
-import Layout from '@components/Layout/Layout'
 import { CustomHead } from '@utils/CustomHead'
 import { BrandSelector } from '@utils/BrandSelector/BrandSelector'
 import { IOption } from '@utils/CustomSelector.type'
 import { CustomSelector } from '@utils/CustomSelector/CustomSelector'
 import { CategorySelector } from '@utils/CategorySelector/CategorySelector'
 import { PriceSelector } from '@utils/PriceSelector/PriceSelector'
+import { getColours } from '@store/reducers/colour/GetColoursSlice'
+import { getStyles } from '@store/reducers/style/GetStylesSlice'
 
 const Shop = () => {
   const dispatch = useAppDispatch()
+
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
   const filter = useAppSelector((state) => state.filterReducer)
 
@@ -217,9 +199,69 @@ const Shop = () => {
 
   return (
     <ShopStyling>
+      <div
+        className="mobile-filter"
+        style={isMobileFilterOpen ? { display: 'flex' } : { display: 'none' }}
+      >
+        <h1 className="title-md">Filter</h1>
+        <div className="mobile-filter__inner">
+          <CategorySelector />
+          {filter.category && (
+            <CustomSelector
+              onChange={subcategoriesHandler}
+              options={subcategories as IOption[]}
+              value={filter.subcategory as IOption[]}
+              label="Subcategory"
+            />
+          )}
+          <PriceSelector />
+          <CustomSelector
+            onChange={sizeHandler}
+            options={sizes}
+            value={filter.size as IOption[]}
+            label="Size"
+          />
+          <CustomSelector
+            onChange={conditionHandler}
+            options={conditions}
+            value={filter.condition as IOption[]}
+            label="Condition"
+          />
+          <BrandSelector
+            onChange={brandHandler}
+            options={brands as IOption[]}
+            inputValue={onInputBrandChange}
+            value={filter.brand as IOption[]}
+          />
+          <CustomSelector
+            onChange={styleHandler}
+            options={styles as IOption[]}
+            value={filter.style as IOption[]}
+            label="Style"
+          />
+          <CustomSelector
+            onChange={colorHandler}
+            options={colours as IOption[]}
+            value={filter.colour as IOption[]}
+            label="Color"
+          />
+        </div>
+        <button
+          className="close-btn button-xl"
+          onClick={() => setIsMobileFilterOpen(false)}
+        >
+          Close
+        </button>
+      </div>
       <CustomHead title="Shop page" />
       <div className="wrapper">
         <div className="filter">
+          <button
+            className="filter-modal-btn"
+            onClick={() => setIsMobileFilterOpen(true)}
+          >
+            Filter <Image src={FilterIcon} alt="Filter" />
+          </button>
           <div className="filter-inner">
             <CategorySelector />
             {filter.category && (
@@ -340,7 +382,6 @@ const Shop = () => {
         )}
         <Pagination
           disabled={itemsStatus === 'loading'}
-          simple
           current={filter.page || 1}
           onChange={(page) => nextPage(page)}
           defaultCurrent={filter.page}
@@ -394,7 +435,23 @@ const ShopStyling = styled.div`
   .rc-pagination-next button,
   .rc-pagination-prev button {
     &:hover {
-      color: var(--dark) !important;
+      color: var(--primary) !important;
+    }
+  }
+
+  .rc-pagination-item {
+    &:hover {
+      border-color: var(--primary-hover);
+      a {
+        color: var(--primary-hover);
+      }
+    }
+  }
+
+  .rc-pagination-item-active {
+    border-color: var(--primary);
+    a {
+      color: var(--primary);
     }
   }
 
@@ -420,6 +477,17 @@ const ShopStyling = styled.div`
     margin-top: 1rem;
     display: flex;
     justify-content: space-between;
+
+    .filter-modal-btn {
+      border: none;
+      outline: none;
+      display: flex;
+      background-color: transparent;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      display: none;
+    }
   }
 
   .filter-inner {
@@ -483,7 +551,7 @@ const ShopStyling = styled.div`
     grid-template-columns: repeat(4, 1fr);
     grid-column-gap: 1vw;
     grid-row-gap: 2vw;
-    margin-top: 1rem;
+    margin-top: 2rem;
 
     .item {
       position: relative;
@@ -525,6 +593,74 @@ const ShopStyling = styled.div`
         margin-top: 1rem;
         font-weight: 600;
       }
+    }
+  }
+
+  .mobile-filter {
+    z-index: 10;
+    position: fixed;
+    padding: 5%;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    top: 0;
+    flex-direction: column;
+    background-color: var(--white);
+
+    .close-btn {
+      margin-top: auto;
+    }
+
+    div {
+      width: 100% !important;
+    }
+
+    .label-btn {
+      min-width: 100% !important;
+      justify-content: space-between;
+    }
+
+    &__inner {
+      margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-direction: column;
+    }
+  }
+
+  @media screen and (max-width: 1200px) {
+    .filter {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--stroke);
+      border-bottom: 1px solid var(--stroke);
+      margin-top: 0;
+
+      .filter-inner {
+        display: none;
+      }
+
+      .sorting {
+        padding-left: 1rem;
+        border-left: 1px solid var(--stroke);
+      }
+
+      .filter-modal-btn {
+        display: flex;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    .items-wrapper {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .items-wrapper {
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 1rem;
     }
   }
 `

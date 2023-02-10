@@ -43,7 +43,7 @@ const Categories: FC = () => {
       .catch((err) => console.log(err))
   }, [])
 
-  const categoryHandler = (category: ItemEntity, gender: Gender) => {
+  const categoryHandler = (category: ItemEntityWithId, gender: Gender) => {
     redirectCategory(category, gender, dispatch)
   }
 
@@ -106,9 +106,6 @@ const Categories: FC = () => {
         <Link href={'/brands'}>
           <h2 className="category-name">Brands</h2>
         </Link>
-      </div>
-      <div className="category">
-        <h2 className="category-name">Jewellery</h2>
       </div>
     </CategoriesStyles>
   )

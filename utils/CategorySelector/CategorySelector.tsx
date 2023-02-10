@@ -53,6 +53,7 @@ export const CategorySelector = <T extends IOption>({
     dispatch(filterActions.setGender(null))
     dispatch(filterActions.setCategory(null))
     dispatch(filterActions.setSubcategory([]))
+    dispatch(filterActions.changePage(1))
   }
 
   const closeSelectByWindow = (e: MouseEvent) => {
@@ -62,12 +63,16 @@ export const CategorySelector = <T extends IOption>({
   }
 
   useEffect(() => {
+    dispatch(filterActions.changePage(1))
+
     if (filter.gender) {
       setCurrentGender(filter.gender)
     }
   }, [filter.gender])
 
   useEffect(() => {
+    dispatch(filterActions.changePage(1))
+
     if (filter.category?.id) {
       setCurrentCategory(filter.category.id)
     }
@@ -160,11 +165,7 @@ export const CategorySelector = <T extends IOption>({
       </button>
       <div
         className="select"
-        style={
-          isOpen
-            ? { opacity: 1, pointerEvents: 'all' }
-            : { opacity: 0, pointerEvents: 'none' }
-        }
+        style={isOpen ? { display: 'block' } : { display: 'none' }}
       >
         <div className="select-container">
           <button
@@ -350,8 +351,6 @@ const CustomSelectorStyles = styled.div`
     min-width: 250px;
     top: 3rem;
     left: 0;
-    pointer-events: none;
-    opacity: 0;
     transition: opacity var(--transition);
     z-index: 5;
     padding-bottom: 1rem;

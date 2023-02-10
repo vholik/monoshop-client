@@ -26,7 +26,7 @@ const AddCardModal = ({ addCard, isOpen, setIsOpen }: AddCardModalProps) => {
   })
 
   const onSubmit: SubmitHandler<CardForm> = (data) => {
-    addCard(data)
+    addCard({...data})
     setIsOpen(false)
   }
 

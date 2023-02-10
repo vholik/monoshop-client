@@ -5,7 +5,8 @@ import SearchIcon from '@public/images/search.svg'
 import Image from 'next/image'
 import styled from 'styled-components'
 import { IOption } from '../CustomSelector.type'
-import { useAppSelector } from '@store/hooks/redux'
+import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
+import { filterActions } from '@store/reducers/filter/FilterSlice'
 
 interface CustomSelectorProps<T extends IOption> {
   onChange: (value: T[]) => any
@@ -20,6 +21,8 @@ export const BrandSelector = <T extends IOption>({
   inputValue,
   options
 }: CustomSelectorProps<T>) => {
+  const dispatch = useAppDispatch()
+
   const [isOpen, setIsOpen] = useState(false)
   const [chosen, setChosen] = useState<T[]>([])
 
@@ -31,6 +34,7 @@ export const BrandSelector = <T extends IOption>({
 
   const submitHandler = () => {
     onChange(chosen)
+    dispatch(filterActions.changePage(1))
   }
 
   const switchHandler = () => {
@@ -49,6 +53,7 @@ export const BrandSelector = <T extends IOption>({
   const clearHandler = () => {
     setChosen([])
     onChange([])
+    dispatch(filterActions.changePage(1))
   }
 
   const isChecked = (option: T) => {
@@ -132,11 +137,7 @@ export const BrandSelector = <T extends IOption>({
       </button>
       <div
         className="select"
-        style={
-          isOpen
-            ? { opacity: 1, pointerEvents: 'all' }
-            : { opacity: 0, pointerEvents: 'none' }
-        }
+        style={isOpen ? { display: 'block' } : { display: 'none' }}
       >
         <div className="select-container">
           <div className="custom-input">
@@ -278,8 +279,6 @@ const CustomSelectorStyles = styled.div`
     position: absolute;
     top: 3rem;
     left: 0;
-    pointer-events: none;
-    opacity: 0;
     transition: opacity var(--transition);
     z-index: 5;
 

@@ -151,6 +151,9 @@ export default function Header() {
                 </div>
               </div>
               <ul className="link-list">
+                <Link href="/sell">
+                  <li>Sell</li>
+                </Link>
                 <Link href="/settings">
                   <li>Settings</li>
                 </Link>

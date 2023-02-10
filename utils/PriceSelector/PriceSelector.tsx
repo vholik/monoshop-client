@@ -31,7 +31,12 @@ export const PriceSelector = () => {
   const selectRef = useRef<HTMLDivElement>(null)
 
   const submitHandler = () => {
-    dispatch(filterActions.setPrice([price.min || 0, price.max || 10000]))
+    dispatch(filterActions.changePage(1))
+    if (!price.min && !price.max) {
+      dispatch(filterActions.setPrice([]))
+    } else {
+      dispatch(filterActions.setPrice([price.min || 0, price.max || 10000]))
+    }
   }
 
   const switchHandler = () => {
@@ -41,6 +46,7 @@ export const PriceSelector = () => {
   const clearHandler = () => {
     setPrice({ min: 0, max: 0 })
     if (isPriceSumbited) {
+      dispatch(filterActions.changePage(1))
       dispatch(filterActions.setPrice([]))
     }
   }
@@ -110,17 +116,13 @@ export const PriceSelector = () => {
       </button>
       <div
         className="select"
-        style={
-          isOpen
-            ? { opacity: 1, pointerEvents: 'all' }
-            : { opacity: 0, pointerEvents: 'none' }
-        }
+        style={isOpen ? { display: 'block' } : { display: 'none' }}
       >
         <div className="select-container">
           <button
             className="clear-btn"
             onClick={clearHandler}
-            disabled={!price.min && !price.max}
+            disabled={!storedPrice?.length}
           >
             Reset
           </button>
@@ -171,11 +173,7 @@ export const PriceSelector = () => {
         </div>
         <hr className="select-line" />
         <div className="select-container">
-          <button
-            className="submit-btn"
-            onClick={submitHandler}
-            disabled={!price.min && !price.max}
-          >
+          <button className="submit-btn" onClick={submitHandler}>
             Submit
           </button>
         </div>
@@ -280,8 +278,6 @@ const CustomSelectorStyles = styled.div`
     position: absolute;
     top: 3rem;
     left: 0;
-    pointer-events: none;
-    opacity: 0;
     transition: opacity var(--transition);
     z-index: 5;
     width: max-content;

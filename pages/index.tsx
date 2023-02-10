@@ -326,9 +326,44 @@ const HomeStyles = styled.div`
   }
 
   @media screen and (max-width: 768px) {
+    .hero {
+      padding: 3rem 1.5rem;
+
+      .hero-title {
+        font-size: 2rem;
+      }
+    }
+
     .advertisement-section {
       row-gap: 4rem;
       grid-template-columns: 1fr;
+    }
+
+    .popular-categories .wrapper {
+      grid-template-columns: repeat(3, 1fr);
+      row-gap: 1rem;
+      column-gap: 1rem;
+    }
+
+    .popular-brands .wrapper {
+      grid-template-columns: repeat(3, 1fr);
+      row-gap: 1rem;
+      column-gap: 1rem;
+    }
+
+    .hot .wrapper {
+      grid-template-columns: repeat(2, 1fr);
+      row-gap: 1rem;
+      column-gap: 1rem;
+    }
+
+    .advertisement-section {
+      row-gap: 2rem;
+      .bg {
+        &:nth-child(2) {
+          display: none;
+        }
+      }
     }
   }
 `

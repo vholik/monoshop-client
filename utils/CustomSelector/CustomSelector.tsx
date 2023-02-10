@@ -5,6 +5,8 @@ import SearchIcon from '@public/images/search.svg'
 import Image from 'next/image'
 import styled from 'styled-components'
 import { IOption } from '@utils/CustomSelector.type'
+import { useAppDispatch } from '@store/hooks/redux'
+import { filterActions } from '@store/reducers/filter/FilterSlice'
 
 interface CustomSelectorProps<T extends IOption> {
   onChange: (value: T[]) => any
@@ -19,6 +21,8 @@ export const CustomSelector = <T extends IOption>({
   options,
   label
 }: CustomSelectorProps<T>) => {
+  const dispatch = useAppDispatch()
+
   const [isOpen, setIsOpen] = useState(false)
   const [chosen, setChosen] = useState<T[]>([])
 
@@ -28,6 +32,7 @@ export const CustomSelector = <T extends IOption>({
 
   const submitHandler = () => {
     onChange(chosen)
+    dispatch(filterActions.changePage(1))
   }
 
   const switchHandler = () => {
@@ -48,6 +53,7 @@ export const CustomSelector = <T extends IOption>({
 
     if (submitedOptionsLength) {
       onChange([])
+      dispatch(filterActions.changePage(1))
     }
   }
 
@@ -128,9 +134,11 @@ export const CustomSelector = <T extends IOption>({
       <div
         className="select"
         style={
-          isOpen
-            ? { opacity: 1, pointerEvents: 'all' }
-            : { opacity: 0, pointerEvents: 'none' }
+          // Old implementation breaks the rules of accesibility
+          // isOpen
+          //   ? { opacity: 1, pointerEvents: 'all', display: 'block' }
+          //   : { opacity: 0, pointerEvents: 'none', display: 'none' }
+          isOpen ? { display: 'block' } : { display: 'none' }
         }
       >
         <div className="select-container">
@@ -185,6 +193,8 @@ const CustomSelectorStyles = styled.div`
     border-radius: 50%;
     min-height: 15px;
     min-width: 15px;
+    max-height: 15px;
+    max-width: 15px;
   }
 
   .custom-input {
@@ -272,8 +282,6 @@ const CustomSelectorStyles = styled.div`
     position: absolute;
     top: 3rem;
     left: 0;
-    pointer-events: none;
-    opacity: 0;
     transition: opacity var(--transition);
     z-index: 5;
     min-width: 200px;

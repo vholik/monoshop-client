@@ -457,10 +457,18 @@ select {
   .container {
     max-width: 768px;
   }
+
+  :root {
+    font-size: 14px;
+  }
 }
 
 @media screen and (max-width: 768px) {
   .container {
     max-width: 360px;
+  }
+
+  :root {
+    --component-margin: 3rem;
   }
 }

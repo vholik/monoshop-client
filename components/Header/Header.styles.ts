@@ -153,4 +153,20 @@ export const HeaderStyles = styled.div`
       background-color: var(--grey-10);
     }
   }
+
+  @media screen and (max-width: 1024px) {
+    .input-wrapper {
+      max-width: 200px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .input-wrapper {
+      display: none;
+    }
+
+    .right .button {
+      display: none;
+    }
+  }
 `
