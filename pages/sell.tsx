@@ -181,7 +181,6 @@ export default function Sell() {
       return
     }
 
-
     const patchedData = {
       ...data,
       images: formImages,
@@ -624,7 +623,7 @@ export default function Sell() {
                           styles={colourStyles}
                           placeholder=""
                           value={brands.filter(
-                            (brand) => value && value.includes(brand.id)
+                            (brand) => value && value.includes(brand.id!)
                           )}
                           onChange={(val) => onChange(val.map((c) => c.id))}
                         />
