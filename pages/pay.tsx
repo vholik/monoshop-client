@@ -1,10 +1,7 @@
-import Header from '@components/Header/Header'
 import styled from 'styled-components'
 import Image from 'next/image'
 import Security from '@public/images/security.svg'
-import Footer from '@components/Footer/Footer'
 import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
-import Router from 'next/router'
 import Link from 'next/link'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { PayFormData } from '@store/types/pay'
@@ -12,18 +9,8 @@ import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { CountryDropdown } from 'react-country-region-selector'
 import { loadStripe } from '@stripe/stripe-js'
-import {
-  Elements,
-  CardElement,
-  useStripe,
-  useElements,
-  PaymentElement
-} from '@stripe/react-stripe-js'
-import { useEffect } from 'react'
-
 import { getStripeSession } from '@store/reducers/payments/PaySlice'
 import { showErrorToast } from '@utils/ReactTostify/tostifyHandlers'
-import Layout from '@components/Layout/Layout'
 import ErrorPage from './404'
 import { CustomHead } from '@utils/CustomHead'
 

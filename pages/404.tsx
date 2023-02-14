@@ -3,8 +3,6 @@ import ErrorIllustration from '@public/images/404.png'
 import ArrowLeft from '@public/images/arrow-left.svg'
 import Image from 'next/image'
 import Link from 'next/link'
-import Header from '@components/Header/Header'
-import Router from 'next/router'
 import { CustomHead } from '@utils/CustomHead'
 
 export default function ErrorPage() {

@@ -2,7 +2,6 @@ import { IOrder } from '@store/types/order'
 import { OrderBar } from '@components/OrderBar/OrderBar'
 import Order from '@components/Order/Order'
 import { OrderListStyles } from './OrderList.styles'
-import { useRouter } from 'next/router'
 import { isRouteSold } from './route.helper'
 
 interface OrderListProps {

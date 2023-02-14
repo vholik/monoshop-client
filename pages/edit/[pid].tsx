@@ -7,7 +7,6 @@ import { getBrands } from '@store/reducers/brand/GetBrandsSlice'
 import { getStyles } from '@store/reducers/style/GetStylesSlice'
 import { getColours } from '@store/reducers/colour/GetColoursSlice'
 import { Gender } from '@store/types/gender.enum'
-
 import {
   colourStyles,
   conditions,
@@ -29,13 +28,11 @@ import {
   convertHashtagsToString,
   convertStringToHashtags
 } from '@utils/hashtagsConverter'
-import { addItem } from '@store/reducers/item/AddItemSlice'
 import Router from 'next/router'
 import { SellStyles } from 'styles/shared/SellStyles'
 import { wrapper } from '@store/reducers/store'
 import { getItemById } from '@store/reducers/item/GetItemByIdSlice'
 import { Item } from '@store/types/item'
-import { isAxiosError } from 'axios'
 import ErrorPage from 'pages/404'
 import { editItem } from '@store/reducers/item/EditItemSlice'
 import { checkIsAuth } from '@store/reducers/auth/AuthSlice'

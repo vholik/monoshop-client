@@ -3,7 +3,7 @@ import Modal from 'react-modal'
 import { modalStyles } from '@utils/customModal.styles'
 import { Rating } from 'react-simple-star-rating'
 import { Dispatch, SetStateAction, useState } from 'react'
-import { Controller, SubmitHandler, useForm } from 'react-hook-form'
+import {  SubmitHandler, useForm } from 'react-hook-form'
 import { IReviewForm } from '@store/types/review'
 import {
   showErrorToast,

@@ -1,17 +1,9 @@
-import Categories from '@components/Categories/Categories'
-import Header from '@components/Header/Header'
 import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
 import { getFavorites } from '@store/reducers/favorite/GetFavoriteSlice'
-import Link from 'next/link'
 import { useEffect } from 'react'
-import styled from 'styled-components'
-import Image from 'next/image'
-import Loading from '@components/Loading/Loading'
-import Footer from '@components/Footer/Footer'
 import { showErrorToast } from '@utils/ReactTostify/tostifyHandlers'
 import Profile from '@components/Profile/Profile'
 import Favorites from '@components/Favorites/Favorites'
-import Layout from '@components/Layout/Layout'
 import { CustomHead } from '@utils/CustomHead'
 
 const FavoritesPage = () => {

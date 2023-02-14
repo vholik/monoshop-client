@@ -17,16 +17,13 @@ const AddCardModal = ({ addCard, isOpen, setIsOpen }: AddCardModalProps) => {
   const {
     register,
     handleSubmit,
-    control,
-    setValue,
-    resetField,
     formState: { errors: formErrors }
   } = useForm<CardForm>({
     mode: 'onChange'
   })
 
   const onSubmit: SubmitHandler<CardForm> = (data) => {
-    addCard({...data})
+    addCard({ ...data })
     setIsOpen(false)
   }
 

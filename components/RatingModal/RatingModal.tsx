@@ -1,13 +1,6 @@
 import Modal from 'react-modal'
 import { modalStyles } from '@utils/customModal.styles'
-import {
-  Dispatch,
-  SetStateAction,
-  UIEvent,
-  useEffect,
-  useRef,
-  useState
-} from 'react'
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
 import { getReviews } from '@store/reducers/review/GetReviewsSlice'
 import Image from 'next/image'

@@ -1,12 +1,9 @@
-import Header from '@components/Header/Header'
 import { IRegisterFormData } from '@store/types/auth'
-import Head from 'next/head'
 import Link from 'next/link'
 import styled from 'styled-components'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
 import { registerUser } from '@store/reducers/auth/RegisterSlice'
-import Router from 'next/router'
 import { CustomHead } from '@utils/CustomHead'
 
 export default function Login() {

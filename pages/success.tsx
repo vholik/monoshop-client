@@ -3,9 +3,7 @@ import SuccessIllustration from '@public/images/success.png'
 import ArrowLeft from '@public/images/arrow-left.svg'
 import Image from 'next/image'
 import Link from 'next/link'
-import Header from '@components/Header/Header'
-import Router, { useRouter } from 'next/router'
-import Layout from '@components/Layout/Layout'
+import { useRouter } from 'next/router'
 import { CustomHead } from '@utils/CustomHead'
 
 export default function Success() {

@@ -1,11 +1,8 @@
-import Footer from '@components/Footer/Footer'
-import Header from '@components/Header/Header'
 import styled from 'styled-components'
 import io, { Socket } from 'socket.io-client'
 import {
   ChangeEvent,
   Fragment,
-  useCallback,
   useEffect,
   useRef,
   useState

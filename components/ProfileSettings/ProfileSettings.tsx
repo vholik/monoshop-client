@@ -21,8 +21,6 @@ const ProfileSettings = ({ user }: IProfileSetting) => {
   const {
     register,
     handleSubmit,
-    control,
-    setValue,
     formState: { errors }
   } = useForm<IProfileFormData>({
     mode: 'onChange'

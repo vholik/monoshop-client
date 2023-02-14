@@ -1,17 +1,8 @@
-import Categories from '@components/Categories/Categories'
-import Header from '@components/Header/Header'
 import { useEffect } from 'react'
-import styled from 'styled-components'
 import ProfileSettings from '@components/ProfileSettings/ProfileSettings'
 import { getProfile } from '@store/reducers/user/ProfileSlice'
 import { useAppDispatch, useAppSelector } from '@store/hooks/redux'
-import Loading from '@components/Loading/Loading'
-import Link from 'next/link'
-import Footer from '@components/Footer/Footer'
 import Profile from '@components/Profile/Profile'
-import ProfileItems from '@components/ProfileItems/ProfileItems'
-import { showErrorToast } from '@utils/ReactTostify/tostifyHandlers'
-import Layout from '@components/Layout/Layout'
 import { CustomHead } from '@utils/CustomHead'
 
 const MyProfile = () => {
