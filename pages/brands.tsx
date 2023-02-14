@@ -21,9 +21,13 @@ const Brands = () => {
   const status = useAppSelector((state) => state.getBrandsReducer.status)
 
   useEffect(() => {
-    dispatch(getBrands(value))
-      .unwrap()
-      .catch((err) => console.log(err))
+    const fetchBrands = () => {
+      dispatch(getBrands(value))
+        .unwrap()
+        .catch((err) => console.log(err))
+    }
+
+    fetchBrands()
   }, [debounce])
 
   const inputChange = (e: ChangeEvent<HTMLInputElement>) => {

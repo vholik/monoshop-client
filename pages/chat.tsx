@@ -3,6 +3,7 @@ import io, { Socket } from 'socket.io-client'
 import {
   ChangeEvent,
   Fragment,
+  useCallback,
   useEffect,
   useRef,
   useState
@@ -14,7 +15,7 @@ import Router from 'next/router'
 import { User } from '@store/types/user'
 import { useAppSelector } from '@store/hooks/redux'
 import Image from 'next/image'
-import moment from 'moment'
+import moment, { fn } from 'moment'
 import Flash from '@public/images/flash.svg'
 import Link from 'next/link'
 import { Item } from '@store/types/item'
@@ -79,6 +80,8 @@ const Chat = () => {
       socket?.emit('joinRoom', { user: room.users.id })
     }
   }
+
+  const cachedHandleKeyPress = useCallback(handleUserKeyPress, [])
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token')
@@ -156,11 +159,12 @@ const Chat = () => {
   }, [router.isReady])
 
   useEffect(() => {
-    window.addEventListener('keydown', handleUserKeyPress)
+    window.addEventListener('keydown', cachedHandleKeyPress)
+
     return () => {
-      window.removeEventListener('keydown', handleUserKeyPress)
+      window.removeEventListener('keydown', cachedHandleKeyPress)
     }
-  }, [handleUserKeyPress])
+  }, [])
 
   function getTimeStamps() {
     const arr: Timestamp[] = []
