@@ -81,7 +81,6 @@ const Chat = () => {
     }
   }
 
-  const cachedHandleKeyPress = useCallback(handleUserKeyPress, [])
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token')
@@ -159,12 +158,12 @@ const Chat = () => {
   }, [router.isReady])
 
   useEffect(() => {
-    window.addEventListener('keydown', cachedHandleKeyPress)
+    window.addEventListener('keydown', handleUserKeyPress)
 
     return () => {
-      window.removeEventListener('keydown', cachedHandleKeyPress)
+      window.removeEventListener('keydown', handleUserKeyPress)
     }
-  }, [])
+  }, [handleUserKeyPress])
 
   function getTimeStamps() {
     const arr: Timestamp[] = []
