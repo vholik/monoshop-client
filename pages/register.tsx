@@ -35,7 +35,9 @@ export default function Login() {
           <p className="success-subtitle">
             To confirm your email we have sent you a confirmation link.
           </p>
-          <button className="button-xl sucess-btn">Okay</button>
+          <Link href="/">
+            <button className="button-xl sucess-btn">Okay</button>
+          </Link>
         </div>
       ) : (
         <div className="wrapper">
