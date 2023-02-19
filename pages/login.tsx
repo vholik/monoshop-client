@@ -258,14 +258,15 @@ const LoginStyles = styled.div`
 
       .button-xl {
         margin-top: 2rem;
-        margin-bottom: 1rem;
+        margin-bottom: 2rem;
       }
     }
 
     .account-action {
       font-family: 400;
       color: var(--grey-60);
-      margin-top: 0.5rem;
+      margin-top: 2rem;
+
       .link {
         color: var(--dark);
         text-decoration: underline;

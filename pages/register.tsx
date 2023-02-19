@@ -170,7 +170,7 @@ const LoginStyles = styled.div`
       }
 
       .button-xl {
-        margin-top: 1rem;
+        margin-top: 2rem;
       }
     }
 
@@ -180,6 +180,8 @@ const LoginStyles = styled.div`
 
     .account-action {
       color: var(--grey-60);
+      margin-top: 1rem;
+
       .link {
         color: var(--dark);
         text-decoration: underline;
