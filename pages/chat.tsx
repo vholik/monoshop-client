@@ -87,7 +87,7 @@ const Chat = () => {
     const accessToken = localStorage.getItem('access_token')
 
     if (accessToken) {
-      const socket = io('http://localhost:8000', {
+      const socket = io(process.env.NEXT_PUBLIC_API_URL!, {
         auth: {
           token: accessToken
         }
