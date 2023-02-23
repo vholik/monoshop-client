@@ -67,6 +67,8 @@ export const CategorySelector = <T extends IOption>({
 
     if (filter.gender) {
       setCurrentGender(filter.gender)
+    } else {
+      setCurrentGender(null)
     }
   }, [filter.gender])
 
@@ -75,6 +77,8 @@ export const CategorySelector = <T extends IOption>({
 
     if (filter.category?.id) {
       setCurrentCategory(filter.category.id)
+    } else {
+        setCurrentCategory(null)
     }
   }, [filter.category])
 
