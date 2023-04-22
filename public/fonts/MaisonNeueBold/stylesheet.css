@@ -8,6 +8,4 @@
       format('woff'),
     /* chrome、firefox */ url('4a373e70cd01dec089c1dd1185ceba51.ttf')
       format('truetype'),
-    /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
-      url('4a373e70cd01dec089c1dd1185ceba51.svg#Maison Neue Bold') format('svg'); /* iOS 4.1- */
 }
