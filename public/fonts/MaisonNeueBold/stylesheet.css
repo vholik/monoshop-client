@@ -1,11 +1,11 @@
 @font-face {
-  font-family: 'Maison Neue Bold';
-  src: url('4a373e70cd01dec089c1dd1185ceba51.eot'); /* IE9*/
-  src: url('4a373e70cd01dec089c1dd1185ceba51.eot?#iefix')
+  font-family: 'Maison Neue Extended Extra Bold';
+  src: url('a6a787f8616df7d0847ed764ff81d724.eot'); /* IE9*/
+  src: url('a6a787f8616df7d0847ed764ff81d724.eot?#iefix')
       format('embedded-opentype'),
-    /* IE6-IE8 */ url('4a373e70cd01dec089c1dd1185ceba51.woff2') format('woff2'),
-    /* chrome、firefox */ url('4a373e70cd01dec089c1dd1185ceba51.woff')
+    /* IE6-IE8 */ url('a6a787f8616df7d0847ed764ff81d724.woff2') format('woff2'),
+    /* chrome、firefox */ url('a6a787f8616df7d0847ed764ff81d724.woff')
       format('woff'),
-    /* chrome、firefox */ url('4a373e70cd01dec089c1dd1185ceba51.ttf')
-      format('truetype'),
+    /* chrome、firefox */ url('a6a787f8616df7d0847ed764ff81d724.ttf')
+      format('truetype');
 }

@@ -1,6 +1,5 @@
 @import url('../public/fonts/HelveticaNeueCyr/stylesheet.css');
 @import url('../public/fonts/MaisonNeueBold/stylesheet.css');
-@import url(//db.onlinewebfonts.com/c/a6a787f8616df7d0847ed764ff81d724?family=Maison+Neue+Extended+Extra+Bold);
 
 html,
 body {
@@ -21,7 +20,7 @@ li {
 
 :root {
   --font-default: 'HelveticaNeueCyr', sans-serif;
-  --font-wide: 'Maison Neue Bold', 'HelveticaNeueCyr', sans-serif;
+  --font-wide: 'Maison Neue Extended Extra Bold', 'HelveticaNeueCyr', sans-serif;
   --dark: #0e0e0f;
   --dark-hover: #2c2c2c;
   --field-highlight: #625bf6;
